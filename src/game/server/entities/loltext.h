@@ -3,6 +3,9 @@
 
 #include <game/server/entity.h>
 
+#define MAX_LOLTEXTS 16
+#define MAX_PLASMA_PER_LOLTEXT 128
+
 //usage: GameServer()->CreateLoltext(...)
 //it will dispose itself after lifespan ended
 
@@ -30,10 +33,13 @@ class CLoltext
 {
 private:
 	static bool s_aaaChars[256][5][3];
+	static CPlasma *s_aapPlasma[MAX_LOLTEXTS][MAX_PLASMA_PER_LOLTEXT];
+	static int s_aExpire[MAX_LOLTEXTS];
 	static bool HasRepr(char c);
 public:
 	static vec2 TextSize(const char *pText);
-	static void Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow);
+	static int Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow);
+	static void Destroy(CGameWorld *pGameWorld, int TextID);
 };
 
 #endif

@@ -3,6 +3,9 @@
 #include <game/server/gamecontext.h>
 #include "loltext.h"
 
+CPlasma *CLoltext::s_aapPlasma[MAX_LOLTEXTS][MAX_PLASMA_PER_LOLTEXT];
+int CLoltext::s_aExpire[MAX_LOLTEXTS];
+
 CPlasma::CPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
@@ -66,7 +69,7 @@ vec2 CLoltext::TextSize(const char *pText)
 	return vec2(Count*g_Config.m_SvLoltextHspace*4.0f, g_Config.m_SvLoltextVspace*5.0f);
 }
 
-void CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow)
+int CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow)
 {
 	char c;
 	vec2 CurPos = Pos;
@@ -79,6 +82,22 @@ void CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 V
 		pParent = 0;
 	}
 
+	int TextID = 0;
+	for(; TextID < MAX_LOLTEXTS; ++TextID)
+		if (s_aExpire[TextID] < pGameWorld->Server()->Tick())
+		{
+			s_aExpire[TextID] = pGameWorld->Server()->Tick() + Lifespan;
+			break;
+		}
+
+	if (TextID == MAX_LOLTEXTS)
+		return -1;
+
+	int NumPlasmas = 0;
+
+	for(int i = 0; i < MAX_PLASMA_PER_LOLTEXT; i++)
+		s_aapPlasma[TextID][i] = 0;
+
 	while((c = *pText++))
 	{
 		if (c >= 'a' && c <= 'z')
@@ -88,10 +107,27 @@ void CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 V
 
 		for(int y = 0; y < 5/*XXX*/; ++y)
 			for(int x = 0; x < 3/*XXX*/; ++x)
-				if (s_aaaChars[(unsigned)c][y][x])
-					new CPlasma(pGameWorld, pParent, CurPos + vec2(x*g_Config.m_SvLoltextHspace, y*g_Config.m_SvLoltextVspace), Vel, Lifespan);
+				if (s_aaaChars[(unsigned)c][y][x] && NumPlasmas < MAX_PLASMA_PER_LOLTEXT)
+					s_aapPlasma[TextID][NumPlasmas++] =
+						        new CPlasma(pGameWorld, pParent, CurPos + vec2(x*g_Config.m_SvLoltextHspace, y*g_Config.m_SvLoltextVspace), Vel, Lifespan);
 		CurPos.x += 4*g_Config.m_SvLoltextHspace;
 	}
+	return TextID;
+}
+
+void CLoltext::Destroy(CGameWorld *pGameWorld, int TextID)
+{
+	if (TextID < 0 || TextID > MAX_LOLTEXTS)
+		return;
+
+	if (s_aExpire[TextID] < pGameWorld->Server()->Tick())
+		return;
+	
+	for(int i = 0; i < MAX_PLASMA_PER_LOLTEXT; i++)
+		if (s_aapPlasma[TextID][i])
+			s_aapPlasma[TextID][i]->Reset();
+
+	s_aExpire[TextID] = 0;
 }
 
 bool CLoltext::HasRepr(char c) // can be removed when we have a full character set
