@@ -40,6 +40,7 @@ public:
 	static vec2 TextSize(const char *pText);
 	static int Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow);
 	static void Destroy(CGameWorld *pGameWorld, int TextID);
+	static void Dump(); //debugging
 };
 
 #endif

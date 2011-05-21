@@ -1404,6 +1404,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 
 void CGameContext::OnShutdown()
 {
+	CLoltext::Destroy(&m_World, -1);
 	delete m_pController;
 	m_pController = 0;
 	Clear();

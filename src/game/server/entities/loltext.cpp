@@ -115,13 +115,39 @@ int CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Ve
 	return TextID;
 }
 
+void CLoltext::Dump()
+{
+	for(int i = 0; i < MAX_LOLTEXTS; i++)
+		dbg_msg("lt", "s_aExpire[%d] = %d", i, s_aExpire[i]);
+
+	for(int i = 0; i < MAX_LOLTEXTS; i++)
+	{
+		int Count = 0;
+		for(int j = 0; j < MAX_PLASMA_PER_LOLTEXT; j++)
+			if (s_aapPlasma[i][j])
+				Count++;
+		dbg_msg("tl", "|s_aapPlasma[%d]| = %d", i, Count);
+	}
+
+}
+
 void CLoltext::Destroy(CGameWorld *pGameWorld, int TextID)
 {
+	if (TextID == -1) //all
+	{
+		for(int i = 0; i < MAX_LOLTEXTS; ++i)
+			Destroy(pGameWorld, i);
+		return;
+	}
+	
 	if (TextID < 0 || TextID >= MAX_LOLTEXTS)
 		return;
 
 	if (s_aExpire[TextID] < pGameWorld->Server()->Tick())
+	{
+		s_aExpire[TextID] = 0; //explicitly unset incase map cycles because Tick counting starts over with 0 then.
 		return;
+	}
 	
 	for(int i = 0; i < MAX_PLASMA_PER_LOLTEXT; i++)
 		if (s_aapPlasma[TextID][i])
