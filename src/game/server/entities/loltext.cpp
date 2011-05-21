@@ -117,7 +117,7 @@ int CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Ve
 
 void CLoltext::Destroy(CGameWorld *pGameWorld, int TextID)
 {
-	if (TextID < 0 || TextID > MAX_LOLTEXTS)
+	if (TextID < 0 || TextID >= MAX_LOLTEXTS)
 		return;
 
 	if (s_aExpire[TextID] < pGameWorld->Server()->Tick())
