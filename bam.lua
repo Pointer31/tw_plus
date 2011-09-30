@@ -130,6 +130,9 @@ function Intermediate_Output(settings, input)
 end
 
 function build(settings)
+	-- apply compiler settings
+	config.compiler:Apply(settings)
+	
 	--settings.objdir = Path("objs")
 	settings.cc.Output = Intermediate_Output
 
@@ -155,6 +158,11 @@ function build(settings)
 			settings.link.frameworks:Add("AppKit")
 		else
 			settings.link.libs:Add("pthread")
+		end
+		
+		if platform == "solaris" then
+		    settings.link.flags:Add("-lsocket")
+		    settings.link.flags:Add("-lnsl")
 		end
 	elseif family == "windows" then
 		settings.link.libs:Add("gdi32")
