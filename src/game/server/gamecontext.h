@@ -36,6 +36,10 @@
 			All players (CPlayer::snap)
 
 */
+
+#define MAX_MUTES 35
+#define MOD_VERSION "0.1 ALPHA"
+
 class CGameContext : public IGameServer
 {
 	IServer *m_pServer;
@@ -61,6 +65,21 @@ class CGameContext : public IGameServer
 	static void ConVote(IConsole::IResult *pResult, void *pUserData);
 	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
+	static void ConFreeze(IConsole::IResult *pResult, void *pUserData);
+	static void ConUnFreeze(IConsole::IResult *pResult, void *pUserData);
+	static void ConMute(IConsole::IResult *pResult, void *pUserData);
+	static void ConUnmuteID(IConsole::IResult *pResult, void *pUserData);
+	static void ConUnmuteIP(IConsole::IResult *pResult, void *pUserData);
+	static void ConMutes(IConsole::IResult *pResult, void *pUserData);
+	static void ConMuteSpec(IConsole::IResult *pResult, void *pUserData);
+	static void ConStop(IConsole::IResult *pResult, void *pUserData);
+	static void ConGo(IConsole::IResult *pResult, void *pUserData);
+	static void ConSetName(IConsole::IResult *pResult, void *pUserData);
+	static void ConSetClan(IConsole::IResult *pResult, void *pUserData);
+	static void ConKill(IConsole::IResult *pResult, void *pUserData);
+	static void ConGive(IConsole::IResult *pResult, void *pUserData);
+	static void ConTeleport(IConsole::IResult *pResult, void *pUserData);
+
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
 
@@ -84,6 +103,7 @@ public:
 
 	// helper functions
 	class CCharacter *GetPlayerChar(int ClientID);
+	inline bool IsValidCID(int CID) { return (CID >= 0) && (CID < MAX_CLIENTS) && m_apPlayers[CID]; }
 
 	// voting
 	void StartVote(const char *pDesc, const char *pCommand, const char *pReason);
@@ -129,6 +149,18 @@ public:
 		CHAT_BLUE=1
 	};
 
+	struct CMute
+	{
+		char m_IP[NETADDR_MAXSTRSIZE];
+		int m_Expires;
+	} m_aMutes[MAX_MUTES];
+
+	// helper functions
+	void AddMute(const char* IP, int Secs);
+	void AddMute(int ClientID, int Secs);
+	int Muted(const char* IP);
+	void PurgeMutes();
+
 	// network
 	void SendChatTarget(int To, const char *pText);
 	void SendChat(int ClientID, int Team, const char *pText);
@@ -165,6 +197,11 @@ public:
 	virtual const char *GameType();
 	virtual const char *Version();
 	virtual const char *NetVersion();
+
+	bool m_SpecMuted;
+	bool ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMessage);
+	bool CanExec(int, const char*);
+	void SaveStats();
 };
 
 inline int CmaskAll() { return -1; }

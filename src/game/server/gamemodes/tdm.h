@@ -7,7 +7,7 @@
 class CGameControllerTDM : public IGameController
 {
 public:
-	CGameControllerTDM(class CGameContext *pGameServer);
+	CGameControllerTDM(class CGameContext *pGameServer, int);
 
 	int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
 	virtual void Snap(int SnappingClient);

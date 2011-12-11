@@ -96,6 +96,23 @@ public:
 		int m_Max;
 	} m_Latency;
 
+	int m_ChatTicks;
+	int m_KillStreak;
+	//
+	int Anticamper();
+	bool m_SentCampMsg;
+	int m_CampTick;
+	vec2 m_CampPos;
+
+	struct Stats
+	{
+		int m_Shots[NUM_WEAPONS];
+		int m_TotalShots;
+		int m_Kills;
+		int m_Deaths;
+		int m_Hits;
+	} m_Stats;
+
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;

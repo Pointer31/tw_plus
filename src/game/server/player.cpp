@@ -21,6 +21,9 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_SpectatorID = SPEC_FREEVIEW;
 	m_LastActionTick = Server()->Tick();
 	m_TeamChangeTick = Server()->Tick();
+
+	m_ChatTicks = 0;
+	mem_zero(&m_Stats, sizeof(m_Stats));
 }
 
 CPlayer::~CPlayer()
@@ -59,6 +62,12 @@ void CPlayer::Tick()
 			m_Latency.m_AccumMax = 0;
 		}
 	}
+
+	if(m_ChatTicks)
+		m_ChatTicks--;
+
+	if(g_Config.m_SvAnticamper)
+		Anticamper();
 
 	if(!m_pCharacter && m_Team == TEAM_SPECTATORS && m_SpectatorID == SPEC_FREEVIEW)
 		m_ViewPos -= vec2(clamp(m_ViewPos.x-m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y-m_LatestActivity.m_TargetY, -400.0f, 400.0f));
@@ -190,6 +199,9 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 
 	m_PlayerFlags = NewInput->m_PlayerFlags;
 
+	if(m_pCharacter && m_pCharacter->Frozen())
+		return;
+
 	if(m_pCharacter)
 		m_pCharacter->OnDirectInput(NewInput);
 
@@ -274,4 +286,53 @@ void CPlayer::TryRespawn()
 	m_pCharacter = new(m_ClientID) CCharacter(&GameServer()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 	GameServer()->CreatePlayerSpawn(SpawnPos);
+}
+
+int CPlayer::Anticamper()
+{
+	if(GameServer()->m_World.m_Paused || !m_pCharacter || m_Team == TEAM_SPECTATORS || m_pCharacter->Frozen())
+	{
+		m_CampTick = -1;
+		m_SentCampMsg = false;
+		return 0;
+	}
+
+	int AnticamperTime = g_Config.m_SvAnticamperTime;
+	int AnticamperRange = g_Config.m_SvAnticamperRange;
+
+	if(m_CampTick == -1)
+	{
+		m_CampPos = m_pCharacter->m_Pos;
+		m_CampTick = Server()->Tick() + Server()->TickSpeed()*AnticamperTime;
+	}
+
+	// Check if the player is moving
+	if((m_CampPos.x - m_pCharacter->m_Pos.x >= (float)AnticamperRange || m_CampPos.x - m_pCharacter->m_Pos.x <= -(float)AnticamperRange) ||
+		(m_CampPos.y - m_pCharacter->m_Pos.y >= (float)AnticamperRange || m_CampPos.y - m_pCharacter->m_Pos.y <= -(float)AnticamperRange))
+	{
+		m_CampTick = -1;
+	}
+
+	// Send warning to the player
+	if(m_CampTick <= Server()->Tick() + Server()->TickSpeed() * AnticamperTime/2 && m_CampTick != -1 && !m_SentCampMsg)
+	{
+		GameServer()->SendBroadcast("ANTICAMPER: Move or die", m_ClientID);
+		m_SentCampMsg = true;
+	}
+
+	// Kill him
+	if((m_CampTick <= Server()->Tick()) && (m_CampTick > 0))
+	{
+		if(g_Config.m_SvAnticamperFreeze)
+		{
+			m_pCharacter->Freeze(g_Config.m_SvAnticamperFreeze);
+			GameServer()->SendBroadcast("You have been freezed due camping", m_ClientID);
+		}
+		else
+			m_pCharacter->Die(m_ClientID, WEAPON_GAME);
+		m_CampTick = -1;
+		m_SentCampMsg = false;
+		return 1;
+	}
+	return 0;
 }

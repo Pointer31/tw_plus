@@ -13,6 +13,7 @@
 #include "gamemodes/tdm.h"
 #include "gamemodes/ctf.h"
 #include "gamemodes/mod.h"
+#include "gamemodes/gctf.h"
 
 enum
 {
@@ -36,6 +37,10 @@ void CGameContext::Construct(int Resetting)
 
 	if(Resetting==NO_RESET)
 		m_pVoteOptionHeap = new CHeap();
+
+	for(int i = 0; i < MAX_MUTES; i++)
+		m_aMutes[i].m_IP[0] = 0;
+	m_SpecMuted = false;
 }
 
 CGameContext::CGameContext(int Resetting)
@@ -592,6 +597,26 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 		pPlayer->m_LastChat = Server()->Tick();
 
+		//Check if the player is muted
+		char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
+		Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
+		int Pos;
+		if((Pos = Muted(aAddrStr)) > -1)
+		{
+			char aBuf[128];
+			int Expires = (m_aMutes[Pos].m_Expires - Server()->Tick())/Server()->TickSpeed();
+			str_format(aBuf, sizeof(aBuf), "You are muted for %d minutes and %d seconds.", Expires/60, Expires%60);
+			SendChatTarget(ClientID, aBuf);
+			return;
+		}
+		//mute the player if he's spamming
+		else if(g_Config.m_SvMuteDuration && ((pPlayer->m_ChatTicks += g_Config.m_SvChatValue) > g_Config.m_SvChatThreshold))
+		{
+			AddMute(ClientID, g_Config.m_SvMuteDuration);
+			pPlayer->m_ChatTicks = 0;
+			return;
+		}
+
 		// check for invalid chars
 		unsigned char *pMessage = (unsigned char *)pMsg->m_pMessage;
 		while (*pMessage)
@@ -601,7 +626,13 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			pMessage++;
 		}
 
-		SendChat(ClientID, Team, pMsg->m_pMessage);
+		if(!ChatCommand(ClientID, pPlayer, pMsg->m_pMessage))
+		{
+			// force redirecting of messages
+			if(m_SpecMuted && pPlayer->GetTeam() == TEAM_SPECTATORS)
+				Team = CGameContext::CHAT_SPEC;
+			SendChat(ClientID, Team, pMsg->m_pMessage);
+		}
 	}
 	else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 	{
@@ -636,6 +667,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		char aCmd[VOTE_CMD_LENGTH] = {0};
 		CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
 		const char *pReason = pMsg->m_Reason[0] ? pMsg->m_Reason : "No reason given";
+
+		if(g_Config.m_SvVoteForceReason && !pMsg->m_Reason[0] && str_comp_nocase(pMsg->m_Type, "option") != 0)
+		{
+			SendChatTarget(ClientID, "You must give a reason for your vote.");
+			return;
+		}
 
 		if(str_comp_nocase(pMsg->m_Type, "option") == 0)
 		{
@@ -781,6 +818,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "Time to wait before changing team: %02d:%02d", TimeLeft/60, TimeLeft%60);
 			SendBroadcast(aBuf, ClientID);
+			return;
+		}
+
+		if(pPlayer->GetCharacter() && pPlayer->GetCharacter()->Frozen())
+		{
+			SendChatTarget(ClientID, "You can not change team while you're frozen");
 			return;
 		}
 
@@ -954,15 +997,110 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		pPlayer->m_LastEmote = Server()->Tick();
 
 		SendEmoticon(ClientID, pMsg->m_Emoticon);
+
+		//Greyfox emotional tees
+		CCharacter* pChr = pPlayer->GetCharacter();
+
+		if(pChr && g_Config.m_SvEmotionalTees)
+		{
+			int Emote = EMOTE_NORMAL;
+			switch(pMsg->m_Emoticon)
+			{
+				case EMOTICON_EXCLAMATION:
+				case EMOTICON_GHOST:
+				case EMOTICON_QUESTION:
+				case EMOTICON_WTF:
+					Emote = EMOTE_SURPRISE;
+					break;
+				case EMOTICON_DOTDOT:
+				case EMOTICON_DROP:
+				case EMOTICON_ZZZ:
+					Emote = EMOTE_BLINK;
+					break;
+				case EMOTICON_EYES:
+				case EMOTICON_HEARTS:
+				case EMOTICON_MUSIC:
+					Emote = EMOTE_HAPPY;
+					break;
+				case EMOTICON_OOP:
+				case EMOTICON_SORRY:
+					Emote = EMOTE_PAIN;
+					break;
+				case EMOTICON_DEVILTEE:
+				case EMOTICON_SPLATTEE:
+				case EMOTICON_ZOMG:
+				case EMOTICON_SUSHI:
+					Emote = EMOTE_ANGRY;
+					break;
+			}
+			pChr->SetEmote(Emote, Server()->Tick() + 2 * Server()->TickSpeed());
+		}
 	}
 	else if (MsgID == NETMSGTYPE_CL_KILL && !m_World.m_Paused)
 	{
 		if(pPlayer->m_LastKill && pPlayer->m_LastKill+Server()->TickSpeed()*3 > Server()->Tick())
 			return;
 
+		if(pPlayer->GetCharacter() && pPlayer->GetCharacter()->Frozen())
+		{
+			SendChatTarget(ClientID, "You can not suicide while you're frozen");
+			return;
+		}
+
 		pPlayer->m_LastKill = Server()->Tick();
 		pPlayer->KillCharacter(WEAPON_SELF);
 	}
+}
+
+void CGameContext::AddMute(const char* IP, int Secs)
+{
+	int Pos = Muted(IP);
+	if(Pos > -1)
+		m_aMutes[Pos].m_Expires = Server()->TickSpeed() * Secs + Server()->Tick(); // overwrite mute
+	else
+		for(int i = 0; i < MAX_MUTES; i++) // find free slot
+			if(!m_aMutes[i].m_IP[0])
+			{
+				str_copy(m_aMutes[i].m_IP, IP, sizeof(m_aMutes[i].m_IP));
+				m_aMutes[i].m_Expires = Server()->TickSpeed() * Secs + Server()->Tick();
+				break;
+			}
+}
+
+void CGameContext::AddMute(int ClientID, int Secs)
+{
+	char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
+	Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
+	AddMute(aAddrStr, Secs);
+
+	char aBuf[128];
+	if(Secs > 0)
+		str_format(aBuf, sizeof(aBuf), "%s has been muted for %d seconds.", Server()->ClientName(ClientID), Secs);
+	else
+		str_format(aBuf, sizeof(aBuf), "%s has been unmuted.", Server()->ClientName(ClientID));
+	SendChatTarget(-1, aBuf);
+}
+
+int CGameContext::Muted(const char* IP)
+{
+	PurgeMutes();
+	int Pos = -1;
+	if(!IP[0])
+		return -1;
+	for(int i = 0; i < MAX_MUTES; i++)
+		if(!str_comp_num(IP, m_aMutes[i].m_IP, sizeof(m_aMutes[i].m_IP)))
+		{
+			Pos = i;
+			break;
+		}
+	return Pos;
+}
+
+void CGameContext::PurgeMutes()
+{
+	for(int i = 0; i < MAX_MUTES; i++)
+		if(m_aMutes[i].m_Expires < Server()->Tick())
+			m_aMutes[i].m_IP[0] = 0;
 }
 
 void CGameContext::ConTuneParam(IConsole::IResult *pResult, void *pUserData)
@@ -1312,6 +1450,163 @@ void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *p
 	}
 }
 
+void CGameContext::ConFreeze(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->GetInteger(0);
+	if(!pSelf->IsValidCID(ClientID))
+		return;
+
+	pSelf->GetPlayerChar(ClientID)->Freeze(pResult->GetInteger(1));
+
+	if(pResult->GetInteger(1) == -1)
+		pSelf->SendBroadcast("You have been deep freezed", ClientID);
+	else
+		pSelf->SendBroadcast("You have been frozen", ClientID);
+}
+
+void CGameContext::ConUnFreeze(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->GetInteger(0);
+	if(!pSelf->IsValidCID(ClientID))
+			return;
+	pSelf->GetPlayerChar(ClientID)->Unfreeze();
+}
+
+void CGameContext::ConMute(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->GetInteger(0);
+	if(!pSelf->IsValidCID(ClientID))
+		return;
+
+	pSelf->AddMute(ClientID, pResult->GetInteger(1));
+}
+
+void CGameContext::ConMutes(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	char aBuf[128];
+	int Sec, Count = 0;
+	pSelf->PurgeMutes();
+	for(int i = 0; i < MAX_MUTES; i++)
+	{
+		if(pSelf->m_aMutes[i].m_IP[0] == 0)
+			continue;
+
+		Sec = (pSelf->m_aMutes[i].m_Expires - pSelf->Server()->Tick())/pSelf->Server()->TickSpeed();
+		str_format(aBuf, sizeof(aBuf), "#%d: %s for %d minutes and %d sec", i, pSelf->m_aMutes[i].m_IP, Sec/60, Sec%60);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf);
+		Count++;
+	}
+	str_format(aBuf, sizeof(aBuf), "%d mute(s)", Count);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf);
+}
+
+void CGameContext::ConUnmuteID(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->GetInteger(0);
+	if(!pSelf->IsValidCID(ClientID))
+		return;
+	pSelf->AddMute(ClientID, 0);
+}
+
+void CGameContext::ConUnmuteIP(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int MuteID = pResult->GetInteger(0);
+	char aBuf[128];
+
+	if(MuteID < 0 || MuteID >= MAX_MUTES)
+		return;
+
+	if(pSelf->Muted(pSelf->m_aMutes[MuteID].m_IP) > -1)
+	{
+		str_format(aBuf, sizeof(aBuf), "unmuted %s", pSelf->m_aMutes[MuteID].m_IP);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf);
+		pSelf->AddMute(pSelf->m_aMutes[MuteID].m_IP, 0);
+	}
+	else
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", "mute not found");
+}
+
+void CGameContext::ConMuteSpec(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	bool IsMute = (bool)clamp(pResult->GetInteger(0), 0, 1);
+	pSelf->m_SpecMuted = IsMute;
+}
+
+void CGameContext::ConStop(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->m_World.m_Paused = false;
+}
+
+void CGameContext::ConGo(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->m_pController->m_FakeWarmup = (pResult->NumArguments() == 1) ? pResult->GetInteger(1) : g_Config.m_SvGoTime;
+}
+
+void CGameContext::ConSetName(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->Server()->SetClientName(pResult->GetInteger(0), pResult->GetString(1));
+}
+
+void CGameContext::ConSetClan(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->Server()->SetClientClan(pResult->GetInteger(0), pResult->GetString(1));
+}
+
+void CGameContext::ConKill(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->GetInteger(0);
+
+	if(pSelf->GetPlayerChar(ClientID))
+		pSelf->GetPlayerChar(ClientID)->Die(ClientID, WEAPON_WORLD);
+}
+
+void CGameContext::ConGive(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int ClientID = pResult->GetInteger(0);
+	if(!pSelf->IsValidCID(ClientID) && !pSelf->GetPlayerChar(ClientID))
+		return;
+
+	int Weapon = pResult->GetInteger(1);
+	if(Weapon >= 0 && Weapon < NUM_WEAPONS)
+	{
+		if(Weapon == WEAPON_NINJA)
+			pSelf->GetPlayerChar(ClientID)->GiveNinja();
+		else
+			pSelf->GetPlayerChar(ClientID)->GiveWeapon(Weapon, -1);
+	}
+	else
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", "invalid weapon id");
+}
+
+void CGameContext::ConTeleport(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int TeleFrom = pResult->GetInteger(0);
+	int TeleTo = pResult->GetInteger(1);
+
+	if(pSelf->IsValidCID(TeleFrom) && pSelf->IsValidCID(TeleTo))
+	{
+		CCharacter* pChr = pSelf->GetPlayerChar(TeleFrom);
+		if(pChr)
+			pChr->GetCore()->m_Pos = pSelf->m_apPlayers[TeleTo]->m_ViewPos;
+		else
+			pSelf->m_apPlayers[TeleFrom]->m_ViewPos = pSelf->m_apPlayers[TeleTo]->m_ViewPos;
+	}
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1335,6 +1630,22 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("vote", "r", CFGFLAG_SERVER, ConVote, this, "Force a vote to yes/no");
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
+
+	Console()->Register("freeze", "ii", CFGFLAG_SERVER, ConFreeze, this, "Freezes a player for x seconds (-1 for deep freeze)");
+	Console()->Register("unfreeze", "i", CFGFLAG_SERVER, ConUnFreeze, this, "Unfreezes a player");
+	Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mutes a player for x sec");
+	Console()->Register("unmuteid", "i", CFGFLAG_SERVER, ConUnmuteID, this, "Unmutes a player by its client id");
+	Console()->Register("unmuteip", "i", CFGFLAG_SERVER, ConUnmuteIP, this, "Removes a mute by its index");
+	Console()->Register("mutes", "", CFGFLAG_SERVER, ConMutes, this, "Show all mutes");
+	Console()->Register("mute_spec", "i", CFGFLAG_SERVER, ConMuteSpec, this, "All messages written in spectators are redirect to teamchat");
+	Console()->Register("stop", "", CFGFLAG_SERVER, ConStop, this, "Pauses the game");
+	Console()->Register("go", "?i", CFGFLAG_SERVER, ConGo, this, "Continues the game");
+	Console()->Register("set_name", "ir", CFGFLAG_SERVER, ConSetName, this, "Set the name of a player");
+	Console()->Register("set_clan", "ir", CFGFLAG_SERVER, ConSetClan, this, "Set the clan of a player");
+	Console()->Register("kill", "i", CFGFLAG_SERVER, ConKill, this, "Kills a player");
+	Console()->Register("give", "ii", CFGFLAG_SERVER, ConGive, this, "Give a player the specified weapon (0 = Hammer; 1 = Gun; 2 = Shotgun; 3 = Grenade, 4 = Riffle, 5 = Ninja)");
+	Console()->Register("tele", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player with to an other");
+	Console()->Register("teleport", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player with to an other");
 }
 
 void CGameContext::OnInit(/*class IKernel *pKernel*/)
@@ -1358,14 +1669,22 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	//players = new CPlayer[MAX_CLIENTS];
 
 	// select gametype
-	if(str_comp(g_Config.m_SvGametype, "mod") == 0)
+	if(str_comp_nocase(g_Config.m_SvGametype, "mod") == 0)
 		m_pController = new CGameControllerMOD(this);
-	else if(str_comp(g_Config.m_SvGametype, "ctf") == 0)
-		m_pController = new CGameControllerCTF(this);
-	else if(str_comp(g_Config.m_SvGametype, "tdm") == 0)
-		m_pController = new CGameControllerTDM(this);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "ctf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "ctf+"))
+		m_pController = new CGameControllerCTF(this, IGameController::GAMETYPE_VANILLA);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "tdm+"))
+		m_pController = new CGameControllerTDM(this, IGameController::GAMETYPE_VANILLA);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "ictf") == 0)
+		m_pController = new CGameControllerCTF(this, IGameController::GAMETYPE_INSTAGIB);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "idm") == 0)
+		m_pController = new CGameControllerDM(this, IGameController::GAMETYPE_INSTAGIB);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "itdm") == 0)
+		m_pController = new CGameControllerTDM(this, IGameController::GAMETYPE_INSTAGIB);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "gctf") == 0)
+		m_pController = new CGameControllerGCTF(this, IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_GCTF);
 	else
-		m_pController = new CGameControllerDM(this);
+		m_pController = new CGameControllerDM(this, IGameController::GAMETYPE_VANILLA);
 
 	// setup core world
 	//for(int i = 0; i < MAX_CLIENTS; i++)

@@ -33,6 +33,8 @@ IGameController::IGameController(class CGameContext *pGameServer)
 	m_aNumSpawnPoints[0] = 0;
 	m_aNumSpawnPoints[1] = 0;
 	m_aNumSpawnPoints[2] = 0;
+
+	m_FakeWarmup = 0;
 }
 
 IGameController::~IGameController()
@@ -136,29 +138,33 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 		m_aaSpawnPoints[1][m_aNumSpawnPoints[1]++] = Pos;
 	else if(Index == ENTITY_SPAWN_BLUE)
 		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
-	else if(Index == ENTITY_ARMOR_1)
-		Type = POWERUP_ARMOR;
-	else if(Index == ENTITY_HEALTH_1)
-		Type = POWERUP_HEALTH;
-	else if(Index == ENTITY_WEAPON_SHOTGUN)
+
+	if(!IsInstagib())
 	{
-		Type = POWERUP_WEAPON;
-		SubType = WEAPON_SHOTGUN;
-	}
-	else if(Index == ENTITY_WEAPON_GRENADE)
-	{
-		Type = POWERUP_WEAPON;
-		SubType = WEAPON_GRENADE;
-	}
-	else if(Index == ENTITY_WEAPON_RIFLE)
-	{
-		Type = POWERUP_WEAPON;
-		SubType = WEAPON_RIFLE;
-	}
-	else if(Index == ENTITY_POWERUP_NINJA && g_Config.m_SvPowerups)
-	{
-		Type = POWERUP_NINJA;
-		SubType = WEAPON_NINJA;
+		if(Index == ENTITY_ARMOR_1)
+			Type = POWERUP_ARMOR;
+		else if(Index == ENTITY_HEALTH_1)
+			Type = POWERUP_HEALTH;
+		else if(Index == ENTITY_WEAPON_SHOTGUN)
+		{
+			Type = POWERUP_WEAPON;
+			SubType = WEAPON_SHOTGUN;
+		}
+		else if(Index == ENTITY_WEAPON_GRENADE)
+		{
+			Type = POWERUP_WEAPON;
+			SubType = WEAPON_GRENADE;
+		}
+		else if(Index == ENTITY_WEAPON_RIFLE)
+		{
+			Type = POWERUP_WEAPON;
+			SubType = WEAPON_RIFLE;
+		}
+		else if(Index == ENTITY_POWERUP_NINJA && g_Config.m_SvPowerups)
+		{
+			Type = POWERUP_NINJA;
+			SubType = WEAPON_NINJA;
+		}
 	}
 
 	if(Type != -1)
@@ -209,6 +215,10 @@ static bool IsSeparator(char c) { return c == ';' || c == ' ' || c == ',' || c =
 void IGameController::StartRound()
 {
 	ResetGame();
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+		if(GameServer()->m_apPlayers[i])
+			mem_zero(&GameServer()->m_apPlayers[i]->m_Stats, sizeof(GameServer()->m_apPlayers[i]->m_Stats));
 
 	m_RoundStartTick = Server()->Tick();
 	m_SuddenDeath = 0;
@@ -359,9 +369,14 @@ void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 	// default health
 	pChr->IncreaseHealth(10);
 
-	// give default weapons
-	pChr->GiveWeapon(WEAPON_HAMMER, -1);
-	pChr->GiveWeapon(WEAPON_GUN, 10);
+	if(IsInstagib())
+		pChr->GiveWeapon(WEAPON_RIFLE, -1);
+	else
+	{
+		// give default weapons
+		pChr->GiveWeapon(WEAPON_HAMMER, -1);
+		pChr->GiveWeapon(WEAPON_GUN, 10);
+	}
 }
 
 void IGameController::DoWarmup(int Seconds)
@@ -423,6 +438,16 @@ void IGameController::Tick()
 			CycleMap();
 			StartRound();
 			m_RoundCount++;
+		}
+	}
+
+	if(m_FakeWarmup)
+	{
+		m_FakeWarmup--;
+		if(!m_FakeWarmup && GameServer()->m_World.m_Paused)
+		{
+			GameServer()->m_World.m_Paused = false;
+			GameServer()->SendChat(-1, CGameContext::CHAT_ALL, "Game started");
 		}
 	}
 
@@ -546,7 +571,11 @@ void IGameController::Snap(int SnappingClient)
 	if(GameServer()->m_World.m_Paused)
 		pGameInfoObj->m_GameStateFlags |= GAMESTATEFLAG_PAUSED;
 	pGameInfoObj->m_RoundStartTick = m_RoundStartTick;
-	pGameInfoObj->m_WarmupTimer = m_Warmup;
+
+	if(m_FakeWarmup)
+		pGameInfoObj->m_WarmupTimer = m_FakeWarmup;
+	else
+		pGameInfoObj->m_WarmupTimer = m_Warmup;
 
 	pGameInfoObj->m_ScoreLimit = g_Config.m_SvScorelimit;
 	pGameInfoObj->m_TimeLimit = g_Config.m_SvTimelimit;

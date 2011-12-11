@@ -60,6 +60,8 @@ protected:
 	int m_UnbalancedTick;
 	bool m_ForceBalanced;
 
+	bool m_IsInstagib;
+
 public:
 	const char *m_pGameType;
 
@@ -141,6 +143,19 @@ public:
 	int ClampTeam(int Team);
 
 	virtual void PostReset();
+
+	enum {
+		GAMETYPE_INSTAGIB = 1<<0,
+		GAMETYPE_VANILLA = 1<<1,
+		GAMETYPE_GCTF = 1<<2
+	};
+	int m_Flags;
+
+	virtual void SetInstagib(bool Set) { m_IsInstagib = Set; }
+	virtual bool IsInstagib() { return m_IsInstagib; }
+	int IsWarmup() { return m_Warmup; }
+	int m_FakeWarmup;
+
 };
 
 #endif

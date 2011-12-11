@@ -45,6 +45,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_ProximityRadius = ms_PhysSize;
 	m_Health = 0;
 	m_Armor = 0;
+	m_FreezeTicks = 0;
 }
 
 void CCharacter::Reset()
@@ -56,8 +57,23 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 {
 	m_EmoteStop = -1;
 	m_LastAction = -1;
-	m_ActiveWeapon = WEAPON_GUN;
-	m_LastWeapon = WEAPON_HAMMER;
+
+	if(GameServer()->m_pController->m_Flags&IGameController::GAMETYPE_GCTF)
+	{
+		m_ActiveWeapon = WEAPON_GRENADE;
+		m_LastWeapon = WEAPON_GRENADE;
+	}
+	else if(GameServer()->m_pController->IsInstagib())
+	{
+		m_ActiveWeapon = WEAPON_RIFLE;
+		m_LastWeapon = WEAPON_RIFLE;
+	}
+	else
+		{
+			m_ActiveWeapon = WEAPON_GUN;
+			m_LastWeapon = WEAPON_HAMMER;
+		}
+
 	m_QueuedWeapon = -1;
 
 	m_pPlayer = pPlayer;
@@ -115,7 +131,7 @@ void CCharacter::HandleNinja()
 	if(m_ActiveWeapon != WEAPON_NINJA)
 		return;
 
-	if ((Server()->Tick() - m_Ninja.m_ActivationTick) > (g_pData->m_Weapons.m_Ninja.m_Duration * Server()->TickSpeed() / 1000))
+	if ((Server()->Tick() - m_Ninja.m_ActivationTick) > (g_pData->m_Weapons.m_Ninja.m_Duration * Server()->TickSpeed() / 1000) && !m_FreezeTicks)
 	{
 		// time's up, return
 		m_aWeapons[WEAPON_NINJA].m_Got = false;
@@ -418,6 +434,9 @@ void CCharacter::FireWeapon()
 
 	}
 
+	m_pPlayer->m_Stats.m_Shots[m_ActiveWeapon]++;
+	m_pPlayer->m_Stats.m_TotalShots++;
+
 	m_AttackTick = Server()->Tick();
 
 	if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0) // -1 == unlimited
@@ -499,6 +518,9 @@ void CCharacter::SetEmote(int Emote, int Tick)
 
 void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 {
+	if(m_FreezeTicks)
+		return;
+
 	// check for changes
 	if(mem_comp(&m_Input, pNewInput, sizeof(CNetObj_PlayerInput)) != 0)
 		m_LastAction = Server()->Tick();
@@ -514,6 +536,9 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 
 void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
 {
+	if(m_FreezeTicks)
+		return;
+
 	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
 	mem_copy(&m_LatestInput, pNewInput, sizeof(m_LatestInput));
 
@@ -547,6 +572,18 @@ void CCharacter::Tick()
 		GameServer()->SendBroadcast(Buf, m_pPlayer->GetCID());
 
 		m_pPlayer->m_ForceBalanced = false;
+	}
+
+	if(m_FreezeTicks > 0)
+	{
+		if(Server()->Tick() % Server()->TickSpeed() == 0)
+			m_FreezeArmor = m_FreezeTicks/Server()->TickSpeed();
+
+		// Give old weapon back
+		if(m_FreezeTicks == 1)
+			Unfreeze();
+		else
+			m_FreezeTicks--;
 	}
 
 	m_Core.m_Input = m_Input;
@@ -695,6 +732,11 @@ void CCharacter::Die(int Killer, int Weapon)
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
 
+	m_FreezeTicks = 0;
+	m_pPlayer->m_Stats.m_Deaths++;
+	if(Killer >= 0)
+		GameServer()->m_apPlayers[Killer]->m_Stats.m_Kills++;
+
 	m_Alive = false;
 	GameServer()->m_World.RemoveEntity(this);
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
@@ -708,11 +750,25 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
 		return false;
 
+	if((GameServer()->m_pController->m_Flags&IGameController::GAMETYPE_GCTF) && g_Config.m_SvGrenadeMinDamage > Dmg)
+		return false;
+
 	// m_pPlayer only inflicts half damage on self
 	if(From == m_pPlayer->GetCID())
-		Dmg = max(1, Dmg/2);
+	{
+		if(GameServer()->m_pController->IsInstagib())
+			return false;
+		else
+			Dmg = max(1, Dmg/2);
+	}
 
 	m_DamageTaken++;
+
+	if(GameServer()->m_pController->IsInstagib())
+	{
+		m_Health = 0;
+		m_Armor = 0;
+	}
 
 	// create healthmod indicator
 	if(Server()->Tick() < m_DamageTakenTick+25)
@@ -791,6 +847,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 	m_EmoteType = EMOTE_PAIN;
 	m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+	m_pPlayer->m_Stats.m_Hits++;
 
 	return true;
 }
@@ -840,7 +897,7 @@ void CCharacter::Snap(int SnappingClient)
 		(!g_Config.m_SvStrictSpectateMode && m_pPlayer->GetCID() == GameServer()->m_apPlayers[SnappingClient]->m_SpectatorID))
 	{
 		pCharacter->m_Health = m_Health;
-		pCharacter->m_Armor = m_Armor;
+		pCharacter->m_Armor = (m_FreezeTicks) ? m_FreezeArmor : m_Armor;
 		if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
 			pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo;
 	}
@@ -852,4 +909,22 @@ void CCharacter::Snap(int SnappingClient)
 	}
 
 	pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
+}
+
+void CCharacter::Freeze(int Secs)
+{
+	if(Secs < 0)
+		m_FreezeTicks = -1;
+	else
+		m_FreezeTicks = Server()->TickSpeed() * Secs;
+	m_LastWeapon = m_ActiveWeapon;
+	m_ActiveWeapon = WEAPON_NINJA;
+	ResetInput();
+	GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
+}
+
+void CCharacter::Unfreeze()
+{
+	m_FreezeTicks = 0;
+	m_ActiveWeapon = m_LastWeapon;
 }

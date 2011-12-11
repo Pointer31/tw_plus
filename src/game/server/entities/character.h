@@ -63,6 +63,11 @@ public:
 	bool IsAlive() const { return m_Alive; }
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 
+	void Freeze(int);
+	void Unfreeze();
+	int Frozen() { return m_FreezeTicks; }
+	CCharacterCore* GetCore() {return &m_Core;}
+
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;
@@ -111,6 +116,7 @@ private:
 
 	int m_Health;
 	int m_Armor;
+	int m_FreezeArmor;
 
 	// ninja
 	struct
@@ -128,6 +134,8 @@ private:
 	int m_ReckoningTick; // tick that we are performing dead reckoning From
 	CCharacterCore m_SendCore; // core that we should send
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
+
+	int m_FreezeTicks;
 
 };
 

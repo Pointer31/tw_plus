@@ -10,12 +10,14 @@
 #include <game/server/gamecontext.h>
 #include "ctf.h"
 
-CGameControllerCTF::CGameControllerCTF(class CGameContext *pGameServer)
+CGameControllerCTF::CGameControllerCTF(class CGameContext *pGameServer, int TypeFlags)
 : IGameController(pGameServer)
 {
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
-	m_pGameType = "CTF";
+	SetInstagib(TypeFlags&GAMETYPE_INSTAGIB);
+	m_pGameType = (IsInstagib()) ? "iCTF" : "CTF+";
+	m_Flags = TypeFlags;
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_FLAGS;
 }
 

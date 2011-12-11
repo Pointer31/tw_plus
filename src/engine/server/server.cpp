@@ -324,7 +324,7 @@ int CServer::Init()
 	return 0;
 }
 
-bool CServer::IsAuthed(int ClientID)
+int CServer::IsAuthed(int ClientID)
 {
 	return m_aClients[ClientID].m_Authed;
 }
