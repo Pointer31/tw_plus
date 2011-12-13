@@ -9,11 +9,11 @@
 //usage: GameServer()->CreateLoltext(...)
 //it will dispose itself after lifespan ended
 
-class CPlasma : public CEntity
+class ClolPlasma : public CEntity
 {
 public:
 	//position relative to pParent->m_Pos. if pParent is NULL, Pos is absolute. lifespan in ticks
-	CPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan);
+	ClolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan);
 
 	virtual void Reset();
 	virtual void Tick();
@@ -33,7 +33,7 @@ class CLoltext
 {
 private:
 	static bool s_aaaChars[256][5][3];
-	static CPlasma *s_aapPlasma[MAX_LOLTEXTS][MAX_PLASMA_PER_LOLTEXT];
+	static ClolPlasma *s_aapPlasma[MAX_LOLTEXTS][MAX_PLASMA_PER_LOLTEXT];
 	static int s_aExpire[MAX_LOLTEXTS];
 	static bool HasRepr(char c);
 public:
