@@ -3,10 +3,10 @@
 #include <game/server/gamecontext.h>
 #include "loltext.h"
 
-CPlasma *CLoltext::s_aapPlasma[MAX_LOLTEXTS][MAX_PLASMA_PER_LOLTEXT];
+ClolPlasma *CLoltext::s_aapPlasma[MAX_LOLTEXTS][MAX_PLASMA_PER_LOLTEXT];
 int CLoltext::s_aExpire[MAX_LOLTEXTS];
 
-CPlasma::CPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan)
+ClolPlasma::ClolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
 	m_LocalPos = vec2(0.0f, 0.0f);
@@ -19,12 +19,12 @@ CPlasma::CPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, i
 	GameWorld()->InsertEntity(this);
 }
 
-void CPlasma::Reset()
+void ClolPlasma::Reset()
 {
 	GameWorld()->DestroyEntity(this);
 }
 
-void CPlasma::Tick()
+void ClolPlasma::Tick()
 {
 	if (m_Life < 0)
 	{
@@ -36,7 +36,7 @@ void CPlasma::Tick()
 	CEntity::m_Pos = (m_pParent?m_pParent->m_Pos:vec2(0.0f,0.0f)) + m_StartOff + (m_LocalPos += m_Vel);
 }
 
-void CPlasma::Snap(int SnappingClient)
+void ClolPlasma::Snap(int SnappingClient)
 {
 	if (NetworkClipped(SnappingClient))
 		return;
@@ -109,7 +109,7 @@ int CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Ve
 			for(int x = 0; x < 3/*XXX*/; ++x)
 				if (s_aaaChars[(unsigned)c][y][x] && NumPlasmas < MAX_PLASMA_PER_LOLTEXT)
 					s_aapPlasma[TextID][NumPlasmas++] =
-						        new CPlasma(pGameWorld, pParent, CurPos + vec2(x*g_Config.m_SvLoltextHspace, y*g_Config.m_SvLoltextVspace), Vel, Lifespan);
+						        new ClolPlasma(pGameWorld, pParent, CurPos + vec2(x*g_Config.m_SvLoltextHspace, y*g_Config.m_SvLoltextVspace), Vel, Lifespan);
 		CurPos.x += 4*g_Config.m_SvLoltextHspace;
 	}
 	return TextID;
