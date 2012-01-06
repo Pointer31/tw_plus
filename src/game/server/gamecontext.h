@@ -38,7 +38,7 @@
 */
 
 #define MAX_MUTES 35
-#define MOD_VERSION "0.1 ALPHA"
+#define MOD_VERSION "0.2 ALPHA"
 
 class CGameContext : public IGameServer
 {
@@ -78,6 +78,7 @@ class CGameContext : public IGameServer
 	static void ConSetClan(IConsole::IResult *pResult, void *pUserData);
 	static void ConKill(IConsole::IResult *pResult, void *pUserData);
 	static void ConGive(IConsole::IResult *pResult, void *pUserData);
+	static void ConTakeWeapon(IConsole::IResult *pResult, void *pUserData);
 	static void ConTeleport(IConsole::IResult *pResult, void *pUserData);
 
 	CGameContext(int Resetting);
@@ -201,7 +202,6 @@ public:
 	bool m_SpecMuted;
 	bool ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMessage);
 	bool CanExec(int, const char*);
-	void SaveStats();
 };
 
 inline int CmaskAll() { return -1; }

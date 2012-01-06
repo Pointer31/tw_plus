@@ -8,7 +8,6 @@
 CGameControllerGCTF::CGameControllerGCTF(class CGameContext *pGameServer, int TypeFlags)
 : CGameControllerCTF(pGameServer, TypeFlags)
 {
-	SetInstagib(TypeFlags&GAMETYPE_INSTAGIB);
 	m_Flags = TypeFlags;
 	m_pGameType = "gCTF";
 }

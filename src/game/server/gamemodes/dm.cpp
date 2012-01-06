@@ -6,9 +6,8 @@
 CGameControllerDM::CGameControllerDM(class CGameContext *pGameServer, int TypeFlags)
 : IGameController(pGameServer)
 {
-	SetInstagib(TypeFlags&GAMETYPE_INSTAGIB);
-	m_pGameType = (IsInstagib()) ? "iDM" : "DM+";
 	m_Flags = TypeFlags;
+	m_pGameType = (IsInstagib()) ? "iDM" : "DM+";
 }
 
 void CGameControllerDM::Tick()

@@ -24,6 +24,9 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 
 	m_ChatTicks = 0;
 	mem_zero(&m_Stats, sizeof(m_Stats));
+	for(int i = 0; i < NUM_WEAPONS-1; i++)
+		m_KeepWeapon[i] = false;
+	m_KeepAward = false;
 }
 
 CPlayer::~CPlayer()
@@ -323,13 +326,15 @@ int CPlayer::Anticamper()
 	// Kill him
 	if((m_CampTick <= Server()->Tick()) && (m_CampTick > 0))
 	{
-		if(g_Config.m_SvAnticamperFreeze)
+		bool IsIFreeze = GameServer()->m_pController->IsIFreeze();
+		if(g_Config.m_SvAnticamperFreeze || IsIFreeze)
 		{
-			m_pCharacter->Freeze(g_Config.m_SvAnticamperFreeze);
-			GameServer()->SendBroadcast("You have been freezed due camping", m_ClientID);
+			m_pCharacter->Freeze((IsIFreeze) ? g_Config.m_SvIFreezeAutomeltTime : g_Config.m_SvAnticamperFreeze);
+			GameServer()->SendBroadcast("You have been frozen due camping", m_ClientID);
 		}
 		else
 			m_pCharacter->Die(m_ClientID, WEAPON_GAME);
+
 		m_CampTick = -1;
 		m_SentCampMsg = false;
 		return 1;

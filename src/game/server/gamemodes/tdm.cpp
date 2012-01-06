@@ -8,9 +8,8 @@
 
 CGameControllerTDM::CGameControllerTDM(class CGameContext *pGameServer, int TypeFlags) : IGameController(pGameServer)
 {
-	SetInstagib(TypeFlags&GAMETYPE_INSTAGIB);
-	m_pGameType = (IsInstagib()) ? "iTDM" : "TDM+";
 	m_Flags = TypeFlags;
+	m_pGameType = (IsInstagib()) ? "iTDM" : "TDM+";
 	m_GameFlags = GAMEFLAG_TEAMS;
 }
 

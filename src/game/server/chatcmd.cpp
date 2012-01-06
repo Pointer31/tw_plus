@@ -9,6 +9,8 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 {
 	if(pMessage[0] == '/' || pMessage[0] == '!')
 		pMessage++;
+	else
+		return false;
 
 	// AuthLevel > 0  => Moderator/Admin
 	int AuthLevel = Server()->IsAuthed(ClientID);
@@ -19,6 +21,8 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		str_format(aBuf, sizeof(aBuf), "Almost-Instagib Mod v.%s created by Teetime.", MOD_VERSION);
 		SendChatTarget(ClientID, aBuf);
 		SendChatTarget(ClientID, "For a list of available commands type \"/cmdlist\"");
+		str_format(aBuf, sizeof(aBuf), "Gametype: %s", GameType());
+		SendChatTarget(ClientID, aBuf);
 		return true;
 	}
 	else if(!str_comp(pMessage, "credits"))
@@ -119,7 +123,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			}
 		}
 	}
-	else if(!str_comp_num(pMessage, "sayto ", 6))
+	else if(!str_comp_num(pMessage, "sayto", 5))
 	{
 		if(!g_Config.m_SvPrivateMessage && !AuthLevel)
 			SendChatTarget(ClientID, "This feature is not available at the moment.");
@@ -134,7 +138,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				//PM by ClientID
 				if(ReceiverID == ClientID)
 				{
-					SendChatTarget(ClientID, "You cant send yourself a private message");
+					SendChatTarget(ClientID, "You can't send yourself a private message");
 				}
 				else
 				{
@@ -147,6 +151,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 					SendChatTarget(ClientID, "PM successfully sent");
 				}
 			}
+			// TODO: Solution for player with spaces in their name?
 			else if(sscanf(pMessage, "sayto %15s %255s", aName, aMsg) == 2)
 			{
 				//PM by name
@@ -161,7 +166,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 				if(ID == ClientID)
 				{
-					SendChatTarget(ClientID, "You cant send yourself a private message");
+					SendChatTarget(ClientID, "You can't send yourself a private message");
 				}
 				else
 				{
@@ -188,10 +193,13 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return true;
 	}
-	else if(!str_comp_num(pMessage, "emote ", 6))
+	else if(!str_comp_num(pMessage, "emote", 5))
 	{
 		char aType[16];
 		int Time = -1, Args;
+		if(!pPlayer->GetCharacter())
+			return true;
+
 		if((Args = sscanf(pMessage, "emote %15s %d", aType, &Time)) >= 1)
 		{
 			if(Args < 2 || Time < 0)
@@ -220,13 +228,16 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		return true;
 	}
-	else if(!str_comp(pMessage, "stats"))
+	else if(!str_comp_num(pMessage, "stats", 5))
 	{
+		CPlayer* pP = pPlayer;
+		//TODO: Possibility to show stats of other players?
+
 		char aaBuf[4][128];
-		str_format(aaBuf[0], sizeof(aaBuf[0]), "Total Shots: %d", pPlayer->m_Stats.m_TotalShots);
-		str_format(aaBuf[1], sizeof(aaBuf[1]), "Kills: %d", pPlayer->m_Stats.m_Kills);
-		str_format(aaBuf[2], sizeof(aaBuf[2]), "Deaths: %d", pPlayer->m_Stats.m_Deaths);
-		str_format(aaBuf[3], sizeof(aaBuf[3]), "Ratio: %.3f", (pPlayer->m_Stats.m_Deaths > 0) ? ((float)pPlayer->m_Stats.m_Kills / (float)pPlayer->m_Stats.m_Deaths) : 0);
+		str_format(aaBuf[0], sizeof(aaBuf[0]), "Total Shots: %d", pP->m_Stats.m_TotalShots);
+		str_format(aaBuf[1], sizeof(aaBuf[1]), "Kills: %d", pP->m_Stats.m_Kills);
+		str_format(aaBuf[2], sizeof(aaBuf[2]), "Deaths: %d", pP->m_Stats.m_Deaths);
+		str_format(aaBuf[3], sizeof(aaBuf[3]), "Ratio: %.2f", (pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 0);
 
 		SendChatTarget(ClientID, "--- Statistics ---");
 		for(int i = 0; i < 4; i++)
@@ -278,16 +289,4 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 bool CGameContext::CanExec(int ClientID, const char* Command)
 {
 	return (Server()->IsAuthed(ClientID) == 2 || (Server()->IsAuthed(ClientID) == 1 && Console()->GetCommandInfo(Command, CFGFLAG_SERVER, false)->GetAccessLevel() == IConsole::ACCESS_LEVEL_MOD));
-}
-
-void CGameContext::SaveStats()
-{
-	if(!g_Config.m_SvStatsFile[0])
-		return;
-
-	/*
-	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-	}
-	*/
 }

@@ -65,8 +65,14 @@ public:
 
 	void Freeze(int);
 	void Unfreeze();
-	int Frozen() { return m_FreezeTicks; }
+	int Frozen();
 	CCharacterCore* GetCore() {return &m_Core;}
+	void AddSpree();
+	void EndSpree(int Killer);
+	void KillChar(bool);
+	void Melt(int MelterID);
+	bool TakeWeapon(int Weapon);
+	bool m_GotAward;
 
 private:
 	// player controlling this character
@@ -136,7 +142,9 @@ private:
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
 
 	int m_FreezeTicks;
-
+	int m_MeltTicks;
+	bool m_DeepFreeze;
+	int m_Spree;
 };
 
 #endif

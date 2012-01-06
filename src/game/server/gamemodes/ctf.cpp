@@ -15,9 +15,8 @@ CGameControllerCTF::CGameControllerCTF(class CGameContext *pGameServer, int Type
 {
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
-	SetInstagib(TypeFlags&GAMETYPE_INSTAGIB);
-	m_pGameType = (IsInstagib()) ? "iCTF" : "CTF+";
 	m_Flags = TypeFlags;
+	m_pGameType = (IsInstagib()) ? "iCTF" : "CTF+";
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_FLAGS;
 }
 
@@ -57,6 +56,7 @@ int CGameControllerCTF::OnCharacterDeath(class CCharacter *pVictim, class CPlaye
 			F->m_DropTick = Server()->Tick();
 			F->m_pCarryingCharacter = 0;
 			F->m_Vel = vec2(0,0);
+			pVictim->GetPlayer()->m_Stats.m_LostFlags++;
 
 			if(pKiller && pKiller->GetTeam() != pVictim->GetPlayer()->GetTeam())
 				pKiller->m_Score++;
@@ -178,6 +178,7 @@ void CGameControllerCTF::Tick()
 					// CAPTURE! \o/
 					m_aTeamscore[fi^1] += 100;
 					F->m_pCarryingCharacter->GetPlayer()->m_Score += 5;
+					F->m_pCarryingCharacter->GetPlayer()->m_Stats.m_Captures++;
 
 					char aBuf[512];
 					str_format(aBuf, sizeof(aBuf), "flag_capture player='%d:%s'",
@@ -194,6 +195,10 @@ void CGameControllerCTF::Tick()
 					{
 						str_format(aBuf, sizeof(aBuf), "The %s flag was captured by '%s'", fi ? "blue" : "red", Server()->ClientName(F->m_pCarryingCharacter->GetPlayer()->GetCID()));
 					}
+
+					if(F->m_pCarryingCharacter->GetPlayer()->m_Stats.m_FastestCapture <= 0.1f || F->m_pCarryingCharacter->GetPlayer()->m_Stats.m_FastestCapture > CaptureTime)
+						F->m_pCarryingCharacter->GetPlayer()->m_Stats.m_FastestCapture = CaptureTime;
+
 					GameServer()->SendChat(-1, -2, aBuf);
 					for(int i = 0; i < 2; i++)
 						m_apFlags[i]->Reset();

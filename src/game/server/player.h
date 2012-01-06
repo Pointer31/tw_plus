@@ -97,7 +97,6 @@ public:
 	} m_Latency;
 
 	int m_ChatTicks;
-	int m_KillStreak;
 	//
 	int Anticamper();
 	bool m_SentCampMsg;
@@ -111,7 +110,13 @@ public:
 		int m_Kills;
 		int m_Deaths;
 		int m_Hits;
+		int m_Captures;
+		int m_LostFlags;
+		double m_FastestCapture;
 	} m_Stats;
+	char m_aPrevName[MAX_NAME_LENGTH];
+	bool m_KeepWeapon[NUM_WEAPONS-1];
+	bool m_KeepAward;
 
 private:
 	CCharacter *m_pCharacter;

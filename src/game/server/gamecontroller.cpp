@@ -9,6 +9,8 @@
 #include "gamecontroller.h"
 #include "gamecontext.h"
 
+#include <stdio.h>
+#include <time.h>
 
 IGameController::IGameController(class CGameContext *pGameServer)
 {
@@ -185,6 +187,8 @@ void IGameController::EndRound()
 	GameServer()->m_World.m_Paused = true;
 	m_GameOverTick = Server()->Tick();
 	m_SuddenDeath = 0;
+	GameServer()->m_SpecMuted = false;
+	SaveStats();
 }
 
 void IGameController::ResetGame()
@@ -745,4 +749,67 @@ int IGameController::ClampTeam(int Team)
 	if(IsTeamplay())
 		return Team&1;
 	return 0;
+}
+
+void IGameController::SaveStats()
+{
+	if(g_Config.m_SvStatsFile[0] && g_Config.m_SvStatsOutputlevel)
+	{
+		char aBuf[1024];
+		FILE* pFile = fopen(g_Config.m_SvStatsFile, "a");
+
+		if(!pFile)
+		{
+			str_format(aBuf, sizeof(aBuf), "Failed to open %s to save stats", g_Config.m_SvStatsFile);
+			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "stats", aBuf);
+			return;
+		}
+
+		{
+			char TimeStr[2][128];
+			double PlayingTime = (double)(Server()->Tick() - m_RoundStartTick)/Server()->TickSpeed();
+			time_t Now_t = time(0);
+			time_t StartRound_t = Now_t - (int)PlayingTime;
+
+			strftime(TimeStr[0], sizeof(TimeStr[0]), "Roundstart at %d.%m.%Y on %X", localtime(&StartRound_t));
+			strftime(TimeStr[1], sizeof(TimeStr[1]), "and ended at %X", localtime(&Now_t));
+			str_format(aBuf, sizeof(aBuf), "--> %s %s (Length: %d min %.2lf sec). Gametype: %s\n\n", TimeStr[0], TimeStr[1], (int)PlayingTime/60, PlayingTime - ((int)PlayingTime/60)*60, GameServer()->GameType());
+			fputs(aBuf, pFile);
+		}
+
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+				continue;
+			CPlayer* pP = GameServer()->m_apPlayers[i];
+
+			char aaTemp[3][512] = {"", "", ""};
+			// Outputlevel 1
+			str_format(aaTemp[0], sizeof(aaTemp[0]), "ID: %2d\t| Name: %-15.15s| Team: %-10.10s| Score: %-6.1d| Kills: %-6.1d| Deaths: %-6.1d| Ratio: %-6.2lf",
+					pP->GetCID(), Server()->ClientName(i), GetTeamName(pP->GetTeam()), pP->m_Score, pP->m_Stats.m_Kills, pP->m_Stats.m_Deaths, (pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 0
+					);
+			//Outputlevel 2
+			if(g_Config.m_SvStatsOutputlevel > 1)
+				str_format(aaTemp[1], sizeof(aaTemp[1]), "| Hits: %-6.1d| Total Shots: %-6.1d| Captures: %-6.1d| Fastest Capture: %6.2lf",
+					pP->m_Stats.m_Hits, pP->m_Stats.m_TotalShots, (m_GameFlags&GAMEFLAG_FLAGS) ? pP->m_Stats.m_Captures : -1, ((m_GameFlags&GAMEFLAG_FLAGS) || pP->m_Stats.m_FastestCapture < 0.1) ? pP->m_Stats.m_FastestCapture : -1
+					);
+			//Outputlevel 3
+			if(g_Config.m_SvStatsOutputlevel > 2)
+				str_format(aaTemp[2], sizeof(aaTemp[2]), "| Lost Flags: %-6.1d",
+					pP->m_Stats.m_LostFlags
+					);
+
+			str_format(aBuf, sizeof(aBuf), "%s %s %s\n", aaTemp[0], aaTemp[1], aaTemp[2]);
+			fputs(aBuf, pFile);
+		}
+
+		if(IsTeamplay())
+		{
+			str_format(aBuf, sizeof(aBuf), "---------------------\nRed: %d | Blue %d\n", m_aTeamscore[TEAM_RED], m_aTeamscore[TEAM_BLUE]);
+			fputs(aBuf, pFile);
+		}
+
+		fputs("________________________________________________________________________________________________________________________________________\n\n\n", pFile);
+		fclose(pFile);
+	}
 }
