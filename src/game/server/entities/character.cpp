@@ -836,7 +836,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(m_SpawnProtectTick > Server()->Tick() || (GameServer()->GetPlayerChar(From) && GameServer()->GetPlayerChar(From)->Spawnprotected()))
 		return false;
 
-	/* almost insta */
+	/* TW+ */
 	if(GameServer()->m_pController->IsInstagib())
 	{
 		if((GameServer()->m_pController->m_Flags&IGameController::GAMETYPE_GCTF) && g_Config.m_SvGrenadeMinDamage > Dmg)
@@ -851,7 +851,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		m_Health = 0;
 		m_Armor = 0;
 	}
-	/*almost insta*/
+	/* TW+ */
 
 	// m_pPlayer only inflicts half damage on self
 	if(From == m_pPlayer->GetCID())

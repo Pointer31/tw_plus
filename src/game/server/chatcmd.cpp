@@ -1,4 +1,4 @@
-/* File is created by Teetime for the Almost-Instagib mod
+/* File is created by Teetime for the TW+ mod
  */
 
 #include "gamecontext.h"
@@ -18,7 +18,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	if(!str_comp(pMessage, "info"))
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Almost-Instagib Mod v.%s created by Teetime.", MOD_VERSION);
+		str_format(aBuf, sizeof(aBuf), "TW+ Mod v.%s created by Teetime.", MOD_VERSION);
 		SendChatTarget(ClientID, aBuf);
 		SendChatTarget(ClientID, "For a list of available commands type \"/cmdlist\"");
 		str_format(aBuf, sizeof(aBuf), "Gametype: %s", GameType());
