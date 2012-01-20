@@ -170,7 +170,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				}
 				else
 				{
-					if(ID > -1)
+					if(IsValidCID(ID))
 					{
 						char aBuf[512];
 						str_format(aBuf, sizeof(aBuf), "You received a private message from %s (ID: %d)", Server()->ClientName(ClientID), ClientID);
