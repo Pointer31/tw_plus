@@ -108,6 +108,7 @@ MACRO_CONFIG_INT(SvWarTime, sv_war_time, 15, 0, 3600, CFGFLAG_SERVER, "Default t
 MACRO_CONFIG_INT(SvLaserjumps, sv_laserjumps, 0, 0, 1, CFGFLAG_SERVER, "Enables laserjumps (only in instagib)")
 MACRO_CONFIG_INT(SvEmotionalTees, sv_emotional_tees, 1, 0, 1, CFGFLAG_SERVER, "Enables emotional tees")
 MACRO_CONFIG_INT(SvPrivateMessage, sv_private_message, 1, 0, 1, CFGFLAG_SERVER, "Enable/Disable private message")
+MACRO_CONFIG_INT(SvSpawnprotection, sv_spawnprotection, 2, 0, 5, CFGFLAG_SERVER, "Spawnprotection in seconds (0 disables)")
 //
 MACRO_CONFIG_STR(SvStatsFile, sv_stats_file, 256, "stats.txt", CFGFLAG_SERVER, "Name of the file where the statistics are stored in")
 MACRO_CONFIG_INT(SvStatsOutputlevel, sv_stats_outputlevel, 1, 0, 3, CFGFLAG_SERVER, "How much informations in the statistics-file should be saved (0 to disable saving)")

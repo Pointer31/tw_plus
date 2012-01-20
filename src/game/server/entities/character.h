@@ -73,6 +73,7 @@ public:
 	void Melt(int MelterID);
 	bool TakeWeapon(int Weapon);
 	bool m_GotAward;
+	bool Spawnprotected();
 
 private:
 	// player controlling this character
@@ -145,6 +146,7 @@ private:
 	int m_MeltTicks;
 	bool m_DeepFreeze;
 	int m_Spree;
+	int m_SpawnProtectTick;
 };
 
 #endif

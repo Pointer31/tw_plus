@@ -38,7 +38,7 @@
 */
 
 #define MAX_MUTES 35
-#define MOD_VERSION "0.2 ALPHA"
+#define MOD_VERSION "0.3 ALPHA"
 
 class CGameContext : public IGameServer
 {
