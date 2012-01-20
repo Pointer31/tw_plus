@@ -95,7 +95,6 @@ void CGameClient::OnConsoleInit()
 {
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pClient = Kernel()->RequestInterface<IClient>();
-	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
 	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
 	m_pSound = Kernel()->RequestInterface<ISound>();
 	m_pInput = Kernel()->RequestInterface<IInput>();
@@ -126,6 +125,8 @@ void CGameClient::OnConsoleInit()
 	m_pVoting = &::gs_Voting;
 	m_pScoreboard = &::gs_Scoreboard;
 	m_pItems = &::gs_Items;
+	m_pMapLayersBackGround = &::gs_MapLayersBackGround;
+	m_pMapLayersForeGround = &::gs_MapLayersForeGround;
 
 	// make a list of all the systems, make sure to add them in the corrent render order
 	m_All.Add(m_pSkins);
@@ -192,12 +193,10 @@ void CGameClient::OnConsoleInit()
 	Console()->Register("force_vote", "ss?r", CFGFLAG_SERVER, 0, 0, "Force a voting option");
 	Console()->Register("clear_votes", "", CFGFLAG_SERVER, 0, 0, "Clears the voting options");
 	Console()->Register("vote", "r", CFGFLAG_SERVER, 0, 0, "Force a vote to yes/no");
+	Console()->Register("swap_teams", "", CFGFLAG_SERVER, 0, 0, "Swap the current teams");
+	Console()->Register("shuffle_teams", "", CFGFLAG_SERVER, 0, 0, "Shuffle the current teams");
 
 
-	// propagate pointers
-	m_UI.SetGraphics(Graphics(), TextRender());
-	m_RenderTools.m_pGraphics = Graphics();
-	m_RenderTools.m_pUI = UI();
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->m_pClient = this;
 
@@ -221,6 +220,13 @@ void CGameClient::OnConsoleInit()
 
 void CGameClient::OnInit()
 {
+	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
+
+	// propagate pointers
+	m_UI.SetGraphics(Graphics(), TextRender());
+	m_RenderTools.m_pGraphics = Graphics();
+	m_RenderTools.m_pUI = UI();
+	
 	int64 Start = time_get();
 
 	// set the language
@@ -545,7 +551,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 			pMsg->m_SoundID == SOUND_CTF_GRAB_PL)
 			g_GameClient.m_pSounds->Enqueue(CSounds::CHN_GLOBAL, pMsg->m_SoundID);
 		else
-			g_GameClient.m_pSounds->Play(CSounds::CHN_GLOBAL, pMsg->m_SoundID, 1.0f, vec2(0,0));
+			g_GameClient.m_pSounds->Play(CSounds::CHN_GLOBAL, pMsg->m_SoundID, 1.0f);
 	}
 }
 
@@ -620,7 +626,7 @@ void CGameClient::ProcessEvents()
 		else if(Item.m_Type == NETEVENTTYPE_SOUNDWORLD)
 		{
 			CNetEvent_SoundWorld *ev = (CNetEvent_SoundWorld *)pData;
-			g_GameClient.m_pSounds->Play(CSounds::CHN_WORLD, ev->m_SoundID, 1.0f, vec2(ev->m_X, ev->m_Y));
+			g_GameClient.m_pSounds->PlayAt(CSounds::CHN_WORLD, ev->m_SoundID, 1.0f, vec2(ev->m_X, ev->m_Y));
 		}
 	}
 }
@@ -887,6 +893,15 @@ void CGameClient::OnNewSnapshot()
 			m_ServerMode = SERVERMODE_PUREMOD;
 	}
 
+	// add tuning to demo
+	if(DemoRecorder()->IsRecording() && mem_comp(&StandardTuning, &m_Tuning, sizeof(CTuningParams)) != 0)
+	{
+		CMsgPacker Msg(NETMSGTYPE_SV_TUNEPARAMS);
+		int *pParams = (int *)&m_Tuning;
+		for(unsigned i = 0; i < sizeof(m_Tuning)/sizeof(int); i++)
+			Msg.AddInt(pParams[i]);
+		Client()->SendMsg(&Msg, MSGFLAG_RECORD|MSGFLAG_NOSEND);
+	}
 }
 
 void CGameClient::OnPredict()

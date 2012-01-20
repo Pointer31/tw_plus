@@ -95,6 +95,11 @@ void CLaser::Tick()
 		DoBounce();
 }
 
+void CLaser::TickPaused()
+{
+	++m_EvalTick;
+}
+
 void CLaser::Snap(int SnappingClient)
 {
 	if(NetworkClipped(SnappingClient))
