@@ -879,16 +879,19 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 	m_DamageTaken++;
 
-	// create healthmod indicator
-	if(Server()->Tick() < m_DamageTakenTick+25)
+	if(!GameServer()->m_pController->IsInstagib())
 	{
-		// make sure that the damage indicators doesn't group together
-		GameServer()->CreateDamageInd(m_Pos, m_DamageTaken*0.25f, Dmg);
-	}
-	else
-	{
-		m_DamageTaken = 0;
-		GameServer()->CreateDamageInd(m_Pos, 0, Dmg);
+		// create healthmod indicator
+		if(Server()->Tick() < m_DamageTakenTick+25)
+		{
+			// make sure that the damage indicators doesn't group together
+			GameServer()->CreateDamageInd(m_Pos, m_DamageTaken*0.25f, Dmg);
+		}
+		else
+		{
+			m_DamageTaken = 0;
+			GameServer()->CreateDamageInd(m_Pos, 0, Dmg);
+		}
 	}
 
 	if(Dmg)
