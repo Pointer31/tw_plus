@@ -15,7 +15,7 @@ CGameControllerGCTF::CGameControllerGCTF(class CGameContext *pGameServer, int Ty
 void CGameControllerGCTF::OnCharacterSpawn(CCharacter* pChr)
 {
 	pChr->IncreaseHealth(10);
-	pChr->GiveWeapon(WEAPON_GRENADE, -1);
+	pChr->GiveWeapon(WEAPON_GRENADE, 10);
 }
 
 void CGameControllerGCTF::Tick()

@@ -491,6 +491,9 @@ void CCharacter::HandleWeapons()
 
 	// ammo regen
 	int AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
+	if(GameServer()->m_pController->m_Flags&IGameController::GAMETYPE_GCTF)
+		AmmoRegenTime = 2000;
+
 	if(AmmoRegenTime)
 	{
 		// If equipped and not active, regen ammo?
