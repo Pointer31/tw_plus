@@ -105,6 +105,7 @@ MACRO_CONFIG_INT(SvAnticamperRange, sv_anticamper_range, 200, 0, 1000, CFGFLAG_S
 // General Stuff
 MACRO_CONFIG_INT(SvVoteForceReason, sv_vote_forcereason, 1, 0, 1, CFGFLAG_SERVER, "Allow only votes with a reason (except settings)")
 MACRO_CONFIG_INT(SvGoTime, sv_go_time, 5, 0, 3600, CFGFLAG_SERVER, "The restart time for the go-command")
+MACRO_CONFIG_INT(SvStopGoFeature, sv_stopgo_feature, 1, 0, 1, CFGFLAG_SERVER, "Enable stop/go-feature in Chat")
 MACRO_CONFIG_INT(SvXonxFeature, sv_xonx_feature, 1, 0, 1, CFGFLAG_SERVER, "Enables chat-commands like 1on1 - 6on6")
 MACRO_CONFIG_INT(SvWarTime, sv_war_time, 15, 0, 3600, CFGFLAG_SERVER, "Default time before a war")
 MACRO_CONFIG_INT(SvLaserjumps, sv_laserjumps, 0, 0, 1, CFGFLAG_SERVER, "Enables laserjumps (only in instagib)")

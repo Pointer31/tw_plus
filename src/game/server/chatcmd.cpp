@@ -35,10 +35,14 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	{
 		SendChatTarget(ClientID, "----- Commands -----");
 		SendChatTarget(ClientID, "\"info\" Information about the mod");
-		SendChatTarget(ClientID, "\"stop\" Pause the game");
-		SendChatTarget(ClientID, "\"go\" Start the game");
-		SendChatTarget(ClientID, "\"restart\" Start a new round");
 		SendChatTarget(ClientID, "\"/stats\" Show player stats");
+
+		if(g_Config.m_SvStopGoFeature || AuthLevel)
+		{
+			SendChatTarget(ClientID, "\"stop\" Pause the game");
+			SendChatTarget(ClientID, "\"go\" Start the game");
+			SendChatTarget(ClientID, "\"restart\" Start a new round");
+		}
 
 		if(g_Config.m_SvPrivateMessage || AuthLevel)
 		{
@@ -61,7 +65,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	}
 	else if(!str_comp(pMessage, "stop"))
 	{
-		if(pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel)
+		if(g_Config.m_SvStopGoFeature && (pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel))
 		{
 			m_World.m_Paused = true;
 			SendChat(-1, CHAT_ALL, "Game paused.");
@@ -69,14 +73,14 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	}
 	else if(!str_comp(pMessage, "go"))
 		{
-			if(pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel)
+			if(g_Config.m_SvStopGoFeature && (pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel))
 			{
 				m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
 			}
 		}
 	else if(!str_comp(pMessage, "restart"))
 	{
-		if(pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel)
+		if(g_Config.m_SvStopGoFeature && (pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel))
 		{
 			if(m_pController->IsWarmup())
 				m_pController->DoWarmup(0);
