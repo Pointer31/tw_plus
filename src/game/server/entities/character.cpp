@@ -46,7 +46,6 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Health = 0;
 	m_Armor = 0;
 	m_FreezeTicks = 0;
-	m_Spree = 0;
 	m_DeepFreeze = false;
 }
 
@@ -88,7 +87,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		if(m_pPlayer->m_KeepWeapon[i] == true)
 			GiveWeapon(i, -1);
 	if(m_pPlayer->m_KeepAward)
-		m_GotAward = true;
+		m_pPlayer->m_GotAward = true;
 
 	if(g_Config.m_SvSpawnprotection)
 		m_SpawnProtectTick = Server()->Tick() + Server()->TickSpeed()*g_Config.m_SvSpawnprotection;
@@ -430,7 +429,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_RIFLE:
 		{
-			if(!m_GotAward || (g_Config.m_SvKillingspreeAwardLasers == 1))
+			if(!m_pPlayer->m_GotAward || (g_Config.m_SvKillingspreeAwardLasers == 1))
 			{
 				new CLaser(GameWorld(), m_Pos, Direction, GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
 			}
@@ -468,7 +467,7 @@ void CCharacter::FireWeapon()
 	if(!m_ReloadTimer)
 	{
 		int FireDelay = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay;
-		if(m_GotAward)
+		if(m_pPlayer->m_GotAward)
 			FireDelay = g_Config.m_SvKillingspreeAwardFiredelay;
 		m_ReloadTimer = FireDelay * Server()->TickSpeed() / 1000;
 	}
@@ -1065,23 +1064,23 @@ int CCharacter::Frozen()
 
 void CCharacter::AddSpree()
 {
-	m_Spree++;
+	m_pPlayer->m_Spree++;
 	const int NumMsg = 5;
 	char aBuf[128];
 
-	if(m_Spree % g_Config.m_SvKillingspreeKills == 0)
+	if(m_pPlayer->m_Spree % g_Config.m_SvKillingspreeKills == 0)
 	{
 		char SpreeMsg[NumMsg][32] = { "is on a killing spree", "is on a rampage", "is dominating", "is unstoppable", "is godlike"};
-		int No = m_Spree/NumMsg;
+		int No = m_pPlayer->m_Spree/NumMsg;
 
-		str_format(aBuf, sizeof(aBuf), "%s %s with %d kills!", Server()->ClientName(m_pPlayer->GetCID()), SpreeMsg[(No > NumMsg-1) ? NumMsg-1 : No], m_Spree);
+		str_format(aBuf, sizeof(aBuf), "%s %s with %d kills!", Server()->ClientName(m_pPlayer->GetCID()), SpreeMsg[(No > NumMsg-1) ? NumMsg-1 : No], m_pPlayer->m_Spree);
 		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 	}
 
-	if((m_Spree >= g_Config.m_SvKillingspreeKills) && g_Config.m_SvKillingspreeAward &&
-			(GameServer()->m_pController->IsIFreeze() || !g_Config.m_SvKillingspreeIFreeze) && !m_GotAward)
+	if((m_pPlayer->m_Spree >= g_Config.m_SvKillingspreeKills) && g_Config.m_SvKillingspreeAward &&
+			(GameServer()->m_pController->IsIFreeze() || !g_Config.m_SvKillingspreeIFreeze) && !m_pPlayer->m_GotAward)
 	{
-		m_GotAward = true;
+		m_pPlayer->m_GotAward = true;
 		str_format(aBuf, sizeof(aBuf), "%s got the killingspree award", Server()->ClientName(m_pPlayer->GetCID()));
 		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 	}
@@ -1089,17 +1088,17 @@ void CCharacter::AddSpree()
 
 void CCharacter::EndSpree(int Killer)
 {
-	if(m_Spree >= g_Config.m_SvKillingspreeKills)
+	if(m_pPlayer->m_Spree >= g_Config.m_SvKillingspreeKills)
 	{
 		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
 		GameServer()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_RIFLE, true);
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "%s %d-kills killing spree was ended by %s", Server()->ClientName(m_pPlayer->GetCID()), m_Spree, Server()->ClientName(Killer));
+		str_format(aBuf, sizeof(aBuf), "%s %d-kills killing spree was ended by %s", Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Spree, Server()->ClientName(Killer));
 		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 	}
-	m_GotAward = false;
-	m_Spree = 0;
+	m_pPlayer->m_GotAward = false;
+	m_pPlayer->m_Spree = 0;
 }
 
 void CCharacter::KillChar(bool JustUnfreeze)

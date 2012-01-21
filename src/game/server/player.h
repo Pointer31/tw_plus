@@ -117,6 +117,8 @@ public:
 	char m_aPrevName[MAX_NAME_LENGTH];
 	bool m_KeepWeapon[NUM_WEAPONS-1];
 	bool m_KeepAward;
+	int m_Spree;
+	bool m_GotAward;
 
 private:
 	CCharacter *m_pCharacter;

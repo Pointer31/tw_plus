@@ -1752,7 +1752,7 @@ void CGameContext::ConGive(IConsole::IResult *pResult, void *pUserData)
 			if(pResult->NumArguments() > 2)
 				pSelf->m_apPlayers[ClientID]->m_KeepAward = (bool)clamp(pResult->GetInteger(2), 0, 1);
 
-			pSelf->GetPlayerChar(ClientID)->m_GotAward = true;
+			pSelf->m_apPlayers[ClientID]->m_GotAward = true;
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "Admin gave %s the killingspree award", pSelf->Server()->ClientName(ClientID));
 			pSelf->SendChat(-1, CHAT_ALL, aBuf);
@@ -1787,7 +1787,7 @@ void CGameContext::ConTakeWeapon(IConsole::IResult *pResult, void *pUserData)
 	else if(Weapon == -2)
 	{
 		if(pSelf->GetPlayerChar(ClientID))
-			pSelf->GetPlayerChar(ClientID)->m_GotAward = false;
+			pSelf->m_apPlayers[ClientID]->m_GotAward = false;
 		pSelf->m_apPlayers[ClientID]->m_KeepAward = false;
 	}
 	else

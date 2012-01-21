@@ -73,7 +73,6 @@ public:
 	void KillChar(bool);
 	void Melt(int MelterID);
 	bool TakeWeapon(int Weapon);
-	bool m_GotAward;
 	bool Spawnprotected();
 
 private:
@@ -146,7 +145,6 @@ private:
 	int m_FreezeTicks;
 	int m_MeltTicks;
 	bool m_DeepFreeze;
-	int m_Spree;
 	int m_SpawnProtectTick;
 };
 

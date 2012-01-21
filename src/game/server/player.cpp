@@ -27,6 +27,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	for(int i = 0; i < NUM_WEAPONS-1; i++)
 		m_KeepWeapon[i] = false;
 	m_KeepAward = false;
+	m_Spree = 0;
+	m_GotAward = false;
 }
 
 CPlayer::~CPlayer()
