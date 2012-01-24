@@ -1018,17 +1018,6 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			str_format(aChatText, sizeof(aChatText), "'%s' changed name to '%s'", aOldName, Server()->ClientName(ClientID));
 			SendChat(-1, CGameContext::CHAT_ALL, aChatText);
 		}
-		/* iFreeze - Renaming when frozen*/
-		if(m_pController->IsIFreeze() && g_Config.m_SvIFreezeFrozenTag && GetPlayerChar(ClientID))
-		{
-			if(GetPlayerChar(ClientID)->Frozen())
-			{
-				str_copy(m_apPlayers[ClientID]->m_aPrevName, Server()->ClientName(ClientID), MAX_NAME_LENGTH-1);
-				char aBuf[MAX_NAME_LENGTH];
-				str_format(aBuf, sizeof(aBuf), "[F] %s", Server()->ClientName(m_apPlayers[ClientID]->GetCID()));
-				Server()->SetClientName(ClientID, aBuf);
-			}
-		}
 		Server()->SetClientClan(ClientID, pMsg->m_pClan);
 		Server()->SetClientCountry(ClientID, pMsg->m_Country);
 		str_copy(pPlayer->m_TeeInfos.m_SkinName, pMsg->m_pSkin, sizeof(pPlayer->m_TeeInfos.m_SkinName));

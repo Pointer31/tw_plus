@@ -136,7 +136,15 @@ void CPlayer::Snap(int SnappingClient)
 	if(!pClientInfo)
 		return;
 
-	StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
+	if(m_pCharacter && m_pCharacter->Frozen() && GameServer()->m_pController->IsIFreeze() && g_Config.m_SvIFreezeFrozenTag)
+	{
+		char aBuf[MAX_NAME_LENGTH];
+		str_format(aBuf, sizeof(aBuf), "[F] %s", Server()->ClientName(m_ClientID));
+		StrToInts(&pClientInfo->m_Name0, 4, aBuf);
+	}
+	else
+		StrToInts(&pClientInfo->m_Name0, 4, Server()->ClientName(m_ClientID));
+
 	StrToInts(&pClientInfo->m_Clan0, 3, Server()->ClientClan(m_ClientID));
 	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 	StrToInts(&pClientInfo->m_Skin0, 6, m_TeeInfos.m_SkinName);

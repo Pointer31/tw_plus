@@ -114,7 +114,6 @@ public:
 		int m_LostFlags;
 		double m_FastestCapture;
 	} m_Stats;
-	char m_aPrevName[MAX_NAME_LENGTH];
 	bool m_KeepWeapon[NUM_WEAPONS-1];
 	bool m_KeepAward;
 	int m_Spree;

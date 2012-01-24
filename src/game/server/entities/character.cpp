@@ -1040,14 +1040,6 @@ void CCharacter::Freeze(int Secs)
 	m_ActiveWeapon = WEAPON_NINJA;
 	ResetInput();
 	GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
-
-	if(GameServer()->m_pController->IsIFreeze() && g_Config.m_SvIFreezeFrozenTag)
-	{
-		str_copy(m_pPlayer->m_aPrevName, Server()->ClientName(m_pPlayer->GetCID()), MAX_NAME_LENGTH-1);
-		char aBuf[MAX_NAME_LENGTH];
-		str_format(aBuf, sizeof(aBuf), "[F] %s", Server()->ClientName(m_pPlayer->GetCID()));
-		Server()->SetClientName(m_pPlayer->GetCID(), aBuf);
-	}
 }
 
 int CCharacter::Frozen()
@@ -1110,10 +1102,6 @@ void CCharacter::KillChar()
 
 void CCharacter::Melt(int MelterID)
 {
-	// Set name back if Frozen Tags are enabled (iFreeze)
-	if(GameServer()->m_pController->IsIFreeze() && g_Config.m_SvIFreezeFrozenTag && Frozen())
-		Server()->SetClientName(m_pPlayer->GetCID(), m_pPlayer->m_aPrevName);
-
 	// Unfreeze
 	m_FreezeTicks = 0;
 	m_DeepFreeze = false;
