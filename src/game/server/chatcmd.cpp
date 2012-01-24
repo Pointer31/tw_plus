@@ -27,7 +27,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	}
 	else if(!str_comp(pMessage, "credits"))
 	{
-		SendChatTarget(ClientID, "Credits goes to the whole Teeworlds-Community and especially");
+		SendChatTarget(ClientID, "Credits goes to the whole Teeworlds-community and especially");
 		SendChatTarget(ClientID, "to BotoX, Tom and Greyfox. This mod has some of their ideas included.");
 		return true;
 	}
@@ -37,65 +37,90 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		SendChatTarget(ClientID, "\"info\" Information about the mod");
 		SendChatTarget(ClientID, "\"/stats\" Show player stats");
 
-		if(g_Config.m_SvStopGoFeature || AuthLevel)
+		if(g_Config.m_SvStopGoFeature)
 		{
 			SendChatTarget(ClientID, "\"stop\" Pause the game");
 			SendChatTarget(ClientID, "\"go\" Start the game");
 			SendChatTarget(ClientID, "\"restart\" Start a new round");
 		}
 
-		if(g_Config.m_SvPrivateMessage || AuthLevel)
-		{
-			SendChatTarget(ClientID, "\"sayto\" <Name/ID> <Msg> Sends a private message to a player");
-		}
-
-		if(g_Config.m_SvXonxFeature || AuthLevel)
+		if(g_Config.m_SvXonxFeature)
 		{
 			SendChatTarget(ClientID, "\"reset\" Reset the Spectator Slots");
 			SendChatTarget(ClientID, "\"1on1\" - \"6on6\" Starts a war");
 		}
 
+		if(g_Config.m_SvPrivateMessage || AuthLevel)
+		{
+			SendChatTarget(ClientID, "\"sayto <Name/ID> <Msg>\" Send a private message to a player");
+		}
+
 		if(CanExec(ClientID, "set_team"))
 		{
 			SendChatTarget(ClientID, "\"spec <client id>\" Set player to spectators");
-			SendChatTarget(ClientID, "\"red <client id>\" Set player to red Team");
-			SendChatTarget(ClientID, "\"blue <client id>\" Set player to blue Team");
+			SendChatTarget(ClientID, "\"red <client id>\" Set player to red team");
+			SendChatTarget(ClientID, "\"blue <client id>\" Set player to blue team");
 		}
 		return true;
 	}
 	else if(!str_comp(pMessage, "stop"))
 	{
-		if(g_Config.m_SvStopGoFeature && (pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel))
+		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
-			m_World.m_Paused = true;
-			SendChat(-1, CHAT_ALL, "Game paused.");
+			if(g_Config.m_SvStopGoFeature)
+			{
+				m_World.m_Paused = true;
+				SendChat(-1, CHAT_ALL, "Game paused.");
+			}
+			else
+			{
+				SendChatTarget(ClientID, "This feature is not available at the moment.");
+				return true;
+			}
 		}
 	}
 	else if(!str_comp(pMessage, "go"))
 		{
-			if(g_Config.m_SvStopGoFeature && (pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel))
+			if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 			{
-				m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
+				if(g_Config.m_SvStopGoFeature)
+				{
+					m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
+				}
+				else
+				{
+					SendChatTarget(ClientID, "This feature is not available at the moment.");
+					return true;
+				}
 			}
 		}
 	else if(!str_comp(pMessage, "restart"))
 	{
-		if(g_Config.m_SvStopGoFeature && (pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel))
+		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
-			if(m_pController->IsWarmup())
-				m_pController->DoWarmup(0);
+			if(g_Config.m_SvStopGoFeature)
+			{
+				if(m_pController->IsWarmup())
+					m_pController->DoWarmup(0);
+				else
+					m_pController->DoWarmup(g_Config.m_SvGoTime);
+			}
 			else
-				m_pController->DoWarmup(g_Config.m_SvGoTime);
+			{
+				SendChatTarget(ClientID, "This feature is not available at the moment.");
+				return true;
+			}
 		}
 	}
 	else if(!str_comp(pMessage, "1on1") || !str_comp(pMessage, "2on2") || !str_comp(pMessage, "3on3") ||
 			!str_comp(pMessage, "4on4") || !str_comp(pMessage, "5on5") || !str_comp(pMessage, "6on6"))
 	{
-		if(pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel)
+		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
-			if(!g_Config.m_SvXonxFeature && !AuthLevel)
+			if(!g_Config.m_SvXonxFeature)
 			{
 				SendChatTarget(ClientID, "This feature is not available at the moment.");
+				return true;
 			}
 			else
 			{
@@ -114,11 +139,12 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	}
 	else if(!str_comp(pMessage, "reset"))
 	{
-		if(pPlayer->GetTeam() != TEAM_SPECTATORS || AuthLevel)
+		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
-			if(!g_Config.m_SvXonxFeature && !AuthLevel)
+			if(!g_Config.m_SvXonxFeature)
 			{
 				SendChatTarget(ClientID, "This feature is not available at the moment.");
+				return true;
 			}
 			else
 			{
