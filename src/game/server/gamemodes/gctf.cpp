@@ -9,7 +9,7 @@ CGameControllerGCTF::CGameControllerGCTF(class CGameContext *pGameServer, int Ty
 : CGameControllerCTF(pGameServer, TypeFlags)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = "gCTF";
+	m_pGameType = "giCTF";
 }
 
 void CGameControllerGCTF::OnCharacterSpawn(CCharacter* pChr)
