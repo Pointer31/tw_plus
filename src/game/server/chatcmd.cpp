@@ -160,7 +160,6 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			{
 				//PM by name
 				int ID = -1;
-				bool found = false;
 				for(int i = 0; i < MAX_CLIENTS; i++)
 					if(!str_comp_nocase(aName, Server()->ClientName(i)))
 					{
