@@ -65,12 +65,11 @@ public:
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 
 	void Freeze(int);
-	void Unfreeze();
 	int Frozen();
 	CCharacterCore* GetCore() {return &m_Core;}
 	void AddSpree();
 	void EndSpree(int Killer);
-	void KillChar(bool);
+	void KillChar();
 	void Melt(int MelterID);
 	bool TakeWeapon(int Weapon);
 	bool Spawnprotected();

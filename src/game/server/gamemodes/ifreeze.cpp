@@ -77,7 +77,7 @@ void CGameControllerIFreeze::ResetFrozenPlayer()
 {
 	for(int i = 0; i < MAX_CLIENTS; i++)
 		if(GameServer()->m_apPlayers[i] && GameServer()->GetPlayerChar(i))
-			GameServer()->GetPlayerChar(i)->KillChar(false);
+			GameServer()->GetPlayerChar(i)->Melt(-1);
 }
 
 void CGameControllerIFreeze::DoWincheck()

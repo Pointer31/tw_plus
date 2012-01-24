@@ -1050,16 +1050,6 @@ void CCharacter::Freeze(int Secs)
 	}
 }
 
-void CCharacter::Unfreeze()
-{
-	if(GameServer()->m_pController->IsIFreeze() && g_Config.m_SvIFreezeFrozenTag && Frozen())
-		Server()->SetClientName(m_pPlayer->GetCID(), m_pPlayer->m_aPrevName);
-
-	m_FreezeTicks = 0;
-	m_DeepFreeze = false;
-	m_ActiveWeapon = m_LastWeapon;
-}
-
 int CCharacter::Frozen()
 {
 	return (m_DeepFreeze) ? -1 : m_FreezeTicks;
@@ -1104,28 +1094,30 @@ void CCharacter::EndSpree(int Killer)
 	m_pPlayer->m_Spree = 0;
 }
 
-void CCharacter::KillChar(bool JustUnfreeze)
+void CCharacter::KillChar()
 {
-	Unfreeze();
+	// we got to wait 0.5 secs before respawning
+	m_pPlayer->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()/2;
 
-	if(!JustUnfreeze)
-	{
-		// we got to wait 0.5 secs before respawning
-		m_pPlayer->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()/2;
-
-		// this is for auto respawn after 3 secs
-		m_pPlayer->m_DieTick = Server()->Tick();
-
+	// this is for auto respawn after 3 secs
+	m_pPlayer->m_DieTick = Server()->Tick();
 		m_Alive = false;
-		GameServer()->m_World.RemoveEntity(this);
-		GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
-		GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
-	}
+	GameServer()->m_World.RemoveEntity(this);
+	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
+	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
+
 }
 
 void CCharacter::Melt(int MelterID)
 {
-	Unfreeze();
+	// Set name back if Frozen Tags are enabled (iFreeze)
+	if(GameServer()->m_pController->IsIFreeze() && g_Config.m_SvIFreezeFrozenTag && Frozen())
+		Server()->SetClientName(m_pPlayer->GetCID(), m_pPlayer->m_aPrevName);
+
+	// Unfreeze
+	m_FreezeTicks = 0;
+	m_DeepFreeze = false;
+	m_ActiveWeapon = m_LastWeapon;
 
 	if(GameServer()->IsValidCID(MelterID))
 	{
@@ -1142,7 +1134,8 @@ void CCharacter::Melt(int MelterID)
 	if(GameServer()->m_pController->IsIFreeze())
 	{
 		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
-		KillChar(!g_Config.m_SvIFreezeMeltRespawn);
+		if(g_Config.m_SvIFreezeMeltRespawn)
+			KillChar();
 	}
 }
 
