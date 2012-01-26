@@ -315,7 +315,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	return false;
 }
 
-bool CGameContext::CanExec(int ClientID, const char* Command)
+bool CGameContext::CanExec(int ClientID, const char* pCommand)
 {
-	return (Server()->IsAuthed(ClientID) == 2 || (Server()->IsAuthed(ClientID) == 1 && Console()->GetCommandInfo(Command, CFGFLAG_SERVER, false)->GetAccessLevel() == IConsole::ACCESS_LEVEL_MOD));
+	return (Server()->IsAuthed(ClientID) == 2 || (Server()->IsAuthed(ClientID) == 1 && Console()->GetCommandInfo(pCommand, CFGFLAG_SERVER, false)->GetAccessLevel() == IConsole::ACCESS_LEVEL_MOD));
 }
