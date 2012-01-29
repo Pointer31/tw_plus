@@ -20,9 +20,14 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "TW+ Mod v.%s created by Teetime.", MOD_VERSION);
 		SendChatTarget(ClientID, aBuf);
+
 		SendChatTarget(ClientID, "For a list of available commands type \"/cmdlist\"");
+
 		str_format(aBuf, sizeof(aBuf), "Gametype: %s", GameType());
 		SendChatTarget(ClientID, aBuf);
+
+		if(m_pController->IsIFreeze())
+				SendChatTarget(ClientID, "iFreeze is originally created by Tom94. Big thanks to him");
 		return true;
 	}
 	else if(!str_comp(pMessage, "credits"))
@@ -34,32 +39,33 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	else if(!str_comp(pMessage, "cmdlist"))
 	{
 		SendChatTarget(ClientID, "----- Commands -----");
-		SendChatTarget(ClientID, "\"info\" Information about the mod");
+		SendChatTarget(ClientID, "\"/info\" Information about the mod");
+		SendChatTarget(ClientID, "\"/credits\" See some credits");
 		SendChatTarget(ClientID, "\"/stats\" Show player stats");
 
 		if(g_Config.m_SvStopGoFeature)
 		{
-			SendChatTarget(ClientID, "\"stop\" Pause the game");
-			SendChatTarget(ClientID, "\"go\" Start the game");
-			SendChatTarget(ClientID, "\"restart\" Start a new round");
+			SendChatTarget(ClientID, "\"/stop\" Pause the game");
+			SendChatTarget(ClientID, "\"/go\" Start the game");
+			SendChatTarget(ClientID, "\"/restart\" Start a new round");
 		}
 
 		if(g_Config.m_SvXonxFeature)
 		{
-			SendChatTarget(ClientID, "\"reset\" Reset the Spectator Slots");
-			SendChatTarget(ClientID, "\"1on1\" - \"6on6\" Starts a war");
+			SendChatTarget(ClientID, "\"/reset\" Reset the Spectator Slots");
+			SendChatTarget(ClientID, "\"/1on1\" - \"6on6\" Starts a war");
 		}
 
 		if(g_Config.m_SvPrivateMessage || AuthLevel)
 		{
-			SendChatTarget(ClientID, "\"sayto <Name/ID> <Msg>\" Send a private message to a player");
+			SendChatTarget(ClientID, "\"/sayto <Name/ID> <Msg>\" Send a private message to a player");
 		}
 
 		if(CanExec(ClientID, "set_team"))
 		{
-			SendChatTarget(ClientID, "\"spec <client id>\" Set player to spectators");
-			SendChatTarget(ClientID, "\"red <client id>\" Set player to red team");
-			SendChatTarget(ClientID, "\"blue <client id>\" Set player to blue team");
+			SendChatTarget(ClientID, "\"/spec <client id>\" Set player to spectators");
+			SendChatTarget(ClientID, "\"/red <client id>\" Set player to red team");
+			SendChatTarget(ClientID, "\"/blue <client id>\" Set player to blue team");
 		}
 		return true;
 	}
