@@ -615,11 +615,6 @@ void CCharacter::Tick()
 		if(m_FreezeTicks <= 0)
 			Melt(-1);
 
-		if(Server()->Tick() % Server()->TickSpeed() == 0)
-		{
-			m_FreezeArmor = (m_FreezeTicks < 0) ? 10 : m_FreezeTicks/Server()->TickSpeed();
-		}
-
 		//Melting
 		if(GameServer()->m_pController->IsIFreeze())
 		{
@@ -1015,8 +1010,8 @@ void CCharacter::Snap(int SnappingClient)
 	if(m_pPlayer->GetCID() == SnappingClient || SnappingClient == -1 ||
 		(!g_Config.m_SvStrictSpectateMode && m_pPlayer->GetCID() == GameServer()->m_apPlayers[SnappingClient]->m_SpectatorID))
 	{
-		pCharacter->m_Health = m_Health;
-		pCharacter->m_Armor = (m_FreezeTicks) ? m_FreezeArmor : m_Armor;
+		pCharacter->m_Health = (m_FreezeTicks) ? (m_FreezeTicks/Server()->TickSpeed())/10 : m_Health;
+		pCharacter->m_Armor = (m_FreezeTicks) ? (m_FreezeTicks/Server()->TickSpeed()) % 10 +1 : m_Armor;
 		if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
 			pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo;
 	}

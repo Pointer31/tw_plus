@@ -122,7 +122,6 @@ private:
 
 	int m_Health;
 	int m_Armor;
-	int m_FreezeArmor;
 
 	// ninja
 	struct
