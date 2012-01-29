@@ -8,6 +8,7 @@
 #include "gamecontext.h"
 #include <game/version.h>
 #include <game/collision.h>
+#include <game/server/entities/loltext.h>
 #include <game/gamecore.h>
 #include "gamemodes/dm.h"
 #include "gamemodes/tdm.h"
@@ -1542,6 +1543,16 @@ void CGameContext::ConVote(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 }
 
+int CGameContext::CreateLolText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText)
+{
+	return CLoltext::Create(&m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow);
+}
+
+void CGameContext::DestroyLolText(int TextID)
+{
+	CLoltext::Destroy(&m_World, TextID);
+}
+
 void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
@@ -1932,6 +1943,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 
 void CGameContext::OnShutdown()
 {
+	CLoltext::Destroy(&m_World, -1);
 	delete m_pController;
 	m_pController = 0;
 	Clear();
