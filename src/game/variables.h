@@ -82,9 +82,6 @@ MACRO_CONFIG_INT(SvVoteSpectateRejoindelay, sv_vote_spectate_rejoindelay, 3, 0, 
 MACRO_CONFIG_INT(SvVoteKick, sv_vote_kick, 1, 0, 1, CFGFLAG_SERVER, "Allow voting to kick players")
 MACRO_CONFIG_INT(SvVoteKickMin, sv_vote_kick_min, 0, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Minimum number of players required to start a kick vote")
 MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SERVER, "The time to ban a player if kicked by vote. 0 makes it just use kick")
-
-MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 14, 10, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
-MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 14, 10, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, 15, CFGFLAG_SERVER, "")
@@ -120,6 +117,12 @@ MACRO_CONFIG_INT(SvStatsOutputlevel, sv_stats_outputlevel, 1, 0, 3, CFGFLAG_SERV
 //
 MACRO_CONFIG_STR(SvChatMessage, sv_chat_message, 256, "", CFGFLAG_SERVER, "A message which will be periodically shown in chat")
 MACRO_CONFIG_INT(SvChatMessageInterval, sv_chat_message_interval, 10, 5, 1000000, CFGFLAG_SERVER, "The interval in minutes where the chatmessage is sent to the chat")
+
+// Loltext
+MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 14, 10, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
+MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 14, 10, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")
+MACRO_CONFIG_INT(SvLoltextLifespan, sv_loltext_lifespan, 50, 25, 100, CFGFLAG_SERVER, "How long the loltext is shown")
+MACRO_CONFIG_INT(SvLoltextShow, sv_loltext_show, 1, 0, 1, CFGFLAG_SERVER, "Show loltext")
 
 // gCTF
 MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 3, 6, 4, CFGFLAG_SERVER, "How much damage the grenade must make at least to kill the player (depends how far away it explodes)")

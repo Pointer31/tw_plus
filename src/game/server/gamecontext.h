@@ -120,6 +120,7 @@ public:
 	void AbortVoteKickOnDisconnect(int ClientID);
 
 	int CreateLolText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText);
+	int CreateLolText(CEntity *pParent, const char *pText);
 	void DestroyLolText(int TextID);
 
 	int m_VoteCreator;

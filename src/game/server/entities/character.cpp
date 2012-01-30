@@ -1112,6 +1112,8 @@ void CCharacter::Melt(int MelterID)
 
 		m_MeltTicks = 0;
 		GameServer()->m_apPlayers[MelterID]->m_Score++;
+		if(g_Config.m_SvLoltextShow)
+			GameServer()->CreateLolText(GameServer()->GetPlayerChar(MelterID), "-1");
 	}
 
 	if(GameServer()->m_pController->IsIFreeze())

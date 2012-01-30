@@ -363,13 +363,25 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 	if(!pKiller || Weapon == WEAPON_GAME)
 		return 0;
 	if(pKiller == pVictim->GetPlayer())
+	{
 		pVictim->GetPlayer()->m_Score--; // suicide
+		if(g_Config.m_SvLoltextShow)
+			GameServer()->CreateLolText(pKiller->GetCharacter(), "-1");
+	}
 	else
 	{
 		if(IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam())
+		{
 			pKiller->m_Score--; // teamkill
+			if(g_Config.m_SvLoltextShow)
+				GameServer()->CreateLolText(pKiller->GetCharacter(), "-1");
+		}
 		else
+		{
 			pKiller->m_Score++; // normal kill
+			if(g_Config.m_SvLoltextShow)
+				GameServer()->CreateLolText(pKiller->GetCharacter(), "+1");
+		}
 	}
 	if(Weapon == WEAPON_SELF)
 		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()*3.0f;

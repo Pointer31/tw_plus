@@ -1548,6 +1548,11 @@ int CGameContext::CreateLolText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Ve
 	return CLoltext::Create(&m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow);
 }
 
+int CGameContext::CreateLolText(CEntity *pParent, const char *pText)
+{
+	return CLoltext::Create(&m_World, pParent, vec2(0, 0), vec2(0, -0.5f), g_Config.m_SvLoltextLifespan, pText, true, false);
+}
+
 void CGameContext::DestroyLolText(int TextID)
 {
 	CLoltext::Destroy(&m_World, TextID);

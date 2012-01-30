@@ -59,7 +59,11 @@ int CGameControllerCTF::OnCharacterDeath(class CCharacter *pVictim, class CPlaye
 			pVictim->GetPlayer()->m_Stats.m_LostFlags++;
 
 			if(pKiller && pKiller->GetTeam() != pVictim->GetPlayer()->GetTeam())
+			{
+				if(g_Config.m_SvLoltextShow)
+					GameServer()->CreateLolText(pKiller->GetCharacter(), "+1");
 				pKiller->m_Score++;
+			}
 
 			HadFlag |= 1;
 		}
