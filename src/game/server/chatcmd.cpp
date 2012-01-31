@@ -43,6 +43,11 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		SendChatTarget(ClientID, "\"/credits\" See some credits");
 		SendChatTarget(ClientID, "\"/stats\" Show player stats");
 
+		if(g_Config.m_SvPrivateMessage || AuthLevel)
+		{
+			SendChatTarget(ClientID, "\"/sayto <Name/ID> <Msg>\" Send a private message to a player");
+		}
+
 		if(g_Config.m_SvStopGoFeature)
 		{
 			SendChatTarget(ClientID, "\"/stop\" Pause the game");
@@ -54,11 +59,6 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		{
 			SendChatTarget(ClientID, "\"/reset\" Reset the Spectator Slots");
 			SendChatTarget(ClientID, "\"/1on1\" - \"6on6\" Starts a war");
-		}
-
-		if(g_Config.m_SvPrivateMessage || AuthLevel)
-		{
-			SendChatTarget(ClientID, "\"/sayto <Name/ID> <Msg>\" Send a private message to a player");
 		}
 
 		if(CanExec(ClientID, "set_team"))
@@ -165,66 +165,67 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			SendChatTarget(ClientID, "This feature is not available at the moment.");
 		else
 		{
-			int ReceiverID;
-			char aMsg[256];
-			char aName[MAX_NAME_LENGTH];
+			int ReceiverID = -1;
+			int NameLength;
 
-			if((sscanf(pMessage, "sayto %d %255s", &ReceiverID, aMsg) == 2) && IsValidCID(ReceiverID))
+			// Skip "sayto"
+			pMessage += str_length("sayto");
+
+			char *pMsg = str_skip_whitespaces(const_cast<char*>(pMessage));
+
+			if(pMsg[0] == '\0')
 			{
-				//PM by ClientID
+				SendChatTarget(ClientID, "Useage: \"/sayto <Name/ID> <Message>\"");
+				return true;
+			}
+
+			//Give names a higher priority than IDs because players doesn't see IDs but can choose names with TAB
+			// Search for name
+			for(int i = 0; i < MAX_CLIENTS; i++)
+			{
+				NameLength = str_length(Server()->ClientName(i));
+				if(str_comp_nocase_num(pMsg, Server()->ClientName(i), NameLength) == 0)
+				{
+					ReceiverID = i;
+					pMsg += NameLength;
+					break;
+				}
+			}
+			// if nobody found by name, check if ID is given
+			if(ReceiverID < 0 && (sscanf(pMsg, "%d", &ReceiverID) == 1))
+			{
+				// Skip ID to message
+				while(*pMsg && *pMsg != ' ')
+					pMsg++;
+			}
+
+
+			if(IsValidCID(ReceiverID))
+			{
 				if(ReceiverID == ClientID)
 				{
 					SendChatTarget(ClientID, "You can't send yourself a private message");
 				}
 				else
 				{
-					char aBuf[512];
-					str_format(aBuf, sizeof(aBuf), "You received a private message from %s (ID: %d)", Server()->ClientName(ClientID), ClientID);
-					SendChatTarget(ReceiverID, aBuf);
+					pMsg = str_skip_whitespaces(pMsg);
 
-					str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(ClientID), aMsg);
-					SendChatTarget(ReceiverID, aBuf);
-					SendChatTarget(ClientID, "PM successfully sent");
-				}
-			}
-			// TODO: Solution for player with spaces in their name?
-			else if(sscanf(pMessage, "sayto %15s %255s", aName, aMsg) == 2)
-			{
-				//PM by name
-				int ID = -1;
-				for(int i = 0; i < MAX_CLIENTS; i++)
-					if(!str_comp_nocase(aName, Server()->ClientName(i)))
-					{
-						ID = i;
-						break;
-					}
-
-				if(ID == ClientID)
-				{
-					SendChatTarget(ClientID, "You can't send yourself a private message");
-				}
-				else
-				{
-					if(IsValidCID(ID))
+					if(pMsg[0] == '\0')
+						SendChatTarget(ClientID, "Your message is empty");
+					else
 					{
 						char aBuf[512];
 						str_format(aBuf, sizeof(aBuf), "You received a private message from %s (ID: %d)", Server()->ClientName(ClientID), ClientID);
-						SendChatTarget(ID, aBuf);
+						SendChatTarget(ReceiverID, aBuf);
 
-						str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(ClientID), aMsg);
-						SendChatTarget(ID, aBuf);
+						str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(ClientID), pMsg);
+						SendChatTarget(ReceiverID, aBuf);
 						SendChatTarget(ClientID, "PM successfully sent");
-					}
-					else
-					{
-						SendChatTarget(ClientID, "A player with this name doesn't exist");
 					}
 				}
 			}
 			else
-			{
-				SendChatTarget(ClientID, "Invalid ID or name. Player doesn't exist");
-			}
+				SendChatTarget(ClientID, "No player with this name or ID found");
 		}
 		return true;
 	}
