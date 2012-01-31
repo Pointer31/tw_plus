@@ -266,17 +266,46 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	}
 	else if(!str_comp_num(pMessage, "stats", 5))
 	{
+		int ReceiverID, NameLength;
+		char aBuf[32] = {0};
 		CPlayer* pP = pPlayer;
-		//TODO: Possibility to show stats of other players?
 
-		char aaBuf[4][128];
-		str_format(aaBuf[0], sizeof(aaBuf[0]), "Total Shots: %d", pP->m_Stats.m_TotalShots);
-		str_format(aaBuf[1], sizeof(aaBuf[1]), "Kills: %d", pP->m_Stats.m_Kills);
-		str_format(aaBuf[2], sizeof(aaBuf[2]), "Deaths: %d", pP->m_Stats.m_Deaths);
-		str_format(aaBuf[3], sizeof(aaBuf[3]), "Ratio: %.2f", (pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 0);
+		if(sscanf(pMessage, "stats %2s", aBuf) > 0)
+		{
+			pMessage += str_length("stats");
+			char *pMsg = str_skip_whitespaces(const_cast<char*>(pMessage));
 
-		SendChatTarget(ClientID, "--- Statistics ---");
-		for(int i = 0; i < 4; i++)
+			for(int i = 0; i < MAX_CLIENTS; i++)
+			{
+				NameLength = str_length(Server()->ClientName(i));
+				if(str_comp_nocase_num(pMsg, Server()->ClientName(i), NameLength) == 0)
+				{
+					ReceiverID = i;
+					pMsg += NameLength;
+					break;
+				}
+			}
+
+			if(IsValidCID(ReceiverID))
+			{
+				pP = m_apPlayers[ReceiverID];
+				str_format(aBuf, sizeof(aBuf), "(%s) ", Server()->ClientName(ReceiverID));
+			}
+			else
+			{
+				SendChatTarget(ClientID, "No player with this name ingame");
+				return true;
+			}
+		}
+
+		char aaBuf[5][128];
+		str_format(aaBuf[0], sizeof(aaBuf[0]), "--- Statistics %s---", aBuf);
+		str_format(aaBuf[1], sizeof(aaBuf[1]), "Total Shots: %d", pP->m_Stats.m_TotalShots);
+		str_format(aaBuf[2], sizeof(aaBuf[2]), "Kills: %d", pP->m_Stats.m_Kills);
+		str_format(aaBuf[3], sizeof(aaBuf[3]), "Deaths: %d", pP->m_Stats.m_Deaths);
+		str_format(aaBuf[4], sizeof(aaBuf[4]), "Ratio: %.2f", (pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 0);
+
+		for(int i = 0; i < 5; i++)
 			SendChatTarget(ClientID, aaBuf[i]);
 
 		return true;
