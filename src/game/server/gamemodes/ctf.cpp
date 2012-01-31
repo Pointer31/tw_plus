@@ -255,7 +255,7 @@ void CGameControllerCTF::Tick()
 					F->m_pCarryingCharacter = apCloseCCharacters[i];
 					F->m_pCarryingCharacter->GetPlayer()->m_Score += 1;
 					if(g_Config.m_SvLoltextShow)
-						GameServer()->CreateLolText(F->m_pCarryingCharacter, "+5");
+						GameServer()->CreateLolText(F->m_pCarryingCharacter, "+1");
 
 					char aBuf[256];
 					str_format(aBuf, sizeof(aBuf), "flag_grab player='%d:%s'",
