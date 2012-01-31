@@ -182,6 +182,8 @@ void CGameControllerCTF::Tick()
 					// CAPTURE! \o/
 					m_aTeamscore[fi^1] += 100;
 					F->m_pCarryingCharacter->GetPlayer()->m_Score += 5;
+					if(g_Config.m_SvLoltextShow)
+						GameServer()->CreateLolText(F->m_pCarryingCharacter, "+5");
 					F->m_pCarryingCharacter->GetPlayer()->m_Stats.m_Captures++;
 
 					char aBuf[512];
@@ -227,6 +229,8 @@ void CGameControllerCTF::Tick()
 					{
 						CCharacter *pChr = apCloseCCharacters[i];
 						pChr->GetPlayer()->m_Score += 1;
+						if(g_Config.m_SvLoltextShow)
+							GameServer()->CreateLolText(F->m_pCarryingCharacter, "+1");
 
 						char aBuf[256];
 						str_format(aBuf, sizeof(aBuf), "flag_return player='%d:%s'",
@@ -250,6 +254,8 @@ void CGameControllerCTF::Tick()
 					F->m_AtStand = 0;
 					F->m_pCarryingCharacter = apCloseCCharacters[i];
 					F->m_pCarryingCharacter->GetPlayer()->m_Score += 1;
+					if(g_Config.m_SvLoltextShow)
+						GameServer()->CreateLolText(F->m_pCarryingCharacter, "+5");
 
 					char aBuf[256];
 					str_format(aBuf, sizeof(aBuf), "flag_grab player='%d:%s'",
