@@ -266,7 +266,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	}
 	else if(!str_comp_num(pMessage, "stats", 5))
 	{
-		int ReceiverID, NameLength;
+		int ReceiverID = -1, NameLength;
 		char aBuf[32] = {0};
 		CPlayer* pP = pPlayer;
 
