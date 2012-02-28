@@ -1576,7 +1576,8 @@ void CGameContext::ConFreeze(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	int ClientID = pResult->GetInteger(0);
-	if(!pSelf->IsValidCID(ClientID))
+
+	if(!pSelf->IsValidCID(ClientID) && !pSelf->GetPlayerChar(ClientID))
 		return;
 
 	pSelf->GetPlayerChar(ClientID)->Freeze(pResult->GetInteger(1));
