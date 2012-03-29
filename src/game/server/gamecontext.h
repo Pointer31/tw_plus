@@ -213,7 +213,7 @@ public:
 	virtual const char *NetVersion();
 
 	bool m_SpecMuted;
-	bool ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMessage);
+	bool ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMessage);
 	bool CanExec(int, const char*);
 };
 

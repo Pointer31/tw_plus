@@ -660,7 +660,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			pMessage++;
 		}
 
-		if(!ChatCommand(ClientID, pPlayer, pMsg->m_pMessage))
+		if(ShowCommand(ClientID, pPlayer, pMsg->m_pMessage))
 		{
 			// force redirecting of messages
 			if(m_SpecMuted && pPlayer->GetTeam() == TEAM_SPECTATORS)

@@ -5,12 +5,14 @@
 #include <engine/shared/config.h>
 #include <stdio.h>
 
-bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMessage)
+bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMessage)
 {
-	if(pMessage[0] == '/' || pMessage[0] == '!')
+	if(!str_comp(pMessage, "go") || !str_comp(pMessage, "stop") || !str_comp(pMessage, "restart"))
+	{/* Do nothing */}
+	else if(pMessage[0] == '/' || pMessage[0] == '!')
 		pMessage++;
 	else
-		return false;
+		return true;
 
 	// AuthLevel > 0  => Moderator/Admin
 	int AuthLevel = Server()->IsAuthed(ClientID);
@@ -28,13 +30,13 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		if(m_pController->IsIFreeze())
 				SendChatTarget(ClientID, "iFreeze is originally created by Tom94. Big thanks to him");
-		return true;
+		return false;
 	}
 	else if(!str_comp(pMessage, "credits"))
 	{
 		SendChatTarget(ClientID, "Credits goes to the whole Teeworlds-community and especially");
 		SendChatTarget(ClientID, "to BotoX, Tom and Greyfox. This mod has some of their ideas included.");
-		return true;
+		return false;
 	}
 	else if(!str_comp(pMessage, "cmdlist"))
 	{
@@ -67,7 +69,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			SendChatTarget(ClientID, "\"/red <client id>\" Set player to red team");
 			SendChatTarget(ClientID, "\"/blue <client id>\" Set player to blue team");
 		}
-		return true;
+		return false;
 	}
 	else if(!str_comp(pMessage, "stop"))
 	{
@@ -79,11 +81,9 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				SendChat(-1, CHAT_ALL, "Game paused.");
 			}
 			else
-			{
 				SendChatTarget(ClientID, "This feature is not available at the moment.");
-				return true;
-			}
 		}
+		return true;
 	}
 	else if(!str_comp(pMessage, "go"))
 		{
@@ -94,11 +94,9 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 					m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
 				}
 				else
-				{
 					SendChatTarget(ClientID, "This feature is not available at the moment.");
-					return true;
-				}
 			}
+			return true;
 		}
 	else if(!str_comp(pMessage, "restart"))
 	{
@@ -112,11 +110,9 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 					m_pController->DoWarmup(g_Config.m_SvGoTime);
 			}
 			else
-			{
 				SendChatTarget(ClientID, "This feature is not available at the moment.");
-				return true;
-			}
 		}
+		return true;
 	}
 	else if(!str_comp(pMessage, "1on1") || !str_comp(pMessage, "2on2") || !str_comp(pMessage, "3on3") ||
 			!str_comp(pMessage, "4on4") || !str_comp(pMessage, "5on5") || !str_comp(pMessage, "6on6"))
@@ -126,7 +122,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			if(!g_Config.m_SvXonxFeature)
 			{
 				SendChatTarget(ClientID, "This feature is not available at the moment.");
-				return true;
+				return false;
 			}
 			else
 			{
@@ -142,6 +138,8 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				SendChat(-1, CHAT_ALL, aBuf);
 			}
 		}
+
+		return true;
 	}
 	else if(!str_comp(pMessage, "reset"))
 	{
@@ -150,7 +148,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			if(!g_Config.m_SvXonxFeature)
 			{
 				SendChatTarget(ClientID, "This feature is not available at the moment.");
-				return true;
+				return false;
 			}
 			else
 			{
@@ -158,6 +156,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				SendChat(-1, CHAT_ALL, "Resetted spectator slots");
 			}
 		}
+		return true;
 	}
 	else if(!str_comp_num(pMessage, "sayto", 5))
 	{
@@ -227,7 +226,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			else
 				SendChatTarget(ClientID, "No player with this name or ID found");
 		}
-		return true;
+		return false;
 	}
 	else if(!str_comp_num(pMessage, "emote", 5))
 	{
@@ -262,7 +261,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			SendChatTarget(ClientID, "Example: \"/emote pain 10\" for showing 10 seconds emote pain.");
 		}
 
-		return true;
+		return false;
 	}
 	else if(!str_comp_num(pMessage, "stats", 5))
 	{
@@ -308,7 +307,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		for(int i = 0; i < 5; i++)
 			SendChatTarget(ClientID, aaBuf[i]);
 
-		return true;
+		return false;
 	}
 	else if(AuthLevel)
 	{
@@ -348,7 +347,7 @@ bool CGameContext::ChatCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 	}
 
-	return false;
+	return true;
 }
 
 bool CGameContext::CanExec(int ClientID, const char* pCommand)
