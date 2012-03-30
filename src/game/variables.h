@@ -94,11 +94,14 @@ MACRO_CONFIG_INT(DbgTuning, dbg_tuning, 0, 0, 1, CFGFLAG_CLIENT, "")
 MACRO_CONFIG_INT(SvChatValue, sv_chat_value, 250, 100, 1000, CFGFLAG_SERVER, "A value which is added on each message and decreased on each tick")
 MACRO_CONFIG_INT(SvChatThreshold, sv_chat_threshold, 1000, 250, 10000, CFGFLAG_SERVER, "If this threshold will exceed by too many messages the player will be muted")
 MACRO_CONFIG_INT(SvMuteDuration, sv_mute_duration, 60, 0, 3600, CFGFLAG_SERVER, "How long the player will be muted (in seconds)")
+MACRO_CONFIG_INT(SvChatMaxDuplicates, sv_chat_max_duplicates, 3, -1, 25, CFGFLAG_SERVER, "How many identical chat messages are allowed to send in a row (-1 for no limit)")
+MACRO_CONFIG_INT(SvVoteMute, sv_vote_mute, 1, 0, 1, CFGFLAG_SERVER, "Allow voting to mute players")
+MACRO_CONFIG_INT(SvVoteMuteDuration, sv_vote_mute_duration, 90, 0, 600, CFGFLAG_SERVER, "How many seconds to mute a player after being muted by vote.")
 
 //Anticamper
 MACRO_CONFIG_INT(SvAnticamper, sv_anticamper, 0, 0, 2, CFGFLAG_SERVER, "0 disables, 1 enables anticamper in all modes and 2 only in instagib gamemodes")
-MACRO_CONFIG_INT(SvAnticamperFreeze, sv_anticamper_freeze, 7, 0, 15, CFGFLAG_SERVER, "If a player should freeze on camping (and how long) or die")
-MACRO_CONFIG_INT(SvAnticamperTime, sv_anticamper_time, 10, 5, 120, CFGFLAG_SERVER, "How many seconds to wait till the player dies/freezes")
+MACRO_CONFIG_INT(SvAnticamperFreeze, sv_anticamper_freeze, 0, 0, 15, CFGFLAG_SERVER, "If a player should freeze on camping (and how long) or die")
+MACRO_CONFIG_INT(SvAnticamperTime, sv_anticamper_time, 9, 5, 120, CFGFLAG_SERVER, "How many seconds to wait till the player dies/freezes")
 MACRO_CONFIG_INT(SvAnticamperRange, sv_anticamper_range, 200, 0, 1000, CFGFLAG_SERVER, "Distance how far away the player must move to escape anticamper")
 
 // General Stuff
@@ -130,14 +133,15 @@ MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 3, 6, 4, CFGFLAG_SER
 //iFreeze
 MACRO_CONFIG_INT(SvIFreezeAutomeltTime, sv_ifreeze_automelt_time, 30, 10, 120, CFGFLAG_SERVER, "Time till the player respawn automatically when he's frozen")
 MACRO_CONFIG_INT(SvIFreezeMeltRange, sv_ifreeze_melt_range, 100, 10, 1000, CFGFLAG_SERVER, "Maximum range to melt a player")
-MACRO_CONFIG_INT(SvIFreezeMeltTime, sv_ifreeze_melt_time, 2, 0, 5, CFGFLAG_SERVER, "Time the player must stand next to a player to melt him")
+MACRO_CONFIG_INT(SvIFreezeMeltTime, sv_ifreeze_melt_time, 1200, 500, 5000, CFGFLAG_SERVER, "Time (in ms) the player must stand next to a player to melt him")
 MACRO_CONFIG_INT(SvIFreezeMeltRespawn, sv_ifreeze_melt_respawn, 1, 0, 1, CFGFLAG_SERVER, "If a player respawn after he was being melted")
 MACRO_CONFIG_INT(SvIFreezeFrozenTag, sv_ifreeze_frozen_tag, 1, 0, 1, CFGFLAG_SERVER, "If frozen players have [F] in front of their name")
+
 // Killingspree
-MACRO_CONFIG_INT(SvKillingspreeKills, sv_killingspree_kills, 5, 3, 20, CFGFLAG_SERVER, "How many kills are needed to get the killingspree award")
-MACRO_CONFIG_INT(SvKillingspreeIFreeze, sv_killingspree_ifreeze, 1, 0, 1, CFGFLAG_SERVER, "Give the killingspree award only in the gametype \"iFreeze\"")
-MACRO_CONFIG_INT(SvKillingspreeAward, sv_killingspree_award, 0, 0, 1, CFGFLAG_SERVER, "If players with more than sv_killingspree_kills kills get the killingspree award")
-MACRO_CONFIG_INT(SvKillingspreeAwardLasers, sv_killingspree_award_lasers, 3, 1, 10, CFGFLAG_SERVER, "How many lasers will shot when you got the award")
-MACRO_CONFIG_INT(SvKillingspreeAwardLasersSplit, sv_killingspree_award_lasers_split, 1, 1, 10, CFGFLAG_SERVER, "Split of the lasers while having the award")
-MACRO_CONFIG_INT(SvKillingspreeAwardFiredelay, sv_killingspree_award_lasers_firedelay, 100, 0, 800, CFGFLAG_SERVER, "Firedelay of the weapon when you got the award")
+MACRO_CONFIG_INT(SvKillingspreeKills, sv_kspree_kills, 5, 3, 20, CFGFLAG_SERVER, "How many kills are needed to get the killingspree award")
+MACRO_CONFIG_INT(SvKillingspreeIFreeze, sv_kspree_ifreeze, 1, 0, 1, CFGFLAG_SERVER, "Give the killingspree award only in iFreeze")
+MACRO_CONFIG_INT(SvKillingspreeAward, sv_kspree_award, 0, 0, 1, CFGFLAG_SERVER, "If players with more than \"sv_killingspree_kills\" kills get the killingspree award")
+MACRO_CONFIG_INT(SvKillingspreeAwardLasers, sv_kspree_award_laser, 3, 1, 10, CFGFLAG_SERVER, "How many lasers will shot when you got the award")
+MACRO_CONFIG_INT(SvKillingspreeAwardLasersSplit, sv_kspree_award_laser_split, 1, 1, 10, CFGFLAG_SERVER, "Split of the lasers while having the award")
+MACRO_CONFIG_INT(SvKillingspreeAwardFiredelay, sv_kspree_award_laser_firedelay, 100, 0, 800, CFGFLAG_SERVER, "Firedelay of the weapon when you got the award")
 #endif

@@ -36,6 +36,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	{
 		SendChatTarget(ClientID, "Credits goes to the whole Teeworlds-community and especially");
 		SendChatTarget(ClientID, "to BotoX, Tom and Greyfox. This mod has some of their ideas included.");
+		SendChatTarget(ClientID, "Also thanks to fisted and eeeee for their amazing loltext.");
 		return false;
 	}
 	else if(!str_comp(pMessage, "cmdlist"))
@@ -78,6 +79,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			if(g_Config.m_SvStopGoFeature)
 			{
 				m_World.m_Paused = true;
+				m_pController->m_FakeWarmup = 0;
 				SendChat(-1, CHAT_ALL, "Game paused.");
 			}
 			else
@@ -91,7 +93,10 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			{
 				if(g_Config.m_SvStopGoFeature)
 				{
-					m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
+					if(m_pController->m_FakeWarmup)
+						m_pController->m_FakeWarmup = 0;
+					else
+						m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
 				}
 				else
 					SendChatTarget(ClientID, "This feature is not available at the moment.");
@@ -105,7 +110,10 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			if(g_Config.m_SvStopGoFeature)
 			{
 				if(m_pController->IsWarmup())
+				{
 					m_pController->DoWarmup(0);
+					m_pController->m_FakeWarmup = 0;
+				}
 				else
 					m_pController->DoWarmup(g_Config.m_SvGoTime);
 			}
@@ -153,51 +161,68 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			else
 			{
 				g_Config.m_SvSpectatorSlots = 0;
-				SendChat(-1, CHAT_ALL, "Resetted spectator slots");
+				SendChat(-1, CHAT_ALL, "Reset spectator slots");
 			}
 		}
 		return true;
 	}
-	else if(!str_comp_num(pMessage, "sayto", 5))
+	else if(!str_comp_num(pMessage, "stats", 5))
+	{
+		int ReceiverID = -1, NameLength;
+		char aBuf[32] = { 0 };
+		CPlayer *pP = pPlayer;
+
+		if (sscanf(pMessage, "stats %2s", aBuf) > 0)
+		{
+			pMessage += str_length("stats");
+
+			ParsePlayerName((char*) pMessage, &ReceiverID);
+
+			if(IsValidCID(ReceiverID))
+			{
+				pP = m_apPlayers[ReceiverID];
+				str_format(aBuf, sizeof(aBuf), "(%s) ", Server()->ClientName(ReceiverID));
+			}
+			else
+			{
+				SendChatTarget(ClientID, "No player with this name ingame");
+				return false;
+			}
+		}
+
+		char aaBuf[5][128];
+		str_format(aaBuf[0], sizeof(aaBuf[0]), "--- Statistics %s---", aBuf);
+		str_format(aaBuf[1], sizeof(aaBuf[1]), "Total Shots: %d", pP->m_Stats.m_TotalShots);
+		str_format(aaBuf[2], sizeof(aaBuf[2]), "Kills: %d", pP->m_Stats.m_Kills);
+		str_format(aaBuf[3], sizeof(aaBuf[3]), "Deaths: %d", pP->m_Stats.m_Deaths);
+		str_format(aaBuf[4], sizeof(aaBuf[4]), "Ratio: %.2f", (pP->m_Stats.m_Deaths > 0) ? ((float) pP->m_Stats.m_Kills / (float) pP->m_Stats.m_Deaths) : 0);
+
+		for (int i = 0; i < 5; i++)
+			SendChatTarget(ClientID, aaBuf[i]);
+
+		return false;
+	}
+	else if(!str_comp_num(pMessage, "sayto", 5) || !str_comp_num(pMessage, "st", 2) || !str_comp_num(pMessage, "pm", 2))
 	{
 		if(!g_Config.m_SvPrivateMessage && !AuthLevel)
 			SendChatTarget(ClientID, "This feature is not available at the moment.");
 		else
 		{
 			int ReceiverID = -1;
-			int NameLength;
 
 			// Skip "sayto"
-			pMessage += str_length("sayto");
+			while(*pMessage && *pMessage != ' ')
+				pMessage++;
 
 			char *pMsg = str_skip_whitespaces(const_cast<char*>(pMessage));
 
 			if(pMsg[0] == '\0')
 			{
 				SendChatTarget(ClientID, "Useage: \"/sayto <Name/ID> <Message>\"");
-				return true;
+				return false;
 			}
 
-			//Give names a higher priority than IDs because players doesn't see IDs but can choose names with TAB
-			// Search for name
-			for(int i = 0; i < MAX_CLIENTS; i++)
-			{
-				NameLength = str_length(Server()->ClientName(i));
-				if(str_comp_nocase_num(pMsg, Server()->ClientName(i), NameLength) == 0)
-				{
-					ReceiverID = i;
-					pMsg += NameLength;
-					break;
-				}
-			}
-			// if nobody found by name, check if ID is given
-			if(ReceiverID < 0 && (sscanf(pMsg, "%d", &ReceiverID) == 1))
-			{
-				// Skip ID to message
-				while(*pMsg && *pMsg != ' ')
-					pMsg++;
-			}
-
+			int Len = ParsePlayerName(pMsg, &ReceiverID);
 
 			if(IsValidCID(ReceiverID))
 			{
@@ -207,7 +232,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				}
 				else
 				{
-					pMsg = str_skip_whitespaces(pMsg);
+					pMsg = str_skip_whitespaces(pMsg + Len);
 
 					if(pMsg[0] == '\0')
 						SendChatTarget(ClientID, "Your message is empty");
@@ -263,94 +288,99 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		return false;
 	}
-	else if(!str_comp_num(pMessage, "stats", 5))
+	else if(!str_comp_num(pMessage, "spec", 4))
 	{
-		int ReceiverID = -1, NameLength;
-		char aBuf[32] = {0};
-		CPlayer* pP = pPlayer;
-
-		if(sscanf(pMessage, "stats %2s", aBuf) > 0)
-		{
-			pMessage += str_length("stats");
-			char *pMsg = str_skip_whitespaces(const_cast<char*>(pMessage));
-
-			for(int i = 0; i < MAX_CLIENTS; i++)
-			{
-				NameLength = str_length(Server()->ClientName(i));
-				if(str_comp_nocase_num(pMsg, Server()->ClientName(i), NameLength) == 0)
-				{
-					ReceiverID = i;
-					pMsg += NameLength;
-					break;
-				}
-			}
-
-			if(IsValidCID(ReceiverID))
-			{
-				pP = m_apPlayers[ReceiverID];
-				str_format(aBuf, sizeof(aBuf), "(%s) ", Server()->ClientName(ReceiverID));
-			}
-			else
-			{
-				SendChatTarget(ClientID, "No player with this name ingame");
-				return true;
-			}
-		}
-
-		char aaBuf[5][128];
-		str_format(aaBuf[0], sizeof(aaBuf[0]), "--- Statistics %s---", aBuf);
-		str_format(aaBuf[1], sizeof(aaBuf[1]), "Total Shots: %d", pP->m_Stats.m_TotalShots);
-		str_format(aaBuf[2], sizeof(aaBuf[2]), "Kills: %d", pP->m_Stats.m_Kills);
-		str_format(aaBuf[3], sizeof(aaBuf[3]), "Deaths: %d", pP->m_Stats.m_Deaths);
-		str_format(aaBuf[4], sizeof(aaBuf[4]), "Ratio: %.2f", (pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 0);
-
-		for(int i = 0; i < 5; i++)
-			SendChatTarget(ClientID, aaBuf[i]);
-
-		return false;
-	}
-	else if(AuthLevel)
-	{
-		if(CanExec(ClientID, "set_team"))
+		if(AuthLevel && CanExec(ClientID, "set_team"))
 		{
 			int ID;
-			if(!str_comp_num(pMessage, "spec", 4))
+			if(sscanf(pMessage, "spec %d", &ID) == 1)
 			{
-				if(sscanf(pMessage, "spec %d", &ID) == 1)
-				{
-					if(!IsValidCID(ID))
-						SendChatTarget(ID, "Invalid ID");
-					else
-						m_apPlayers[ID]->SetTeam(TEAM_SPECTATORS);
-				}
-			}
-			else if(!str_comp_num(pMessage, "red", 3))
-			{
-				if(sscanf(pMessage, "red %d", &ID) == 1)
-				{
-					if(!IsValidCID(ID))
-						SendChatTarget(ID, "Invalid ID");
-					else
-						m_apPlayers[ID]->SetTeam(TEAM_RED);
-				}
-			}
-			else if(!str_comp_num(pMessage, "blue", 4))
-			{
-				if(sscanf(pMessage, "blue %d", &ID) == 1)
-				{
-					if(!IsValidCID(ID))
-						SendChatTarget(ID, "Invalid ID");
-					else
-						m_apPlayers[ID]->SetTeam(TEAM_BLUE);
-				}
+				if (!IsValidCID(ID))
+					SendChatTarget(ID, "Invalid ID");
+				else
+					m_apPlayers[ID]->SetTeam(TEAM_SPECTATORS);
 			}
 		}
+		return true;
 	}
+	else if(!str_comp_num(pMessage, "red", 3))
+	{
+		if(AuthLevel && CanExec(ClientID, "set_team"))
+		{
+			int ID;
+			if(sscanf(pMessage, "red %d", &ID) == 1)
+			{
+				if (!IsValidCID(ID))
+					SendChatTarget(ID, "Invalid ID");
+				else
+					m_apPlayers[ID]->SetTeam(TEAM_RED);
+			}
+		}
+		return true;
+	}
+	else if(!str_comp_num(pMessage, "blue", 4))
+	{
+		if(AuthLevel && CanExec(ClientID, "set_team"))
+		{
+			int ID;
+			if (sscanf(pMessage, "blue %d", &ID) == 1)
+			{
+				if (!IsValidCID(ID))
+					SendChatTarget(ID, "Invalid ID");
+				else
+					m_apPlayers[ID]->SetTeam(TEAM_BLUE);
+			}
+		}
+		return true;
+	}
+	else
+		SendChatTarget(ClientID, "No such command. Type \"/cmdlist\" to get a list of available commands");
 
-	return true;
+	return false;
 }
 
 bool CGameContext::CanExec(int ClientID, const char* pCommand)
 {
 	return (Server()->IsAuthed(ClientID) == 2 || (Server()->IsAuthed(ClientID) == 1 && Console()->GetCommandInfo(pCommand, CFGFLAG_SERVER, false)->GetAccessLevel() == IConsole::ACCESS_LEVEL_MOD));
+}
+
+int CGameContext::ParsePlayerName(char *pMsg, int *ClientID)
+{
+	//Give names a higher priority than IDs because players doesn't see IDs but can choose names with tab
+
+	int NameLength;
+	*ClientID = -1;
+	bool ShortenName = false;
+	pMsg = str_skip_whitespaces(pMsg);
+
+	if(m_pController->IsIFreeze() && str_comp_num(pMsg, "[F] ", 4) == 0)
+	{
+		ShortenName = true;
+		pMsg += 4;
+	}
+
+	// Search for name
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		NameLength = str_length(Server()->ClientName(i));
+		//In iFreeze: If a player has the frozen tag and his name is long, ignore the last 4 chars (+1 for \0)
+		int Count = (ShortenName && NameLength > MAX_NAME_LENGTH-5) ? NameLength -4 : NameLength;
+
+		if(str_comp_nocase_num(pMsg, Server()->ClientName(i), Count) == 0)
+		{
+			*ClientID = i;
+			return NameLength;
+		}
+	}
+
+	// if nobody found by name, check if ID is given
+	if (*ClientID < 0 && (sscanf(pMsg, "%d", ClientID) == 1))
+	{
+		int Len = 0;
+		while (*pMsg && *pMsg != ' ')
+			Len++;
+		return Len;
+	}
+
+	return 0;
 }

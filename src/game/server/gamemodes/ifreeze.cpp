@@ -30,7 +30,7 @@ int CGameControllerIFreeze::OnCharacterDeath(class CCharacter *pVictim, class CP
 		if(pKiller != pVictim->GetPlayer())
 		{
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "You Froze %s", Server()->ClientName(pPV->GetCID()));
+			str_format(aBuf, sizeof(aBuf), "You froze %s", Server()->ClientName(pPV->GetCID()));
 			GameServer()->SendBroadcast(aBuf, pKiller->GetCID());
 			str_format(aBuf, sizeof(aBuf), "%s froze you", Server()->ClientName(pKiller->GetCID()));
 			GameServer()->SendBroadcast(aBuf, pPV->GetCID());
@@ -46,18 +46,18 @@ void CGameControllerIFreeze::DoFreezeScoring()
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if(GameServer()->m_apPlayers[i] && GameServer()->GetPlayerChar(i))
+		if(GameServer()->m_apPlayers[i])
 		{
 			if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_BLUE)
 			{
 				Blue++;
-				if(GameServer()->GetPlayerChar(i)->Frozen())
+				if(GameServer()->GetPlayerChar(i) && GameServer()->GetPlayerChar(i)->Frozen())
 					BlueFr++;
 			}
 			else if(GameServer()->m_apPlayers[i]->GetTeam() == TEAM_RED)
 			{
 				Red++;
-				if(GameServer()->GetPlayerChar(i)->Frozen())
+				if(GameServer()->GetPlayerChar(i) && GameServer()->GetPlayerChar(i)->Frozen())
 					RedFr++;
 			}
 		}

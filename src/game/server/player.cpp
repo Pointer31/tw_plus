@@ -23,6 +23,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_TeamChangeTick = Server()->Tick();
 
 	m_ChatTicks = 0;
+	m_OldChatMsgCount = 0;
 	mem_zero(&m_Stats, sizeof(m_Stats));
 	for(int i = 0; i < NUM_WEAPONS-1; i++)
 		m_KeepWeapon[i] = false;

@@ -631,9 +631,9 @@ void CCharacter::Tick()
 					m_MeltTicks++;
 					FoundMelter = true;
 					// Send "thawed" on half of melttime
-					if(m_MeltTicks == Server()->TickSpeed()*(g_Config.m_SvIFreezeMeltTime*0.5f))
+					if(m_MeltTicks == (int)(Server()->TickSpeed()*g_Config.m_SvIFreezeMeltTime*0.0005f))
 						GameServer()->SendBroadcast("You are being thawed", m_pPlayer->GetCID());
-					else if(m_MeltTicks >= Server()->TickSpeed()*g_Config.m_SvIFreezeMeltTime)
+					else if(m_MeltTicks >= Server()->TickSpeed()*g_Config.m_SvIFreezeMeltTime*0.001f)
 						Melt(apCloseChars[i]->GetPlayer()->GetCID());
 					break;
 				}
@@ -649,7 +649,7 @@ void CCharacter::Tick()
 		if(m_SpawnProtectTick > Server()->Tick())
 		{
 			// All 100ms
-			if(Server()->Tick() % 10 == 0)
+			if(Server()->Tick() % 5 == 0)
 			{
 				char aBuf[64];
 				str_format(aBuf, sizeof(aBuf), "Spawnprotection for %.1f sec.", (float)(m_SpawnProtectTick - Server()->Tick())/Server()->TickSpeed());
@@ -1113,7 +1113,7 @@ void CCharacter::Melt(int MelterID)
 		m_MeltTicks = 0;
 		GameServer()->m_apPlayers[MelterID]->m_Score++;
 		if(g_Config.m_SvLoltextShow)
-			GameServer()->CreateLolText(GameServer()->GetPlayerChar(MelterID), "-1");
+			GameServer()->CreateLolText(GameServer()->GetPlayerChar(MelterID), "+1");
 	}
 
 	if(GameServer()->m_pController->IsIFreeze())

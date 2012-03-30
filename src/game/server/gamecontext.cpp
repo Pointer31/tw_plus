@@ -662,6 +662,23 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 		if(ShowCommand(ClientID, pPlayer, pMsg->m_pMessage))
 		{
+			if(g_Config.m_SvChatMaxDuplicates != -1)
+			{
+				if(str_comp_num(pPlayer->m_aOldChatMsg, pMsg->m_pMessage, sizeof(pPlayer->m_aOldChatMsg)) == 0)
+				{
+					if(++pPlayer->m_OldChatMsgCount >= g_Config.m_SvChatMaxDuplicates)
+					{
+						SendChatTarget(ClientID, "You are trying to send too many identical messages.");
+						return;
+					}
+				}
+				else
+				{
+					pPlayer->m_OldChatMsgCount = 0;
+					str_copy(pPlayer->m_aOldChatMsg, pMsg->m_pMessage, sizeof(pPlayer->m_aOldChatMsg));
+				}
+			}
+
 			// force redirecting of messages
 			if(m_SpecMuted && pPlayer->GetTeam() == TEAM_SPECTATORS)
 				Team = CGameContext::CHAT_SPEC;
@@ -810,6 +827,36 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			str_format(aDesc, sizeof(aDesc), "move '%s' to spectators", Server()->ClientName(SpectateID));
 			str_format(aCmd, sizeof(aCmd), "set_team %d -1 %d", SpectateID, g_Config.m_SvVoteSpectateRejoindelay);
 		}
+		else if(str_comp_nocase(pMsg->m_Type, "mute") == 0)
+		{
+			if(!g_Config.m_SvVoteMute)
+			{
+				SendChatTarget(ClientID, "Server does not allow voting to mute players");
+				return;
+			}
+
+			int MuteID = str_toint(pMsg->m_Value);
+			if(!IsValidCID(MuteID))
+			{
+				SendChatTarget(ClientID, "Invalid client id to mute");
+				return;
+			}
+			if(MuteID == ClientID)
+			{
+				SendChatTarget(ClientID, "You can't mute yourself");
+				return;
+			}
+			if(Server()->IsAuthed(MuteID))
+			{
+				SendChatTarget(ClientID, "You can't mute admins");
+				return;
+			}
+
+			str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to mute '%s' (%s)", Server()->ClientName(ClientID), Server()->ClientName(MuteID), pReason);
+			str_format(aDesc, sizeof(aDesc), "mute '%s'", Server()->ClientName(MuteID));
+			str_format(aCmd, sizeof(aCmd), "mute %d %d", MuteID, g_Config.m_SvVoteMuteDuration);
+
+		}
 
 		if(aCmd[0])
 		{
@@ -912,7 +959,10 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		pPlayer->m_LastChangeInfo = Server()->Tick();
 
 		// set start infos
-		Server()->SetClientName(ClientID, pMsg->m_pName);
+		if(m_pController->IsIFreeze() && str_comp_num(pMsg->m_pName, "[F]", 3) == 0)
+			Server()->SetClientName(ClientID, pMsg->m_pName+3);
+		else
+			Server()->SetClientName(ClientID, pMsg->m_pName);
 		Server()->SetClientClan(ClientID, pMsg->m_pClan);
 		Server()->SetClientCountry(ClientID, pMsg->m_Country);
 		str_copy(pPlayer->m_TeeInfos.m_SkinName, pMsg->m_pSkin, sizeof(pPlayer->m_TeeInfos.m_SkinName));
@@ -1010,6 +1060,9 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		pPlayer->m_LastChangeInfo = Server()->Tick();
 
 		// set infos
+		if(m_pController->IsIFreeze() && str_comp_num(pMsg->m_pName, "[F]", 3) == 0)
+			pMsg->m_pName += 3;
+
 		char aOldName[MAX_NAME_LENGTH];
 		str_copy(aOldName, Server()->ClientName(ClientID), sizeof(aOldName));
 		Server()->SetClientName(ClientID, pMsg->m_pName);
@@ -1716,6 +1769,7 @@ void CGameContext::ConKill(IConsole::IResult *pResult, void *pUserData)
 		pSelf->GetPlayerChar(ClientID)->Die(ClientID, WEAPON_WORLD);
 }
 
+#ifdef USECHEATS
 void CGameContext::ConGive(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
@@ -1815,6 +1869,7 @@ void CGameContext::ConTeleport(IConsole::IResult *pResult, void *pUserData)
 			pSelf->m_apPlayers[TeleFrom]->m_ViewPos = pSelf->m_apPlayers[TeleTo]->m_ViewPos;
 	}
 }
+#endif
 
 void CGameContext::OnConsoleInit()
 {
@@ -1857,10 +1912,12 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("set_name", "ir", CFGFLAG_SERVER, ConSetName, this, "Set the name of a player");
 	Console()->Register("set_clan", "ir", CFGFLAG_SERVER, ConSetClan, this, "Set the clan of a player");
 	Console()->Register("kill", "i", CFGFLAG_SERVER, ConKill, this, "Kills a player (-1 for all)");
+#ifdef USECHEATS
 	Console()->Register("give", "ii?i", CFGFLAG_SERVER, ConGive, this, "Give a player the a weapon (-2=Award;-1=All weapons;0=Hammer;1=Gun;2=Shotgun;3=Grenade;4=Riffle,5=Ninja)");
 	Console()->Register("takeweapon", "ii", CFGFLAG_SERVER, ConTakeWeapon, this, "Takes away a weapon of a player (-2=Award;-1=All weapons;0=Hammer;1=Gun;2=Shotgun;3=Grenade;4=Riffle");
 	Console()->Register("tele", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player to another");
 	Console()->Register("teleport", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player to another");
+#endif
 }
 
 void CGameContext::OnInit(/*class IKernel *pKernel*/)

@@ -97,6 +97,8 @@ public:
 	} m_Latency;
 
 	int m_ChatTicks;
+	char m_aOldChatMsg[256];
+	int m_OldChatMsgCount;
 	//
 	int Anticamper();
 	bool m_SentCampMsg;
