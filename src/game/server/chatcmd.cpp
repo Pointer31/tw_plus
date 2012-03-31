@@ -360,13 +360,14 @@ int CGameContext::ParsePlayerName(char *pMsg, int *ClientID)
 	}
 
 	// Search for name
+	//TODO: player0:"pew"; player1:"pew pew" -> Message for "pew" goes to player0 => Check if there is a player-name which might better fit
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
 		NameLength = str_length(Server()->ClientName(i));
 		//In iFreeze: If a player has the frozen tag and his name is long, ignore the last 4 chars (+1 for \0)
 		int Count = (ShortenName && NameLength > MAX_NAME_LENGTH-5) ? NameLength -4 : NameLength;
 
-		if(str_comp_nocase_num(pMsg, Server()->ClientName(i), Count) == 0)
+		if((str_comp_nocase_num(pMsg, Server()->ClientName(i), Count) == 0) && (pMsg[Count] == ' ' || pMsg[Count] == '\0'))
 		{
 			*ClientID = i;
 			return NameLength;
@@ -378,7 +379,10 @@ int CGameContext::ParsePlayerName(char *pMsg, int *ClientID)
 	{
 		int Len = 0;
 		while (*pMsg && *pMsg != ' ')
+		{
 			Len++;
+			pMsg++;
+		}
 		return Len;
 	}
 
