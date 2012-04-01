@@ -1101,6 +1101,7 @@ void CCharacter::Melt(int MelterID)
 	m_FreezeTicks = 0;
 	m_DeepFreeze = false;
 	m_ActiveWeapon = m_LastWeapon;
+	m_MeltTicks = 0;
 
 	if(GameServer()->IsValidCID(MelterID))
 	{
@@ -1110,7 +1111,6 @@ void CCharacter::Melt(int MelterID)
 		str_format(aBuf, sizeof(aBuf), "%s melted you", Server()->ClientName(MelterID));
 		GameServer()->SendBroadcast(aBuf, m_pPlayer->GetCID());
 
-		m_MeltTicks = 0;
 		GameServer()->m_apPlayers[MelterID]->m_Score++;
 		if(g_Config.m_SvLoltextShow)
 			GameServer()->CreateLolText(GameServer()->GetPlayerChar(MelterID), "+1");
