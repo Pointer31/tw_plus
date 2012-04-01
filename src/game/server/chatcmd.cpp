@@ -349,7 +349,7 @@ int CGameContext::ParsePlayerName(char *pMsg, int *ClientID)
 {
 	//Give names a higher priority than IDs because players doesn't see IDs but can choose names with tab
 
-	int NameLength;
+	int NameLength, NameLengthHit = 0;
 	*ClientID = -1;
 	bool ShortenName = false;
 	pMsg = str_skip_whitespaces(pMsg);
@@ -361,7 +361,6 @@ int CGameContext::ParsePlayerName(char *pMsg, int *ClientID)
 	}
 
 	// Search for name
-	//TODO: player0:"pew"; player1:"pew pew" -> Message for "pew" goes to player0 => Check if there is a player-name which might better fit
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
 		NameLength = str_length(Server()->ClientName(i));
@@ -371,9 +370,11 @@ int CGameContext::ParsePlayerName(char *pMsg, int *ClientID)
 		if((str_comp_nocase_num(pMsg, Server()->ClientName(i), Count) == 0) && (pMsg[Count] == ' ' || pMsg[Count] == '\0'))
 		{
 			*ClientID = i;
-			return NameLength;
+			NameLengthHit = NameLength;
 		}
 	}
+	if(*ClientID != -1)
+		return NameLengthHit;
 
 	// if nobody found by name, check if ID is given
 	if (*ClientID < 0 && (sscanf(pMsg, "%d", ClientID) == 1))
