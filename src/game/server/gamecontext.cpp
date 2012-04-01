@@ -667,7 +667,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			{
 				if(str_comp_num(pPlayer->m_aOldChatMsg, pMsg->m_pMessage, sizeof(pPlayer->m_aOldChatMsg)) == 0)
 				{
-					if(++pPlayer->m_OldChatMsgCount >= g_Config.m_SvChatMaxDuplicates)
+					if(pPlayer->m_OldChatMsgCount++ >= g_Config.m_SvChatMaxDuplicates)
 					{
 						SendChatTarget(ClientID, "You are trying to send too many identical messages.");
 						return;

@@ -2,6 +2,7 @@
  */
 
 #include "gamecontext.h"
+#include <game/version.h>
 #include <engine/shared/config.h>
 #include <stdio.h>
 
