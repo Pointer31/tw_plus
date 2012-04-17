@@ -1810,6 +1810,23 @@ void gui_messagebox(const char *title, const char *message)
 
 int str_isspace(char c) { return c == ' ' || c == '\n' || c == '\t'; }
 
+char str_isupper(char c)
+{
+	return (c >= 65 && c <= 90);
+}
+
+char str_islower(char c)
+{
+	return (c >= 97 && c <= 122);
+}
+
+char str_tolower(char c)
+{
+	if(c >= 65 && c <= 90)
+		return c + 32;
+	return c;
+}
+
 char str_uppercase(char c)
 {
 	if(c >= 'a' && c <= 'z')

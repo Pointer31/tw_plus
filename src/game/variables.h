@@ -97,6 +97,7 @@ MACRO_CONFIG_INT(SvMuteDuration, sv_mute_duration, 60, 0, 3600, CFGFLAG_SERVER, 
 MACRO_CONFIG_INT(SvChatMaxDuplicates, sv_chat_max_duplicates, 3, -1, 25, CFGFLAG_SERVER, "How many identical chat messages are allowed to send in a row (-1 for no limit)")
 MACRO_CONFIG_INT(SvVoteMute, sv_vote_mute, 1, 0, 1, CFGFLAG_SERVER, "Allow voting to mute players")
 MACRO_CONFIG_INT(SvVoteMuteDuration, sv_vote_mute_duration, 180, 0, 600, CFGFLAG_SERVER, "How many seconds to mute a player after being muted by vote.")
+MACRO_CONFIG_INT(SvAntiCapslock, sv_anti_capslock, 1, 0, 1, CFGFLAG_SERVER, "If all letters are capitalized they will be lowercased")
 
 //Anticamper
 MACRO_CONFIG_INT(SvAnticamper, sv_anticamper, 0, 0, 2, CFGFLAG_SERVER, "0 disables, 1 enables anticamper in all modes and 2 only in instagib gamemodes")

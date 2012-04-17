@@ -680,6 +680,14 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 			}
 
+			//Lowercase a string (NO utf8/Unicode support (yet?))
+			pMessage = (unsigned char *)pMsg->m_pMessage;
+			if(g_Config.m_SvAntiCapslock && CheckForCapslock(pMessage))
+			{
+				for(; *pMessage; pMessage++)
+					*pMessage = str_tolower(*pMessage);
+			}
+
 			// force redirecting of messages
 			if(m_SpecMuted && pPlayer->GetTeam() == TEAM_SPECTATORS)
 				Team = CGameContext::CHAT_SPEC;
@@ -1615,6 +1623,34 @@ int CGameContext::CreateLolText(CEntity *pParent, const char *pText)
 void CGameContext::DestroyLolText(int TextID)
 {
 	CLoltext::Destroy(&m_World, TextID);
+}
+
+bool CGameContext::CheckForCapslock(unsigned char *pStr)
+{
+	unsigned char *pBuf = pStr;
+	int Lower = 0, Upper = 0, None = 0;
+	while(*pBuf)
+	{
+		// Check for Unicode-char - only ANSI is supported yet
+		if(str_utf8_forward((const char *)pBuf, 0) > 1)
+			return false;
+
+		if(str_islower(*pBuf))
+			Lower++;
+		else if(str_isupper(*pBuf))
+			Upper++;
+		else
+			None++;
+
+		pBuf++;
+	}
+
+	// TODO: Add a tolerance? e.g. not all letters have to be capitalized but 1/2 or 2/3?
+	int Length = pBuf - pStr;
+	if((Length > 4) && (Length - None == Upper) && (Lower == 0))
+		return true;
+
+	return false;
 }
 
 void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
