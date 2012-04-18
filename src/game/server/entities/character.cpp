@@ -490,8 +490,9 @@ void CCharacter::HandleWeapons()
 
 	// ammo regen
 	int AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
-	if(GameServer()->m_pController->m_Flags&IGameController::GAMETYPE_GCTF)
-		AmmoRegenTime = 2000;
+	bool gCTF = GameServer()->m_pController->m_Flags&IGameController::GAMETYPE_GCTF;
+	if(gCTF && m_aWeapons[m_ActiveWeapon].m_Ammo > -1)
+		AmmoRegenTime = g_Config.m_SvGrenadeAmmoRegen;
 
 	if(AmmoRegenTime)
 	{
@@ -504,7 +505,7 @@ void CCharacter::HandleWeapons()
 			if ((Server()->Tick() - m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart) >= AmmoRegenTime * Server()->TickSpeed() / 1000)
 			{
 				// Add some ammo
-				m_aWeapons[m_ActiveWeapon].m_Ammo = min(m_aWeapons[m_ActiveWeapon].m_Ammo + 1, 10);
+				m_aWeapons[m_ActiveWeapon].m_Ammo = min(m_aWeapons[m_ActiveWeapon].m_Ammo + 1, (gCTF) ? g_Config.m_SvGrenadeAmmo : 10);
 				m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
 			}
 		}

@@ -2,6 +2,7 @@
  * Made by Teetime
  */
 #include "gctf.h"
+#include <engine/shared/config.h>
 #include <game/server/entities/character.h>
 #include <game/server/gamecontext.h>
 
@@ -9,13 +10,13 @@ CGameControllerGCTF::CGameControllerGCTF(class CGameContext *pGameServer, int Ty
 : CGameControllerCTF(pGameServer, TypeFlags)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = "giCTF";
+	m_pGameType = "gCTF";
 }
 
 void CGameControllerGCTF::OnCharacterSpawn(CCharacter* pChr)
 {
 	pChr->IncreaseHealth(10);
-	pChr->GiveWeapon(WEAPON_GRENADE, 10);
+	pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmo);
 }
 
 void CGameControllerGCTF::Tick()

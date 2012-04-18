@@ -129,7 +129,9 @@ MACRO_CONFIG_INT(SvLoltextLifespan, sv_loltext_lifespan, 50, 25, 100, CFGFLAG_SE
 MACRO_CONFIG_INT(SvLoltextShow, sv_loltext_show, 1, 0, 1, CFGFLAG_SERVER, "Show loltext")
 
 // gCTF
-MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 3, 6, 4, CFGFLAG_SERVER, "How much damage the grenade must make at least to kill the player (depends how far away it explodes)")
+MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 4, 3, 6, CFGFLAG_SERVER, "Minimum damage the grenade must make to kill the player (depends how far away it explodes)")
+MACRO_CONFIG_INT(SvGrenadeAmmo, sv_grenade_ammo, 6, -1, 10, CFGFLAG_SERVER, "How much ammo for the grenade")
+MACRO_CONFIG_INT(SvGrenadeAmmoRegen, sv_grenade_ammo_regen, 1000, 800, 2000, CFGFLAG_SERVER, "Time till the one bullet regenerate")
 
 //iFreeze
 MACRO_CONFIG_INT(SvIFreezeAutomeltTime, sv_ifreeze_automelt_time, 30, 10, 120, CFGFLAG_SERVER, "Time till the player respawn automatically when he's frozen")

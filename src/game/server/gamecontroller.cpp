@@ -475,6 +475,10 @@ void IGameController::Tick()
 		}
 	}
 
+	// Grenade should have everytime more than 3 bullets
+	if(g_Config.m_SvGrenadeAmmo < 4)
+		g_Config.m_SvGrenadeAmmo = -1;
+
 	// game is Paused
 	if(GameServer()->m_World.m_Paused)
 		++m_RoundStartTick;
