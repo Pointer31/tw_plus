@@ -12,7 +12,7 @@ CGameControllerGCTF::CGameControllerGCTF(class CGameContext *pGameServer, int Ty
 : CGameControllerCTF(pGameServer, TypeFlags)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = "gCTF";
+	m_pGameType = "gCTF+";
 }
 
 void CGameControllerGCTF::OnCharacterSpawn(CCharacter* pChr)
@@ -33,7 +33,7 @@ CGameControllerGDM::CGameControllerGDM(class CGameContext *pGameServer, int Type
 : CGameControllerDM(pGameServer, TypeFlags)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = "gDM";
+	m_pGameType = "gDM+";
 }
 
 void CGameControllerGDM::OnCharacterSpawn(CCharacter* pChr)
@@ -54,7 +54,7 @@ CGameControllerGTDM::CGameControllerGTDM(class CGameContext *pGameServer, int Ty
 : CGameControllerTDM(pGameServer, TypeFlags)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = "gTDM";
+	m_pGameType = "gTDM+";
 }
 
 void CGameControllerGTDM::OnCharacterSpawn(CCharacter* pChr)

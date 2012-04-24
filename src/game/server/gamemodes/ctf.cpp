@@ -16,7 +16,7 @@ CGameControllerCTF::CGameControllerCTF(class CGameContext *pGameServer, int Type
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
 	m_Flags = TypeFlags;
-	m_pGameType = (IsInstagib()) ? "iCTF" : "CTF+";
+	m_pGameType = (IsInstagib()) ? "iCTF+" : "CTF+";
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_FLAGS;
 }
 
