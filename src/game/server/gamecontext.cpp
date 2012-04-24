@@ -1985,23 +1985,23 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	// select gametype
 	if(str_comp_nocase(g_Config.m_SvGametype, "mod") == 0)
 		m_pController = new CGameControllerMOD(this);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "ctf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "ctf+"))
+	else if(str_comp_nocase(g_Config.m_SvGametype, "ctf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "ctf+"))		// CTF
 		m_pController = new CGameControllerCTF(this, IGameController::GAMETYPE_VANILLA);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "tdm+"))
+	else if(str_comp_nocase(g_Config.m_SvGametype, "tdm") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "tdm+"))		// TDM
 		m_pController = new CGameControllerTDM(this, IGameController::GAMETYPE_VANILLA);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "ictf") == 0)
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "ictf") || !str_comp_nocase(g_Config.m_SvGametype, "ictf+"))		// iCTF
 		m_pController = new CGameControllerCTF(this, IGameController::GAMETYPE_INSTAGIB);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "idm") == 0)
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "idm") || !str_comp_nocase(g_Config.m_SvGametype, "idm+"))			// iDM
 		m_pController = new CGameControllerDM(this, IGameController::GAMETYPE_INSTAGIB);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "itdm") == 0)
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "itdm") || !str_comp_nocase(g_Config.m_SvGametype, "itdm+"))		// iTDM
 		m_pController = new CGameControllerTDM(this, IGameController::GAMETYPE_INSTAGIB);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "gctf") == 0)
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "gctf") || !str_comp_nocase(g_Config.m_SvGametype, "gctf+"))		// gCTF
 		m_pController = new CGameControllerGCTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "gdm") == 0)
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "gdm") || !str_comp_nocase(g_Config.m_SvGametype, "gdm+"))			// gDM
 		m_pController = new CGameControllerGDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "gtdm") == 0)
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "gtdm") || str_comp_nocase(g_Config.m_SvGametype, "gtdm+"))			// gTDM
 		m_pController = new CGameControllerGTDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
-	else if(str_comp_nocase(g_Config.m_SvGametype, "ifreeze") == 0)
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "ifreeze") || !str_comp_nocase(g_Config.m_SvGametype, "ifreeze+"))	// iFreeze
 		m_pController = new CGameControllerIFreeze(this, IGameController::GAMETYPE_IFREEZE|IGameController::GAMETYPE_INSTAGIB);
 	else
 		m_pController = new CGameControllerDM(this, IGameController::GAMETYPE_VANILLA);
