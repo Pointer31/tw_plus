@@ -14,7 +14,7 @@
 #include "gamemodes/tdm.h"
 #include "gamemodes/ctf.h"
 #include "gamemodes/mod.h"
-#include "gamemodes/gctf.h"
+#include "gamemodes/grenade.h"
 #include "gamemodes/ifreeze.h"
 
 enum
@@ -1997,6 +1997,10 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		m_pController = new CGameControllerTDM(this, IGameController::GAMETYPE_INSTAGIB);
 	else if(str_comp_nocase(g_Config.m_SvGametype, "gctf") == 0)
 		m_pController = new CGameControllerGCTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "gdm") == 0)
+		m_pController = new CGameControllerGDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "gtdm") == 0)
+		m_pController = new CGameControllerGTDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
 	else if(str_comp_nocase(g_Config.m_SvGametype, "ifreeze") == 0)
 		m_pController = new CGameControllerIFreeze(this, IGameController::GAMETYPE_IFREEZE|IGameController::GAMETYPE_INSTAGIB);
 	else
