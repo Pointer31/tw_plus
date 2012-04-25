@@ -1941,19 +1941,19 @@ void CGameContext::OnConsoleInit()
 
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 
-	Console()->Register("freeze", "ii", CFGFLAG_SERVER, ConFreeze, this, "Freezes a player for x seconds (-1 for deep freeze)");
+	Console()->Register("freeze", "ii", CFGFLAG_SERVER, ConFreeze, this, "Freeze a player for x seconds");
 	Console()->Register("unfreeze", "i", CFGFLAG_SERVER, ConUnFreeze, this, "Unfreeze a player");
 	Console()->Register("melt", "i", CFGFLAG_SERVER, ConUnFreeze, this, "Melt a player (same effect like unfreeze)");
-	Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mutes a player for x sec");
-	Console()->Register("unmuteid", "i", CFGFLAG_SERVER, ConUnmuteID, this, "Unmutes a player by its client id");
-	Console()->Register("unmuteip", "i", CFGFLAG_SERVER, ConUnmuteIP, this, "Removes a mute by its index");
+	Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mute a player for x sec");
+	Console()->Register("unmuteid", "i", CFGFLAG_SERVER, ConUnmuteID, this, "Unmute a player by its client id");
+	Console()->Register("unmuteip", "i", CFGFLAG_SERVER, ConUnmuteIP, this, "Remove a mute by its index");
 	Console()->Register("mutes", "", CFGFLAG_SERVER, ConMutes, this, "Show all mutes");
 	Console()->Register("mute_spec", "?i", CFGFLAG_SERVER, ConMuteSpec, this, "All messages written in spectators will be redirect to teamchat for this round");
-	Console()->Register("stop", "", CFGFLAG_SERVER, ConStop, this, "Pauses the game");
-	Console()->Register("go", "?i", CFGFLAG_SERVER, ConGo, this, "Continues the game");
+	Console()->Register("stop", "", CFGFLAG_SERVER, ConStop, this, "Pause the game");
+	Console()->Register("go", "?i", CFGFLAG_SERVER, ConGo, this, "Continue the game");
 	Console()->Register("set_name", "ir", CFGFLAG_SERVER, ConSetName, this, "Set the name of a player");
 	Console()->Register("set_clan", "ir", CFGFLAG_SERVER, ConSetClan, this, "Set the clan of a player");
-	Console()->Register("kill", "i", CFGFLAG_SERVER, ConKill, this, "Kills a player (-1 for all)");
+	Console()->Register("kill", "i", CFGFLAG_SERVER, ConKill, this, "Kill a player");
 #ifdef USECHEATS
 	Console()->Register("give", "ii?i", CFGFLAG_SERVER, ConGive, this, "Give a player the a weapon (-2=Award;-1=All weapons;0=Hammer;1=Gun;2=Shotgun;3=Grenade;4=Riffle,5=Ninja)");
 	Console()->Register("takeweapon", "ii", CFGFLAG_SERVER, ConTakeWeapon, this, "Takes away a weapon of a player (-2=Award;-1=All weapons;0=Hammer;1=Gun;2=Shotgun;3=Grenade;4=Riffle");
