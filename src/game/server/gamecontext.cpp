@@ -1999,7 +1999,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		m_pController = new CGameControllerGCTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
 	else if(!str_comp_nocase(g_Config.m_SvGametype, "gdm") || !str_comp_nocase(g_Config.m_SvGametype, "gdm+"))			// gDM
 		m_pController = new CGameControllerGDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
-	else if(!str_comp_nocase(g_Config.m_SvGametype, "gtdm") || str_comp_nocase(g_Config.m_SvGametype, "gtdm+"))			// gTDM
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "gtdm") || !str_comp_nocase(g_Config.m_SvGametype, "gtdm+"))			// gTDM
 		m_pController = new CGameControllerGTDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
 	else if(!str_comp_nocase(g_Config.m_SvGametype, "ifreeze") || !str_comp_nocase(g_Config.m_SvGametype, "ifreeze+"))	// iFreeze
 		m_pController = new CGameControllerIFreeze(this, IGameController::GAMETYPE_IFREEZE|IGameController::GAMETYPE_INSTAGIB);
