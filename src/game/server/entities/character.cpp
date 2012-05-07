@@ -467,8 +467,13 @@ void CCharacter::FireWeapon()
 	if(!m_ReloadTimer)
 	{
 		int FireDelay = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay;
+
+		if(m_ActiveWeapon == WEAPON_RIFLE)
+			FireDelay = g_Config.m_SvLaserReloadTime;
+
 		if(m_pPlayer->m_GotAward)
 			FireDelay = g_Config.m_SvKillingspreeAwardFiredelay;
+
 		m_ReloadTimer = FireDelay * Server()->TickSpeed() / 1000;
 	}
 }
