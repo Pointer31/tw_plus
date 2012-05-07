@@ -1218,7 +1218,13 @@ void CGameContext::ConTuneParam(IConsole::IResult *pResult, void *pUserData)
 	const char *pParamName = pResult->GetString(0);
 	float NewValue = pResult->GetFloat(1);
 
-	if(pSelf->Tuning()->Set(pParamName, NewValue))
+	if(pResult->NumArguments() == 1 && pSelf->Tuning()->Get(pParamName, &NewValue))
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "%s is %.2f", pParamName, NewValue);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
+	}
+	else if(pSelf->Tuning()->Set(pParamName, NewValue))
 	{
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "%s changed to %.2f", pParamName, NewValue);
@@ -1921,7 +1927,7 @@ void CGameContext::OnConsoleInit()
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 
-	Console()->Register("tune", "si", CFGFLAG_SERVER, ConTuneParam, this, "Tune variable to value");
+	Console()->Register("tune", "s?i", CFGFLAG_SERVER, ConTuneParam, this, "Tune variable to value");
 	Console()->Register("tune_reset", "", CFGFLAG_SERVER, ConTuneReset, this, "Reset tuning");
 	Console()->Register("tune_dump", "", CFGFLAG_SERVER, ConTuneDump, this, "Dump tuning");
 
