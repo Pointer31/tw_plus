@@ -80,9 +80,12 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		{
 			if(g_Config.m_SvStopGoFeature)
 			{
-				m_World.m_Paused = true;
+				if(!m_World.m_Paused)
+				{
+					m_World.m_Paused = true;
+					SendChat(-1, CHAT_ALL, "Game paused.");
+				}
 				m_pController->m_FakeWarmup = 0;
-				SendChat(-1, CHAT_ALL, "Game paused.");
 			}
 			else
 				SendChatTarget(ClientID, "This feature is not available at the moment.");
@@ -95,10 +98,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			{
 				if(g_Config.m_SvStopGoFeature)
 				{
-					if(m_pController->m_FakeWarmup)
-						m_pController->m_FakeWarmup = 0;
-					else
-						m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
+					m_pController->m_FakeWarmup = Server()->TickSpeed() * g_Config.m_SvGoTime;
 				}
 				else
 					SendChatTarget(ClientID, "This feature is not available at the moment.");
