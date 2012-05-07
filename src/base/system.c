@@ -1810,20 +1810,32 @@ void gui_messagebox(const char *title, const char *message)
 
 int str_isspace(char c) { return c == ' ' || c == '\n' || c == '\t'; }
 
-char str_isupper(char c)
+#include "UTF8-letter-cases.h"
+
+int str_isupper(int c)
 {
-	return (c >= 65 && c <= 90);
+	int Entrys = sizeof(aaUTF8CapitalLetters)/(3*sizeof(int)), i;
+	for(i = 0; i < Entrys; i++)
+		if(c >= aaUTF8CapitalLetters[i][0] && c <= aaUTF8CapitalLetters[i][1])
+			return 1;
+	return 0;
 }
 
-char str_islower(char c)
+int str_islower(int c)
 {
-	return (c >= 97 && c <= 122);
+	int Entrys = sizeof(aaUTF8LowerLetters)/(3*sizeof(int)), i;
+	for(i = 0; i < Entrys; i++)
+		if(c >= aaUTF8LowerLetters[i][0] && c <= aaUTF8LowerLetters[i][1])
+			return 1;
+	return 0;
 }
 
-char str_tolower(char c)
+int str_tolower(int c)
 {
-	if(c >= 65 && c <= 90)
-		return c + 32;
+	int Entrys = sizeof(aaUTF8CapitalLetters)/(3*sizeof(int)), i;
+	for(i = 0; i < Entrys; i++)
+		if(c >= aaUTF8CapitalLetters[i][0] && c <= aaUTF8CapitalLetters[i][1])
+			return c + aaUTF8CapitalLetters[i][2];
 	return c;
 }
 

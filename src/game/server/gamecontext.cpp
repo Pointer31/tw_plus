@@ -680,18 +680,24 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 			}
 
-			//Lowercase a string (NO utf8/Unicode support (yet?))
-			pMessage = (unsigned char *)pMsg->m_pMessage;
-			if(g_Config.m_SvAntiCapslock && CheckForCapslock(pMessage))
-			{
-				for(; *pMessage; pMessage++)
-					*pMessage = str_tolower(*pMessage);
-			}
-
 			// force redirecting of messages
 			if(m_SpecMuted && pPlayer->GetTeam() == TEAM_SPECTATORS)
 				Team = CGameContext::CHAT_SPEC;
-			SendChat(ClientID, Team, pMsg->m_pMessage);
+
+			//Lowercase a string (Only support for latin letters)
+			if(g_Config.m_SvAntiCapslock && CheckForCapslock(pMsg->m_pMessage))
+			{
+				int Char, CurrentPos = 0;
+				char aNewMsg[512] = {0};
+				while(*pMsg->m_pMessage)
+				{
+					Char = str_utf8_decode(&pMsg->m_pMessage);
+					CurrentPos += str_utf8_encode(&aNewMsg[CurrentPos], str_tolower(Char));
+				}
+				SendChat(ClientID, Team, aNewMsg);
+			}
+			else
+				SendChat(ClientID, Team, pMsg->m_pMessage);
 		}
 	}
 	else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
@@ -1625,29 +1631,26 @@ void CGameContext::DestroyLolText(int TextID)
 	CLoltext::Destroy(&m_World, TextID);
 }
 
-bool CGameContext::CheckForCapslock(unsigned char *pStr)
+bool CGameContext::CheckForCapslock(const char *pStr)
 {
-	unsigned char *pBuf = pStr;
 	int Lower = 0, Upper = 0, None = 0;
-	while(*pBuf)
-	{
-		// Check for Unicode-char - only ANSI is supported yet
-		if(str_utf8_forward((const char *)pBuf, 0) > 1)
-			return false;
+	if(!str_utf8_check(pStr))
+		return false;
 
-		if(str_islower(*pBuf))
+	while(*pStr)
+	{
+		int Char = str_utf8_decode(&pStr);
+
+		if(str_islower(Char))
 			Lower++;
-		else if(str_isupper(*pBuf))
+		else if(str_isupper(Char))
 			Upper++;
 		else
 			None++;
-
-		pBuf++;
 	}
 
-	// TODO: Add a tolerance? e.g. not all letters have to be capitalized but 1/2 or 2/3?
-	int Length = pBuf - pStr;
-	if((Length > 4) && (Length - None == Upper) && (Lower == 0))
+	int Length = Lower + Upper + None;
+	if((Length > g_Config.m_SvAntiCapslockMinimum) && ((double)Lower/Length < g_Config.m_SvAntiCapslockTolerance/10.f))
 		return true;
 
 	return false;

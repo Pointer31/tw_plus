@@ -217,7 +217,7 @@ public:
 	bool ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMessage);
 	bool CanExec(int, const char*);
 	int ParsePlayerName(char* pMsg, int *ClientID);
-	bool CheckForCapslock(unsigned char *pStr);
+	bool CheckForCapslock(const char *pStr);
 };
 
 inline int CmaskAll() { return -1; }
