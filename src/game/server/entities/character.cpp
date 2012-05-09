@@ -666,6 +666,9 @@ void CCharacter::Tick()
 			GameServer()->SendBroadcast("", m_pPlayer->GetCID());
 	}
 
+	if((g_Config.m_SvAnticamper == 1) || (g_Config.m_SvAnticamper == 2 && GameServer()->m_pController->IsInstagib()))
+		Anticamper();
+
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
 
@@ -1029,6 +1032,57 @@ void CCharacter::Snap(int SnappingClient)
 	}
 
 	pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
+}
+
+int CCharacter::Anticamper()
+{
+	if(GameServer()->m_World.m_Paused || Frozen())
+	{
+		m_CampTick = -1;
+		m_SentCampMsg = false;
+		return 0;
+	}
+
+	int AnticamperTime = g_Config.m_SvAnticamperTime;
+	int AnticamperRange = g_Config.m_SvAnticamperRange;
+
+	if(m_CampTick == -1)
+	{
+		m_CampPos = m_Pos;
+		m_CampTick = Server()->Tick() + Server()->TickSpeed()*AnticamperTime;
+	}
+
+	// Check if the player is moving
+	if((m_CampPos.x - m_Pos.x >= (float)AnticamperRange || m_CampPos.x - m_Pos.x <= -(float)AnticamperRange) ||
+		(m_CampPos.y - m_Pos.y >= (float)AnticamperRange || m_CampPos.y - m_Pos.y <= -(float)AnticamperRange))
+	{
+		m_CampTick = -1;
+	}
+
+	// Send warning to the player
+	if(m_CampTick <= Server()->Tick() + Server()->TickSpeed() * AnticamperTime/2 && m_CampTick != -1 && !m_SentCampMsg)
+	{
+		GameServer()->SendBroadcast("ANTICAMPER: Move or die", m_pPlayer->GetCID());
+		m_SentCampMsg = true;
+	}
+
+	// Kill him
+	if((m_CampTick <= Server()->Tick()) && (m_CampTick > 0))
+	{
+		bool IsIFreeze = GameServer()->m_pController->IsIFreeze();
+		if(g_Config.m_SvAnticamperFreeze || IsIFreeze)
+		{
+			Freeze((IsIFreeze) ? g_Config.m_SvIFreezeAutomeltTime : g_Config.m_SvAnticamperFreeze);
+			GameServer()->SendBroadcast("You have been frozen due camping", m_pPlayer->GetCID());
+		}
+		else
+			Die(m_pPlayer->GetCID(), WEAPON_GAME);
+
+		m_CampTick = -1;
+		m_SentCampMsg = false;
+		return 1;
+	}
+	return 0;
 }
 
 void CCharacter::Freeze(int Secs)

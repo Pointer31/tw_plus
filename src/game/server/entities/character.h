@@ -144,6 +144,11 @@ private:
 	int m_MeltTicks;
 	bool m_DeepFreeze;
 	int m_SpawnProtectTick;
+	//
+	int Anticamper();
+	bool m_SentCampMsg;
+	int m_CampTick;
+	vec2 m_CampPos;
 };
 
 #endif

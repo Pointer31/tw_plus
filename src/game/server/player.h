@@ -99,11 +99,6 @@ public:
 	int m_ChatTicks;
 	char m_aOldChatMsg[256];
 	int m_OldChatMsgCount;
-	//
-	int Anticamper();
-	bool m_SentCampMsg;
-	int m_CampTick;
-	vec2 m_CampPos;
 
 	struct Stats
 	{
