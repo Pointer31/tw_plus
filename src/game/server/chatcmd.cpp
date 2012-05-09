@@ -260,7 +260,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		char aType[16];
 		int Time = -1, Args;
 		if(!pPlayer->GetCharacter())
-			return true;
+			return false;
 
 		if((Args = sscanf(pMessage, "emote %15s %d", aType, &Time)) >= 1)
 		{
@@ -270,21 +270,23 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			int Tick = Server()->Tick() + Time*Server()->TickSpeed();
 
 			if(!str_comp_nocase(aType, "surprise"))
-				pPlayer->GetCharacter()->SetEmote(EMOTE_SURPRISE, Tick);
+				pPlayer->GetCharacter()->SetEmoteFix(EMOTE_SURPRISE, Tick);
 			else if(!str_comp_nocase(aType, "blink"))
-				pPlayer->GetCharacter()->SetEmote(EMOTE_BLINK, Tick);
+				pPlayer->GetCharacter()->SetEmoteFix(EMOTE_BLINK, Tick);
 			else if(!str_comp_nocase(aType, "happy"))
-				pPlayer->GetCharacter()->SetEmote(EMOTE_HAPPY, Tick);
+				pPlayer->GetCharacter()->SetEmoteFix(EMOTE_HAPPY, Tick);
 			else if(!str_comp_nocase(aType, "pain"))
-				pPlayer->GetCharacter()->SetEmote(EMOTE_PAIN, Tick);
+				pPlayer->GetCharacter()->SetEmoteFix(EMOTE_PAIN, Tick);
 			else if(!str_comp_nocase(aType, "angry"))
-				pPlayer->GetCharacter()->SetEmote(EMOTE_ANGRY, Tick);
+				pPlayer->GetCharacter()->SetEmoteFix(EMOTE_ANGRY, Tick);
+			else if(!str_comp_nocase(aType, "normal"))
+				pPlayer->GetCharacter()->SetEmoteFix(EMOTE_NORMAL, Tick);
 			else
 				SendChatTarget(ClientID, "Unkown emote. Type \"/emote\"");
 		}
 		else
 		{
-			SendChatTarget(ClientID, "Usage: /emote <type> <sec>. Use as type: \"surprise\", \"blink\", \"happy\", \"pain\" or \"angry\".");
+			SendChatTarget(ClientID, "Usage: /emote <type> <sec>. Use as type: \"surprise\", \"blink\", \"happy\", \"pain\", \"angry\" or \"normal\".");
 			SendChatTarget(ClientID, "Example: \"/emote pain 10\" for showing 10 seconds emote pain.");
 		}
 

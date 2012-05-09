@@ -552,6 +552,12 @@ void CCharacter::SetEmote(int Emote, int Tick)
 	m_EmoteStop = Tick;
 }
 
+void CCharacter::SetEmoteFix(int Emote, int Tick)
+{
+	m_pPlayer->m_SetEmoteType = Emote;
+	m_pPlayer->m_SetEmoteStop = Tick;
+}
+
 void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 {
 	if(m_FreezeTicks || m_DeepFreeze)
@@ -1004,8 +1010,13 @@ void CCharacter::Snap(int SnappingClient)
 		m_EmoteType = EMOTE_NORMAL;
 		m_EmoteStop = -1;
 	}
+	if(m_pPlayer->m_SetEmoteStop < Server()->Tick())
+	{
+		m_pPlayer->m_SetEmoteType = EMOTE_NORMAL;
+		m_pPlayer->m_SetEmoteStop = -1;
+	}
 
-	pCharacter->m_Emote = m_EmoteType;
+	pCharacter->m_Emote = (m_EmoteType == EMOTE_NORMAL) ? m_pPlayer->m_SetEmoteType : m_EmoteType;
 
 	pCharacter->m_AmmoCount = 0;
 	pCharacter->m_Health = 0;

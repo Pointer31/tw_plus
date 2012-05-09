@@ -30,6 +30,9 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_KeepAward = false;
 	m_Spree = 0;
 	m_GotAward = false;
+	//
+	m_SetEmoteStop = Server()->Tick();
+	m_SetEmoteType = EMOTE_NORMAL;
 }
 
 CPlayer::~CPlayer()

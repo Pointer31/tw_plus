@@ -100,6 +100,9 @@ public:
 	char m_aOldChatMsg[256];
 	int m_OldChatMsgCount;
 
+	int m_SetEmoteType;
+	int m_SetEmoteStop;
+
 	struct Stats
 	{
 		int m_Shots[NUM_WEAPONS];
