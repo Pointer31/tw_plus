@@ -260,7 +260,10 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		char aType[16];
 		int Time = -1, Args;
 		if(!pPlayer->GetCharacter())
+		{
+			SendChatTarget(ClientID, "\"emote\" is not available at the moment. Join game or wait till you spawn to set.");
 			return false;
+		}
 
 		if((Args = sscanf(pMessage, "emote %15s %d", aType, &Time)) >= 1)
 		{
