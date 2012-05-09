@@ -31,7 +31,6 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		if(m_pController->IsIFreeze())
 				SendChatTarget(ClientID, "iFreeze is originally created by Tom94. Big thanks to him");
-		SendChatTarget(ClientID, "Visit repository at GitHub: https://github.com/Teetime/teeworlds");
 		return false;
 	}
 	else if(!str_comp(pMessage, "credits"))
