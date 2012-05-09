@@ -1121,10 +1121,10 @@ void CCharacter::AddSpree()
 
 	if(m_pPlayer->m_Spree % g_Config.m_SvKillingspreeKills == 0)
 	{
-		static char *pSpreeMsg[NumMsg] = { "is on a killing spree", "is on a rampage", "is dominating", "is unstoppable", "is godlike"};
+		static const char aaSpreeMsg[NumMsg][32] = { "is on a killing spree", "is on a rampage", "is dominating", "is unstoppable", "is godlike"};
 		int No = m_pPlayer->m_Spree/NumMsg-1;
 
-		str_format(aBuf, sizeof(aBuf), "%s %s with %d kills!", Server()->ClientName(m_pPlayer->GetCID()), pSpreeMsg[(No > NumMsg-1) ? NumMsg-1 : No], m_pPlayer->m_Spree);
+		str_format(aBuf, sizeof(aBuf), "%s %s with %d kills!", Server()->ClientName(m_pPlayer->GetCID()), aaSpreeMsg[(No > NumMsg-1) ? NumMsg-1 : No], m_pPlayer->m_Spree);
 		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 	}
 
