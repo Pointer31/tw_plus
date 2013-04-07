@@ -652,6 +652,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			return;
 		}
 
+		if(str_length(pMsg->m_pMessage) >= 512)
+		{
+			SendChatTarget(ClientID, "Your Message is too long.");
+			return;
+		}
+
 		// check for invalid chars
 		unsigned char *pMessage = (unsigned char *)pMsg->m_pMessage;
 		while (*pMessage)
