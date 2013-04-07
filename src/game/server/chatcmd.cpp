@@ -50,6 +50,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		if(g_Config.m_SvPrivateMessage || AuthLevel)
 		{
 			SendChatTarget(ClientID, "\"/sayto <Name/ID> <Msg>\" Send a private message to a player");
+			SendChatTarget(ClientID, "\"/ans <Msg>\" Answer to the player, the last PM came from");
 		}
 
 		if(g_Config.m_SvStopGoFeature)
@@ -219,7 +220,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 			if(pMsg[0] == '\0')
 			{
-				SendChatTarget(ClientID, "Useage: \"/sayto <Name/ID> <Message>\"");
+				SendChatTarget(ClientID, "Usage: \"/sayto <Name/ID> <Message>\"");
 				return false;
 			}
 
@@ -246,6 +247,9 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 						str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(ClientID), pMsg);
 						SendChatTarget(ReceiverID, aBuf);
 						SendChatTarget(ClientID, "PM successfully sent");
+
+						m_apPlayers[ReceiverID]->m_LastPMReceivedFrom = ClientID;
+						m_apPlayers[ClientID]->m_LastPMReceivedFrom = ReceiverID;
 					}
 				}
 			}
@@ -253,6 +257,41 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				SendChatTarget(ClientID, "No player with this name or ID found");
 		}
 		return false;
+	}
+	else if(!str_comp_num(pMessage, "ans", 3))
+	{
+		if(!g_Config.m_SvPrivateMessage && !AuthLevel)
+			SendChatTarget(ClientID, "This feature is not available at the moment.");
+		else
+		{
+			int LastChatterID = m_apPlayers[ClientID]->m_LastPMReceivedFrom;
+			if(IsValidCID(LastChatterID))
+			{
+				char *pMsg = pMsg = str_skip_whitespaces(const_cast<char *>(pMessage) + 3);
+
+				if(pMsg[0] == '\0')
+					SendChatTarget(ClientID, "Your Message is empty.");
+				else
+				{
+					char aBuf[512];
+					str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(LastChatterID), pMessage+3);
+					SendChatTarget(LastChatterID, aBuf);
+					SendChatTarget(ClientID, "PM successfully sent");
+
+					m_apPlayers[LastChatterID]->m_LastPMReceivedFrom = ClientID;
+					m_apPlayers[ClientID]->m_LastPMReceivedFrom = LastChatterID;
+				}
+			}
+			else
+			{
+				if(LastChatterID == -1)
+					SendChatTarget(ClientID, "Please first write a PM with /sayto");
+				else if(LastChatterID == -2)
+					SendChatTarget(ClientID, "The original player leaved, please use /sayto to write a new PM");
+				else //dafuq?
+					SendChatTarget(ClientID, "Something went kinda wrong. Use /sayto");
+			}
+		}
 	}
 	else if(!str_comp_num(pMessage, "emote", 5))
 	{

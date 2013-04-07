@@ -99,6 +99,7 @@ public:
 	int m_ChatTicks;
 	char m_aOldChatMsg[256];
 	int m_OldChatMsgCount;
+	int m_LastPMReceivedFrom;
 
 	int m_SetEmoteType;
 	int m_SetEmoteStop;

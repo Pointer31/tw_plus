@@ -597,11 +597,15 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	(void)m_pController->CheckTeamBalance();
 	m_VoteUpdate = true;
 
-	// update spectator modes
+	// update spectator modes and last pm-id
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
-		if(m_apPlayers[i] && m_apPlayers[i]->m_SpectatorID == ClientID)
+		if(!m_apPlayers[i])
+			continue;
+		if(m_apPlayers[i]->m_SpectatorID == ClientID)
 			m_apPlayers[i]->m_SpectatorID = SPEC_FREEVIEW;
+		if(m_apPlayers[i]->m_LastPMReceivedFrom == ClientID)
+			m_apPlayers[i]->m_LastPMReceivedFrom = -2;
 	}
 }
 
