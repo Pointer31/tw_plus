@@ -347,7 +347,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			if(sscanf(pMessage, "spec %d", &ID) == 1)
 			{
 				if (!IsValidCID(ID))
-					SendChatTarget(ID, "Invalid ID");
+					SendChatTarget(ClientID, "Invalid ID");
 				else
 					m_apPlayers[ID]->SetTeam(TEAM_SPECTATORS);
 			}
@@ -362,7 +362,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			if(sscanf(pMessage, "red %d", &ID) == 1)
 			{
 				if (!IsValidCID(ID))
-					SendChatTarget(ID, "Invalid ID");
+					SendChatTarget(ClientID, "Invalid ID");
 				else
 					m_apPlayers[ID]->SetTeam(TEAM_RED);
 			}
@@ -377,7 +377,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			if (sscanf(pMessage, "blue %d", &ID) == 1)
 			{
 				if (!IsValidCID(ID))
-					SendChatTarget(ID, "Invalid ID");
+					SendChatTarget(ClientID, "Invalid ID");
 				else
 					m_apPlayers[ID]->SetTeam(TEAM_BLUE);
 			}
