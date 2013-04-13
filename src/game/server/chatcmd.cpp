@@ -267,14 +267,14 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			int LastChatterID = m_apPlayers[ClientID]->m_LastPMReceivedFrom;
 			if(IsValidCID(LastChatterID))
 			{
-				char *pMsg = pMsg = str_skip_whitespaces(const_cast<char *>(pMessage) + 3);
+				char *pMsg = str_skip_whitespaces(const_cast<char *>(pMessage+3));
 
 				if(pMsg[0] == '\0')
 					SendChatTarget(ClientID, "Your Message is empty.");
 				else
 				{
 					char aBuf[512];
-					str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(LastChatterID), pMessage+3);
+					str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(ClientID), pMsg);
 					SendChatTarget(LastChatterID, aBuf);
 					SendChatTarget(ClientID, "PM successfully sent");
 
