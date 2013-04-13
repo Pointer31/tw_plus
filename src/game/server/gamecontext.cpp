@@ -597,16 +597,21 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	(void)m_pController->CheckTeamBalance();
 	m_VoteUpdate = true;
 
-	// update spectator modes and last pm-id
+	// update spectator modes and last pm-id and count how many players are still ingame
+	int PlIngame = 0;
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if(!m_apPlayers[i])
 			continue;
+		PlIngame++;
 		if(m_apPlayers[i]->m_SpectatorID == ClientID)
 			m_apPlayers[i]->m_SpectatorID = SPEC_FREEVIEW;
 		if(m_apPlayers[i]->m_LastPMReceivedFrom == ClientID)
 			m_apPlayers[i]->m_LastPMReceivedFrom = -2;
 	}
+
+	if(PlIngame == 0)
+		m_World.m_Paused = false;
 }
 
 void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
