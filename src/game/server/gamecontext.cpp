@@ -671,7 +671,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			pMessage++;
 		}
 
-		if(ShowCommand(ClientID, pPlayer, pMsg->m_pMessage))
+		if(ShowCommand(ClientID, pPlayer, pMsg->m_pMessage, &Team))
 		{
 			if(g_Config.m_SvChatMaxDuplicates != -1)
 			{

@@ -214,9 +214,11 @@ public:
 	virtual const char *NetVersion();
 
 	bool m_SpecMuted;
-	bool ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMessage);
+	bool ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMessage, int *pTeam);
+	//Helpers
 	bool CanExec(int, const char*);
 	int ParsePlayerName(char* pMsg, int *ClientID);
+	int StrLeftComp(const char *pOrigin, const char *pSub);
 	bool CheckForCapslock(const char *pStr);
 };
 

@@ -6,19 +6,23 @@
 #include <engine/shared/config.h>
 #include <stdio.h>
 
-bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMessage)
+bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMessage, int *pTeam)
 {
-	if(!str_comp(pMessage, "go") || !str_comp(pMessage, "stop") || !str_comp(pMessage, "restart"))
+	if(StrLeftComp(pMessage, "go") || StrLeftComp(pMessage, "stop") || StrLeftComp(pMessage, "restart"))
 	{/* Do nothing */}
 	else if(pMessage[0] == '/' || pMessage[0] == '!')
 		pMessage++;
 	else
 		return true;
 
+	int Len = 0;
+
 	// AuthLevel > 0  => Moderator/Admin
 	int AuthLevel = Server()->IsAuthed(ClientID);
+	// It's a command so we set Team to CHAT_ALL that things like restart can't be written in teamchat and will be visible for everybody
+	*pTeam = CHAT_ALL;
 
-	if(!str_comp(pMessage, "info"))
+	if(StrLeftComp(pMessage, "info"))
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "TW+ Mod v.%s created by Teetime.", MOD_VERSION);
@@ -33,14 +37,14 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 				SendChatTarget(ClientID, "iFreeze is originally created by Tom94. Big thanks to him");
 		return false;
 	}
-	else if(!str_comp(pMessage, "credits"))
+	else if(StrLeftComp(pMessage, "credits"))
 	{
 		SendChatTarget(ClientID, "Credits goes to the whole Teeworlds-community and especially");
 		SendChatTarget(ClientID, "to BotoX, Tom and Greyfox. This mod has some of their ideas included.");
 		SendChatTarget(ClientID, "Also thanks to fisted and eeeee for their amazing loltext.");
 		return false;
 	}
-	else if(!str_comp(pMessage, "cmdlist"))
+	else if(StrLeftComp(pMessage, "cmdlist"))
 	{
 		SendChatTarget(ClientID, "----- Commands -----");
 		SendChatTarget(ClientID, "\"/info\" Information about the mod");
@@ -50,7 +54,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		if(g_Config.m_SvPrivateMessage || AuthLevel)
 		{
 			SendChatTarget(ClientID, "\"/sayto <Name/ID> <Msg>\" Send a private message to a player");
-			SendChatTarget(ClientID, "\"/ans <Msg>\" Answer to the player, the last PM came from");
+			SendChatTarget(ClientID, "\"/r <Msg>\" Answer to the player, the last PM came from");
 		}
 
 		if(g_Config.m_SvStopGoFeature)
@@ -74,7 +78,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return false;
 	}
-	else if(!str_comp(pMessage, "stop"))
+	else if(StrLeftComp(pMessage, "stop"))
 	{
 		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
@@ -92,7 +96,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return true;
 	}
-	else if(!str_comp(pMessage, "go"))
+	else if(StrLeftComp(pMessage, "go"))
 		{
 			if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 			{
@@ -105,7 +109,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			}
 			return true;
 		}
-	else if(!str_comp(pMessage, "restart"))
+	else if(StrLeftComp(pMessage, "restart"))
 	{
 		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
@@ -124,8 +128,8 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return true;
 	}
-	else if(!str_comp(pMessage, "1on1") || !str_comp(pMessage, "2on2") || !str_comp(pMessage, "3on3") ||
-			!str_comp(pMessage, "4on4") || !str_comp(pMessage, "5on5") || !str_comp(pMessage, "6on6"))
+	else if(StrLeftComp(pMessage, "1on1") || StrLeftComp(pMessage, "2on2") || StrLeftComp(pMessage, "3on3") ||
+			StrLeftComp(pMessage, "4on4") || StrLeftComp(pMessage, "5on5") || StrLeftComp(pMessage, "6on6"))
 	{
 		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
@@ -151,7 +155,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		return true;
 	}
-	else if(!str_comp(pMessage, "reset"))
+	else if(StrLeftComp(pMessage, "reset"))
 	{
 		if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 		{
@@ -168,7 +172,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return true;
 	}
-	else if(!str_comp_num(pMessage, "stats", 5))
+	else if((Len = StrLeftComp(pMessage, "stats")))
 	{
 		int ReceiverID = -1;
 		char aBuf[32] = { 0 };
@@ -176,7 +180,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		if (sscanf(pMessage, "stats %2s", aBuf) > 0)
 		{
-			pMessage += str_length("stats");
+			pMessage += Len;
 
 			ParsePlayerName((char*) pMessage, &ReceiverID);
 
@@ -204,7 +208,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		return false;
 	}
-	else if(!str_comp_num(pMessage, "sayto", 5) || !str_comp_num(pMessage, "st", 2) || !str_comp_num(pMessage, "pm", 2))
+	else if((Len=StrLeftComp(pMessage, "sayto")) || (Len=StrLeftComp(pMessage, "st")) || (Len=StrLeftComp(pMessage, "pm")))
 	{
 		if(!g_Config.m_SvPrivateMessage && !AuthLevel)
 			SendChatTarget(ClientID, "This feature is not available at the moment.");
@@ -212,11 +216,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		{
 			int ReceiverID = -1;
 
-			// Skip "sayto"
-			while(*pMessage && *pMessage != ' ')
-				pMessage++;
-
-			char *pMsg = str_skip_whitespaces(const_cast<char*>(pMessage));
+			char *pMsg = str_skip_whitespaces(const_cast<char*>(pMessage + Len));
 
 			if(pMsg[0] == '\0')
 			{
@@ -261,7 +261,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return false;
 	}
-	else if(!str_comp_num(pMessage, "ans", 3))
+	else if((Len=StrLeftComp(pMessage, "ans")) || (Len=StrLeftComp(pMessage, "r")))
 	{
 		if(!g_Config.m_SvPrivateMessage && !AuthLevel)
 			SendChatTarget(ClientID, "This feature is not available at the moment.");
@@ -270,7 +270,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			int LastChatterID = m_apPlayers[ClientID]->m_LastPMReceivedFrom;
 			if(IsValidCID(LastChatterID))
 			{
-				char *pMsg = str_skip_whitespaces(const_cast<char *>(pMessage+3));
+				char *pMsg = str_skip_whitespaces(const_cast<char *>(pMessage+Len));
 
 				if(pMsg[0] == '\0')
 					SendChatTarget(ClientID, "Your Message is empty.");
@@ -298,8 +298,9 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 					SendChatTarget(ClientID, "Something went kinda wrong. Use /sayto");
 			}
 		}
+		return false;
 	}
-	else if(!str_comp_num(pMessage, "emote", 5))
+	else if(StrLeftComp(pMessage, "emote"))
 	{
 		char aType[16];
 		int Time = -1, Args;
@@ -339,7 +340,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		return false;
 	}
-	else if(!str_comp_num(pMessage, "spec", 4))
+	else if(StrLeftComp(pMessage, "spec"))
 	{
 		if(AuthLevel && CanExec(ClientID, "set_team"))
 		{
@@ -354,7 +355,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return true;
 	}
-	else if(!str_comp_num(pMessage, "red", 3))
+	else if(StrLeftComp(pMessage, "red"))
 	{
 		if(AuthLevel && CanExec(ClientID, "set_team"))
 		{
@@ -369,7 +370,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return true;
 	}
-	else if(!str_comp_num(pMessage, "blue", 4))
+	else if(StrLeftComp(pMessage, "blue"))
 	{
 		if(AuthLevel && CanExec(ClientID, "set_team"))
 		{
@@ -438,5 +439,24 @@ int CGameContext::ParsePlayerName(char *pMsg, int *ClientID)
 		return Len;
 	}
 
+	return 0;
+}
+
+int CGameContext::StrLeftComp(const char *pOrigin, const char *pSub)
+{
+	const char *pSlide = pOrigin;
+	while(*pSlide && *pSub)
+	{
+		if(*pSlide == *pSub)
+		{
+			pSlide++;
+			pSub++;
+
+			if(*pSub == '\0' && (*pSlide == ' ' || *pSlide == '\0'))
+				return pSlide - pOrigin;
+		}
+		else
+			return 0;
+	}
 	return 0;
 }
