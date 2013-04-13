@@ -250,6 +250,9 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 						m_apPlayers[ReceiverID]->m_LastPMReceivedFrom = ClientID;
 						m_apPlayers[ClientID]->m_LastPMReceivedFrom = ReceiverID;
+
+						str_format(aBuf, sizeof(aBuf), "%d:%s sent a PM to %d:%s", ClientID, Server()->ClientName(ClientID), ReceiverID, Server()->ClientName(ReceiverID));
+						Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "PM", aBuf);
 					}
 				}
 			}
@@ -280,6 +283,9 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 					m_apPlayers[LastChatterID]->m_LastPMReceivedFrom = ClientID;
 					m_apPlayers[ClientID]->m_LastPMReceivedFrom = LastChatterID;
+
+					str_format(aBuf, sizeof(aBuf), "%d:%s sent a PM to %d:%s", ClientID, Server()->ClientName(ClientID), LastChatterID, Server()->ClientName(LastChatterID));
+					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "PM", aBuf);
 				}
 			}
 			else
