@@ -41,8 +41,6 @@ void CGameContext::Construct(int Resetting)
 	if(Resetting==NO_RESET)
 		m_pVoteOptionHeap = new CHeap();
 
-	for(int i = 0; i < MAX_MUTES; i++)
-		m_aMutes[i].m_IP[0] = 0;
 	m_SpecMuted = false;
 }
 
@@ -675,13 +673,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			pPlayer->m_LastChat = Server()->Tick();
 
 			//Check if the player is muted
-			char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
-			Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
-			int Pos;
-			if((Pos = Muted(aAddrStr)) > -1)
+			CMute::CMuteEntry *pMute = m_Mute.Muted(ClientID);
+			if(pMute)
 			{
 				char aBuf[128];
-				int Expires = (m_aMutes[Pos].m_Expires - Server()->Tick())/Server()->TickSpeed();
+				int Expires = (pMute->m_Expires - Server()->Tick())/Server()->TickSpeed();
 				str_format(aBuf, sizeof(aBuf), "You are muted for %d minutes and %d seconds.", Expires/60, Expires%60);
 				SendChatTarget(ClientID, aBuf);
 				return;
@@ -689,7 +685,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			//mute the player if he's spamming
 			else if(g_Config.m_SvMuteDuration && ((pPlayer->m_ChatTicks += g_Config.m_SvChatValue) > g_Config.m_SvChatThreshold))
 			{
-				AddMute(ClientID, g_Config.m_SvMuteDuration);
+				m_Mute.AddMute(ClientID, g_Config.m_SvMuteDuration);
 				pPlayer->m_ChatTicks = 0;
 				return;
 			}
@@ -1208,57 +1204,6 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 	}
 }
 
-void CGameContext::AddMute(const char* IP, int Secs)
-{
-	int Pos = Muted(IP);
-	if(Pos > -1)
-		m_aMutes[Pos].m_Expires = Server()->TickSpeed() * Secs + Server()->Tick(); // overwrite mute
-	else
-		for(int i = 0; i < MAX_MUTES; i++) // find free slot
-			if(!m_aMutes[i].m_IP[0])
-			{
-				str_copy(m_aMutes[i].m_IP, IP, sizeof(m_aMutes[i].m_IP));
-				m_aMutes[i].m_Expires = Server()->TickSpeed() * Secs + Server()->Tick();
-				break;
-			}
-}
-
-void CGameContext::AddMute(int ClientID, int Secs)
-{
-	char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
-	Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
-	AddMute(aAddrStr, Secs);
-
-	char aBuf[128];
-	if(Secs > 0)
-		str_format(aBuf, sizeof(aBuf), "%s has been muted for %d seconds.", Server()->ClientName(ClientID), Secs);
-	else
-		str_format(aBuf, sizeof(aBuf), "%s has been unmuted.", Server()->ClientName(ClientID));
-	SendChatTarget(-1, aBuf);
-}
-
-int CGameContext::Muted(const char* IP)
-{
-	PurgeMutes();
-	int Pos = -1;
-	if(!IP[0])
-		return -1;
-	for(int i = 0; i < MAX_MUTES; i++)
-		if(!str_comp_num(IP, m_aMutes[i].m_IP, sizeof(m_aMutes[i].m_IP)))
-		{
-			Pos = i;
-			break;
-		}
-	return Pos;
-}
-
-void CGameContext::PurgeMutes()
-{
-	for(int i = 0; i < MAX_MUTES; i++)
-		if(m_aMutes[i].m_Expires < Server()->Tick())
-			m_aMutes[i].m_IP[0] = 0;
-}
-
 void CGameContext::ConTuneParam(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
@@ -1748,64 +1693,6 @@ void CGameContext::ConUnFreeze(IConsole::IResult *pResult, void *pUserData)
 	pSelf->GetPlayerChar(ClientID)->Melt(-1);
 }
 
-void CGameContext::ConMute(IConsole::IResult *pResult, void *pUserData)
-{
-	CGameContext *pSelf = (CGameContext *)pUserData;
-	int ClientID = pResult->GetInteger(0);
-	if(!pSelf->IsValidCID(ClientID))
-		return;
-
-	pSelf->AddMute(ClientID, pResult->GetInteger(1));
-}
-
-void CGameContext::ConMutes(IConsole::IResult *pResult, void *pUserData)
-{
-	CGameContext *pSelf = (CGameContext *)pUserData;
-	char aBuf[128];
-	int Sec, Count = 0;
-	pSelf->PurgeMutes();
-	for(int i = 0; i < MAX_MUTES; i++)
-	{
-		if(pSelf->m_aMutes[i].m_IP[0] == 0)
-			continue;
-
-		Sec = (pSelf->m_aMutes[i].m_Expires - pSelf->Server()->Tick())/pSelf->Server()->TickSpeed();
-		str_format(aBuf, sizeof(aBuf), "#%d: %s for %d minutes and %d sec", i, pSelf->m_aMutes[i].m_IP, Sec/60, Sec%60);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf);
-		Count++;
-	}
-	str_format(aBuf, sizeof(aBuf), "%d mute(s)", Count);
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf);
-}
-
-void CGameContext::ConUnmuteID(IConsole::IResult *pResult, void *pUserData)
-{
-	CGameContext *pSelf = (CGameContext *)pUserData;
-	int ClientID = pResult->GetInteger(0);
-	if(!pSelf->IsValidCID(ClientID))
-		return;
-	pSelf->AddMute(ClientID, 0);
-}
-
-void CGameContext::ConUnmuteIP(IConsole::IResult *pResult, void *pUserData)
-{
-	CGameContext *pSelf = (CGameContext *)pUserData;
-	int MuteID = pResult->GetInteger(0);
-	char aBuf[128];
-
-	if(MuteID < 0 || MuteID >= MAX_MUTES)
-		return;
-
-	if(pSelf->Muted(pSelf->m_aMutes[MuteID].m_IP) > -1)
-	{
-		str_format(aBuf, sizeof(aBuf), "unmuted %s", pSelf->m_aMutes[MuteID].m_IP);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", aBuf);
-		pSelf->AddMute(pSelf->m_aMutes[MuteID].m_IP, 0);
-	}
-	else
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Server", "mute not found");
-}
-
 void CGameContext::ConMuteSpec(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
@@ -2000,10 +1887,6 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("freeze", "ii", CFGFLAG_SERVER, ConFreeze, this, "Freeze a player for x seconds");
 	Console()->Register("unfreeze", "i", CFGFLAG_SERVER, ConUnFreeze, this, "Unfreeze a player");
 	Console()->Register("melt", "i", CFGFLAG_SERVER, ConUnFreeze, this, "Melt a player (same effect like unfreeze)");
-	Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mute a player for x sec");
-	Console()->Register("unmuteid", "i", CFGFLAG_SERVER, ConUnmuteID, this, "Unmute a player by its client id");
-	Console()->Register("unmuteip", "i", CFGFLAG_SERVER, ConUnmuteIP, this, "Remove a mute by its index");
-	Console()->Register("mutes", "", CFGFLAG_SERVER, ConMutes, this, "Show all mutes");
 	Console()->Register("mute_spec", "?i", CFGFLAG_SERVER, ConMuteSpec, this, "All messages written in spectators will be redirect to teamchat for this round");
 	Console()->Register("stop", "", CFGFLAG_SERVER, ConStop, this, "Pause the game");
 	Console()->Register("go", "?i", CFGFLAG_SERVER, ConGo, this, "Continue the game");
@@ -2024,6 +1907,7 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
+	m_Mute.Init(this);
 
 	//if(!data) // only load once
 		//data = load_data_from_memory(internal_data);

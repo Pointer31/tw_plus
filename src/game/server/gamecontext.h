@@ -14,6 +14,7 @@
 #include "gamecontroller.h"
 #include "gameworld.h"
 #include "player.h"
+#include "mute.h"
 
 /*
 	Tick
@@ -36,8 +37,6 @@
 			All players (CPlayer::snap)
 
 */
-
-#define MAX_MUTES 35
 
 class CGameContext : public IGameServer
 {
@@ -70,10 +69,6 @@ class CGameContext : public IGameServer
 
 	static void ConFreeze(IConsole::IResult *pResult, void *pUserData);
 	static void ConUnFreeze(IConsole::IResult *pResult, void *pUserData);
-	static void ConMute(IConsole::IResult *pResult, void *pUserData);
-	static void ConUnmuteID(IConsole::IResult *pResult, void *pUserData);
-	static void ConUnmuteIP(IConsole::IResult *pResult, void *pUserData);
-	static void ConMutes(IConsole::IResult *pResult, void *pUserData);
 	static void ConMuteSpec(IConsole::IResult *pResult, void *pUserData);
 	static void ConStop(IConsole::IResult *pResult, void *pUserData);
 	static void ConGo(IConsole::IResult *pResult, void *pUserData);
@@ -161,17 +156,7 @@ public:
 		CHAT_BLUE=1
 	};
 
-	struct CMute
-	{
-		char m_IP[NETADDR_MAXSTRSIZE];
-		int m_Expires;
-	} m_aMutes[MAX_MUTES];
-
-	// helper functions
-	void AddMute(const char* IP, int Secs);
-	void AddMute(int ClientID, int Secs);
-	int Muted(const char* IP);
-	void PurgeMutes();
+	CMute m_Mute;
 
 	// network
 	void SendChatTarget(int To, const char *pText);
