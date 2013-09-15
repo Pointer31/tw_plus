@@ -96,18 +96,18 @@ MACRO_CONFIG_INT(SvChatThreshold, sv_chat_threshold, 1000, 250, 10000, CFGFLAG_S
 MACRO_CONFIG_INT(SvMuteDuration, sv_mute_duration, 60, 0, 3600, CFGFLAG_SERVER, "How long the player will be muted (in seconds)")
 MACRO_CONFIG_INT(SvChatMaxDuplicates, sv_chat_max_duplicates, 3, -1, 25, CFGFLAG_SERVER, "How many duplicates of a chat messages is allowed to send in a row (-1 for no limit)")
 MACRO_CONFIG_INT(SvVoteMute, sv_vote_mute, 1, 0, 1, CFGFLAG_SERVER, "Allow voting to mute players")
-MACRO_CONFIG_INT(SvVoteMuteDuration, sv_vote_mute_duration, 180, 0, 600, CFGFLAG_SERVER, "How many seconds to mute a player after being muted by vote.")
+MACRO_CONFIG_INT(SvVoteMuteDuration, sv_vote_mute_duration, 300, 0, 600, CFGFLAG_SERVER, "How many seconds to mute a player after being muted by vote.")
 
 // Anti Capslock
 MACRO_CONFIG_INT(SvAntiCapslock, sv_anticapslock, 1, 0, 1, CFGFLAG_SERVER, "If all letters of a chat-message are capitalized they will be lowercased")
 MACRO_CONFIG_INT(SvAntiCapslockTolerance, sv_anticapslock_tolerance, 5, 0, 10, CFGFLAG_SERVER, "How many letters of 10 are allowed to be lowercased that it just work")
-MACRO_CONFIG_INT(SvAntiCapslockMinimum, sv_anticapslock_minimum, 4, 1, 15, CFGFLAG_SERVER, "Minimum number of letters that the anti-capslock feature works")
+MACRO_CONFIG_INT(SvAntiCapslockMinimum, sv_anticapslock_minimum, 8, 1, 128, CFGFLAG_SERVER, "Minimum number of letters that the anti-capslock feature works")
 
 //Anticamper
 MACRO_CONFIG_INT(SvAnticamper, sv_anticamper, 0, 0, 2, CFGFLAG_SERVER, "0 disables, 1 enables anticamper in all modes and 2 only in instagib gamemodes")
 MACRO_CONFIG_INT(SvAnticamperFreeze, sv_anticamper_freeze, 0, 0, 15, CFGFLAG_SERVER, "If a player should freeze on camping (and how long) or die")
 MACRO_CONFIG_INT(SvAnticamperTime, sv_anticamper_time, 9, 5, 20, CFGFLAG_SERVER, "How many seconds to wait till the player dies/freezes")
-MACRO_CONFIG_INT(SvAnticamperRange, sv_anticamper_range, 200, 100, 1000, CFGFLAG_SERVER, "Distance how far away the player must move to escape anticamper")
+MACRO_CONFIG_INT(SvAnticamperRange, sv_anticamper_range, 300, 100, 1000, CFGFLAG_SERVER, "Distance how far away the player must move to escape anticamper")
 
 // General Stuff
 MACRO_CONFIG_INT(SvVoteForceReason, sv_vote_forcereason, 1, 0, 1, CFGFLAG_SERVER, "Allow only votes with a reason (except settings)")
@@ -131,7 +131,7 @@ MACRO_CONFIG_INT(SvChatMessageInterval, sv_chat_message_interval, 15, 7, 1000000
 MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 14, 10, 25, CFGFLAG_SERVER, "Horizontal offset between loltext 'pixels'")
 MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 14, 10, 25, CFGFLAG_SERVER, "Vertical offset between loltext 'pixels'")
 MACRO_CONFIG_INT(SvLoltextLifespan, sv_loltext_lifespan, 50, 25, 100, CFGFLAG_SERVER, "How long the loltext is shown")
-MACRO_CONFIG_INT(SvLoltextShow, sv_loltext_show, 1, 0, 1, CFGFLAG_SERVER, "Show loltext")
+MACRO_CONFIG_INT(SvLoltextShow, sv_loltext_show, 0, 0, 1, CFGFLAG_SERVER, "Show loltext")
 
 // Grenade
 MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 4, 3, 6, CFGFLAG_SERVER, "Minimum damage the grenade must make to kill the player (depends how far away the bullet explodes)")
