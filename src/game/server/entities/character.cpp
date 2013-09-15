@@ -93,6 +93,12 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	if(g_Config.m_SvSpawnprotection)
 		m_SpawnProtectTick = Server()->Tick() + Server()->TickSpeed()*g_Config.m_SvSpawnprotection;
 
+	if(m_pPlayer->m_FreezeOnSpawn)
+	{
+		Freeze(g_Config.m_SvIFreezeAutomeltTime);
+		m_pPlayer->m_FreezeOnSpawn = false;
+	}
+
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision());
 	m_Core.m_Pos = m_Pos;

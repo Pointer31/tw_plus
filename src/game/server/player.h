@@ -120,6 +120,7 @@ public:
 	int m_Spree;
 	bool m_GotAward;
 
+	bool m_FreezeOnSpawn;
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;
