@@ -1654,7 +1654,7 @@ bool CGameContext::CheckForCapslock(const char *pStr)
 	}
 
 	int Length = Lower + Upper + None;
-	if((Length > g_Config.m_SvAntiCapslockMinimum) && ((double)Lower/Length < g_Config.m_SvAntiCapslockTolerance/10.f))
+	if((Length > g_Config.m_SvAntiCapslockMinimum) && ((double)(Lower+None)/Length < g_Config.m_SvAntiCapslockTolerance/10.f))
 		return true;
 
 	return false;
