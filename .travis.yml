@@ -1,0 +1,15 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+
+before_script:
+# setting up bam
+  - git clone git://github.com/matricks/bam.git
+  - cd bam
+  - ./make_unix.sh
+  - cd ..
+
+script:
+  - bam/bam server_debug
+  - bam/bam server_release
