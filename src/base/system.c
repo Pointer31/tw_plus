@@ -1866,7 +1866,7 @@ char *str_utf8_skip_whitespaces(char *str)
 	while(*str)
 	{
 		str_old = str;
-		code = str_utf8_decode(&str);
+		code = str_utf8_decode((const char **)&str);
 
 		// check if unicode is not empty
 		if(code > 0x20 && code != 0xA0 && code != 0x034F && (code < 0x2000 || code > 0x200F) && (code < 0x2028 || code > 0x202F) &&

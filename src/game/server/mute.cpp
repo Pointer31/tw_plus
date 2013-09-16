@@ -185,7 +185,6 @@ void CMute::ConUnmuteIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CMute *pSelf = (CMute *) pUserData;
 	int MuteID = pResult->GetInteger(0);
-	char aBuf[128];
 
 	CMuteEntry *pMute = pSelf->GetMute(MuteID);
 
