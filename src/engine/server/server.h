@@ -232,10 +232,6 @@ public:
 	//
 	static void ConWhois(IConsole::IResult *pResult, void *pUser);
 
-	static void ConAddBanmaster(IConsole::IResult *pResult, void *pUser);
-	static void ConBanmasters(IConsole::IResult *pResult, void *pUser);
-	static void ConClearBanmasters(IConsole::IResult *pResult, void *pUser);
-
 	void RegisterCommands();
 
 
