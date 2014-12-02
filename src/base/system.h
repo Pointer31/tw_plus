@@ -1217,7 +1217,7 @@ int str_tolower(int c);
 */
 void gui_messagebox(const char *title, const char *message);
 
-char *str_utf8_skip_whitespaces(char *str);
+const char *str_utf8_skip_whitespaces(const char *str);
 
 /*
 	Function: str_utf8_rewind
