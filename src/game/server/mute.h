@@ -43,6 +43,10 @@ public:
 	 */
 	void Init(CGameContext *pGameServer);
 	/**
+	 * Register console commands
+	 */
+	void OnConsoleInit(IConsole *pConsole);
+	/**
 	 * Return the number of current mutes
 	 */
 	inline int NumMutes();

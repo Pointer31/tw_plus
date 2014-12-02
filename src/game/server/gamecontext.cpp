@@ -1905,6 +1905,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("tele", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player to another");
 	Console()->Register("teleport", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player to another");
 #endif
+	m_Mute.OnConsoleInit(m_pConsole);
 }
 
 void CGameContext::OnInit(/*class IKernel *pKernel*/)

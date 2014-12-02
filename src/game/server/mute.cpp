@@ -19,8 +19,11 @@ void CMute::Init(CGameContext *pGameServer)
 {
 	m_pGameServer = pGameServer;
 	m_pServer = pGameServer->Server();
-	m_pConsole = pGameServer->Console();
+}
 
+void CMute::OnConsoleInit(IConsole *pConsole)
+{
+	m_pConsole = pConsole;
 	Console()->Register("mute", "ii", CFGFLAG_SERVER, ConMute, this, "Mute a player for x sec");
 	Console()->Register("unmuteid", "i", CFGFLAG_SERVER, ConUnmuteID, this, "Unmute a player by its client id");
 	Console()->Register("unmuteip", "i", CFGFLAG_SERVER, ConUnmuteIP, this, "Remove a mute by its index");
