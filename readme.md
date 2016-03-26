@@ -92,6 +92,7 @@ You will **score** both **by freezing** a opponent **and melting** a teammate. I
 ## Rcon-Commands
 
 _Note: The letters behind a command determines what kind of argument and how many are required. i = number, r = string. A leading questionmark (?) means the following argument is optional._
+
 | Command | Usage | Description |
 | --- | --- | --- |
 | freeze ii | freeze &lt;ClientID&gt; &lt;Time in sec&gt; | Freeze a player for x seconds |
@@ -111,6 +112,7 @@ _Note: The letters behind a command determines what kind of argument and how man
 
 ## Chat-Commands
 _Note: Alternatives are seperated by a comma. For `go`, `stop` and `restart` it's not necessary to type a leading slash._
+
 | Command | Usage | Description |
 | --- | --- | --- |
 |/info | /info | Show information about this mod |
@@ -125,8 +127,6 @@ _Note: Alternatives are seperated by a comma. For `go`, `stop` and `restart` it'
 | /1on1 - /6on6 | /1on1 | Start a war and set spectator slots |
 | /reset | /reset | Reset spectator slots which may have been set by `\1on1` - `\6on6` |
 
-\
-\
 For other server settings please see the official [Teeworlds documentation](https://www.teeworlds.com/?page=docs&wiki=docs_overview)
 
 ---
