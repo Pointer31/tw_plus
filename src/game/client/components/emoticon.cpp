@@ -9,6 +9,10 @@
 #include <game/client/render.h>
 #include "emoticon.h"
 
+#include <game/client/components/chat.h>
+#include <game/client/animstate.h>
+#include <engine/serverbrowser.h>
+
 CEmoticon::CEmoticon()
 {
 	OnReset();
@@ -37,6 +41,7 @@ void CEmoticon::OnReset()
 	m_WasActive = false;
 	m_Active = false;
 	m_SelectedEmote = -1;
+	m_SelectedEyeEmote = -1;
 }
 
 void CEmoticon::OnRelease()
@@ -100,6 +105,8 @@ void CEmoticon::OnRender()
 	{
 		if(m_WasActive && m_SelectedEmote != -1)
 			SendEmote(m_SelectedEmote);
+		if(m_WasActive && m_SelectedEyeEmote != -1)
+			EyeEmote(m_SelectedEyeEmote);
 		m_WasActive = false;
 		return;
 	}
@@ -120,10 +127,12 @@ void CEmoticon::OnRender()
 	if (SelectedAngle < 0)
 		SelectedAngle += 2*pi;
 
+	m_SelectedEmote = -1;
+	m_SelectedEyeEmote = -1;
 	if (length(m_SelectorMouse) > 110.0f)
 		m_SelectedEmote = (int)(SelectedAngle / (2*pi) * NUM_EMOTICONS);
-	else
-		m_SelectedEmote = -1;
+	else if(length(m_SelectorMouse) > 40.0f)
+		m_SelectedEyeEmote = (int)(SelectedAngle / (2*pi) * NUM_EMOTES);
 
 	CUIRect Screen = *UI()->Screen();
 
@@ -159,6 +168,43 @@ void CEmoticon::OnRender()
 
 	Graphics()->QuadsEnd();
 
+	CServerInfo Info;
+	Client()->GetServerInfo(&Info);
+	if(IsRace(&Info) && Config()->m_ClEyeWheel)
+	{
+		Graphics()->TextureClear();
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(1.0,1.0,1.0,0.3f);
+		DrawCircle(Screen.w/2, Screen.h/2, 100.0f, 64);
+		Graphics()->QuadsEnd();
+
+		CTeeRenderInfo *pTeeInfo = &m_pClient->m_aClients[m_pClient->m_LocalClientID].m_RenderInfo;
+
+		for (int i = 0; i < NUM_EMOTES; i++)
+		{
+			float Angle = 2*pi*i/NUM_EMOTES;
+			if (Angle > pi)
+				Angle -= 2*pi;
+
+			bool Selected = m_SelectedEyeEmote == i;
+
+			float NudgeX = 70.0f * cosf(Angle);
+			float NudgeY = 70.0f * sinf(Angle);
+
+			pTeeInfo->m_Size = Selected ? 64.0f : 48.0f;
+			RenderTools()->RenderTee(CAnimState::GetIdle(), pTeeInfo, i, vec2(-1,0), vec2(Screen.w/2 + NudgeX, Screen.h/2 + NudgeY));
+			pTeeInfo->m_Size = 64.0f;
+		}
+
+		Graphics()->TextureClear();
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(0,0,0,0.3f);
+		DrawCircle(Screen.w/2, Screen.h/2, 30.0f, 64);
+		Graphics()->QuadsEnd();
+	}
+	else
+		m_SelectedEyeEmote = -1;
+
 	RenderTools()->RenderCursor(m_SelectorMouse.x + Screen.w/2, m_SelectorMouse.y + Screen.h/2, 24.0f);
 }
 
@@ -167,4 +213,33 @@ void CEmoticon::SendEmote(int Emoticon)
 	CNetMsg_Cl_Emoticon Msg;
 	Msg.m_Emoticon = Emoticon;
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+void CEmoticon::EyeEmote(int Emote)
+{
+	char aBuf[32];
+	const char *pEmote = "";
+	switch(Emote)
+	{
+	case EMOTE_NORMAL:
+		pEmote = "normal";
+		break;
+	case EMOTE_PAIN:
+		pEmote = "pain";
+		break;
+	case EMOTE_HAPPY:
+		pEmote = "happy";
+		break;
+	case EMOTE_SURPRISE:
+		pEmote = "surprise";
+		break;
+	case EMOTE_ANGRY:
+		pEmote = "angry";
+		break;
+	case EMOTE_BLINK:
+		pEmote = "blink";
+		break;
+	}
+	str_format(aBuf, sizeof(aBuf), "/emote %s %d", pEmote, Config()->m_ClEyeDuration);
+	GameClient()->m_pChat->SendChat(0, aBuf);
 }
