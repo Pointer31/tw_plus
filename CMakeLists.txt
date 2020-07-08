@@ -1397,6 +1397,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
 )
 set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game
+  bezier.cpp
+  bezier.h
   collision.cpp
   collision.h
   commands.h
@@ -1775,6 +1777,7 @@ add_custom_target(everything DEPENDS ${TARGETS_OWN})
 if(GTEST_FOUND OR DOWNLOAD_GTEST)
   set_src(TESTS GLOB src/test
     aio.cpp
+    bezier.cpp
     bytes_be.cpp
     compression.cpp
     datafile.cpp
