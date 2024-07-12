@@ -26,7 +26,6 @@ pistol autoshooting
 shutdown message  
 slash chat commands edited/added, including /me, /w, and /help  
 Spectator stays spectator after map change  
-very bad anti-adbot by checking if a client send discord invites in their first messages  
 
 **Included Maps**  
 included extra maps to show the new features:  
