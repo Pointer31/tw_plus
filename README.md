@@ -10,25 +10,25 @@ Using bam, use build target server_debug.
 ## Features
 Apart from the features of the standard server as well as the tw+ server by teetime, the server include the following:  
 
-**Map**
+**Map**  
 multiple flag stands per map (one stand is chosen randomly)  
 teleports (player, flag, and projectiles, (todo: laser?))  
 grenade fountains  
 slow killing death zone  
 
-**Weapons**
+**Weapons**  
 ninja (toggle invincibility, crazy-weapons, slash speed, heart/armor bonusses on pickup)  
 toggleable silly custom weapons (laser->plasmagun, grenade->(wip)bouncy grenade, shotgun->explosive shotgun)  
 pistol autoshooting  
 (wip)hooking tee into spikes count as kill  
 
-**Other**
+**Other**  
 shutdown message  
 slash chat commands edited/added, including /me, /w, and /help  
 Spectator stays spectator after map change  
 very bad anti-adbot by checking if a client send discord invites in their first messages  
 
-**Included Maps**
+**Included Maps**  
 included extra maps to show the new features:  
 dm_island (slowdeath zone)  
 dm_tele (teleports)  
