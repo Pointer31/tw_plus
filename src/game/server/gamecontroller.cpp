@@ -217,6 +217,7 @@ void IGameController::EndRound()
 	GameServer()->m_SpecMuted = false;
 	SaveStats();
 
+	// added to determine if a spectator should stay spectator later
 	for(int i = 0; i < MAX_CLIENTS; i++) {
 		std::string name = Server()->ClientName(i);
 		Server()->m_playerNames[i] = name;
@@ -227,6 +228,65 @@ void IGameController::EndRound()
 				std::string name = "(invalid)";
 				Server()->m_playerNames[i] = name;
 			}
+		}
+	}
+
+	// Add stats system message
+	if (g_Config.m_SvRoundendMessage) {
+		if(IsTeamplay())
+		{
+			char aBuf[1024] = "No message (this should not appear)";
+			int scoreRed = m_aTeamscore[TEAM_RED];
+			int scoreBlue = m_aTeamscore[TEAM_BLUE];
+			if (scoreRed > scoreBlue)
+				str_format(aBuf, sizeof(aBuf), "★ Red team has won the round! Red: %d, Blue: %d\n", scoreRed, scoreBlue);
+			else
+				str_format(aBuf, sizeof(aBuf), "★ Blue team has won the round! Red: %d, Blue: %d\n", scoreRed, scoreBlue);
+			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+
+			char bBuf[1024] = "No message2 (this should not appear)";
+			char cBuf[1024] = "No message3 (this should not appear)";
+			int mostKill = -1;
+			int mostFlags = -1;
+			for(int i = 0; i < MAX_CLIENTS; i++) {
+				if(!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+					continue;
+				CPlayer* pP = GameServer()->m_apPlayers[i];
+
+				if (pP->m_Stats.m_Kills > mostKill) {
+					mostKill = pP->m_Stats.m_Kills;
+					str_format(bBuf, sizeof(bBuf), "★ '%s' has most kills with %d kills!", Server()->ClientName(i), pP->m_Stats.m_Kills);
+				}
+				if (pP->m_Stats.m_Captures > mostFlags) {
+					mostFlags = pP->m_Stats.m_Captures;
+					str_format(cBuf, sizeof(cBuf), "★ '%s' has captured the most flags with %d flags!", Server()->ClientName(i), pP->m_Stats.m_Captures);
+				}
+			}
+			if (mostFlags > 0)
+				m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, cBuf);
+			else
+				m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, bBuf);
+		} else { // Non-team gamemode
+			char aBuf[1024] = "No message (this should not appear)";
+			char bBuf[1024] = "No message2 (this should not appear)";
+			int highestScore = -99;
+			float bestRatio = -1;
+			for(int i = 0; i < MAX_CLIENTS; i++) {
+				if(!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+					continue;
+				CPlayer* pP = GameServer()->m_apPlayers[i];
+
+				if (pP->m_Score > highestScore) {
+					highestScore = pP->m_Score;
+					str_format(aBuf, sizeof(aBuf), "★ '%s' has won the round with a score of %d!", Server()->ClientName(i), pP->m_Score);
+				}
+				if (((pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 99999) > bestRatio) {
+					bestRatio = ((pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 99999);
+					str_format(bBuf, sizeof(bBuf), "★ '%s' has the best kill/death ratio with %d kills and %d deaths!", Server()->ClientName(i), pP->m_Stats.m_Kills, pP->m_Stats.m_Deaths);
+				}
+				}
+			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, bBuf);
 		}
 	}
 }
@@ -880,7 +940,7 @@ void IGameController::SaveStats()
 
 		if(IsTeamplay())
 		{
-			str_format(aBuf, sizeof(aBuf), "---------------------\nRed: %d | Blue %d\n", m_aTeamscore[TEAM_RED], m_aTeamscore[TEAM_BLUE]);
+			str_format(aBuf, sizeof(aBuf), "---------------------\nRed: %d | Blue: %d\n", m_aTeamscore[TEAM_RED], m_aTeamscore[TEAM_BLUE]);
 			fputs(aBuf, pFile);
 		}
 

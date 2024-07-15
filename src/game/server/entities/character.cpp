@@ -890,7 +890,19 @@ void CCharacter::Tick()
 	{
 		m_slowDeathTick--;
 		if (m_slowDeathTick < 0) {
-			TakeDamage({0,0}, 1, -1, WEAPON_NINJA);
+			if (StrLeftComp(GameServer()->GameType(), "DM+")
+			|| StrLeftComp(GameServer()->GameType(), "TDM+")
+			|| StrLeftComp(GameServer()->GameType(), "CTF+")) {
+				TakeDamage({0,0}, 1, -1, WEAPON_NINJA);
+			} else {
+				m_Health = m_Health - 1;
+				if (m_Health < 1)
+					Die(m_pPlayer->GetCID(), WEAPON_NINJA);
+					
+				GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
+				m_EmoteType = EMOTE_PAIN;
+				m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+			}
 			m_slowDeathTick = g_Config.m_SvSlowDeathTicks;
 		}
 	}
@@ -1444,4 +1456,23 @@ bool CCharacter::TakeWeapon(int Weapon)
 bool CCharacter::Spawnprotected()
 {
 	return m_SpawnProtectTick > Server()->Tick();
+}
+
+int CCharacter::StrLeftComp(const char *pOrigin, const char *pSub)
+{
+	const char *pSlide = pOrigin;
+	while(*pSlide && *pSub)
+	{
+		if(*pSlide == *pSub)
+		{
+			pSlide++;
+			pSub++;
+
+			if(*pSub == '\0' && (*pSlide == ' ' || *pSlide == '\0'))
+				return pSlide - pOrigin;
+		}
+		else
+			return 0;
+	}
+	return 0;
 }

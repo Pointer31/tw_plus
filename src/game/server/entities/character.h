@@ -154,6 +154,7 @@ private:
 
 	bool m_inTele; // whether the player is in a teleport or not
 	int m_slowDeathTick; // how many ticks are left before being hurt, while in a slow death zone.
+	int StrLeftComp(const char *pOrigin, const char *pSub);
 };
 
 #endif

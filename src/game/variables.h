@@ -191,6 +191,8 @@ MACRO_CONFIG_INT(SvChatMe, sv_slash_me, 1, 0, 1, CFGFLAG_SERVER, "Whether or not
 
 //MACRO_CONFIG_INT(SvTuneReset, sv_tune_reset, 5, 0, 10, CFGFLAG_SERVER, "(WIP) Whether tuning is reset after each map change or not")
 
+MACRO_CONFIG_INT(SvRoundendMessage, sv_roundend_message, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable the system message that shows who won on round end")
+
 //
 MACRO_CONFIG_STR(SvShutdownMessage, sv_shutdown_msg, 128, "Server shutdown", CFGFLAG_SERVER, "Message displayed on server shutdown (old, use shutdown <message>)")
 

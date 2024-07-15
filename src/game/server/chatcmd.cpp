@@ -26,7 +26,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	if(StrLeftComp(pMessage, "info"))
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "TW+ Mod v.%s created by Teetime.", MOD_VERSION);
+		str_format(aBuf, sizeof(aBuf), "TW+ Mod v.%s created by Teetime, modified by Pointer.", MOD_VERSION);
 		SendChatTarget(ClientID, aBuf);
 
 		SendChatTarget(ClientID, "For a list of available commands type \"/cmdlist\"");
@@ -43,7 +43,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		SendChatTarget(ClientID, "Credits goes to the whole Teeworlds-community and especially");
 		SendChatTarget(ClientID, "to BotoX, Tom and Greyfox. This mod has some of their ideas included.");
 		SendChatTarget(ClientID, "Also thanks to fisted and eeeee for their amazing loltext.");
-		SendChatTarget(ClientID, "Slightly edited by Pointer.");
+		SendChatTarget(ClientID, "Slightly modified by Pointer.");
 		return false;
 	}
 	else if(StrLeftComp(pMessage, "help"))
