@@ -82,6 +82,8 @@ class CGameContext : public IGameServer
 	static void ConGive(IConsole::IResult *pResult, void *pUserData);
 	static void ConTakeWeapon(IConsole::IResult *pResult, void *pUserData);
 	static void ConTeleport(IConsole::IResult *pResult, void *pUserData);
+	static void ConPlayerSetHealth(IConsole::IResult *pResult, void *pUserData);
+	static void ConPlayerSetShields(IConsole::IResult *pResult, void *pUserData);
 // #endif
 
 	CGameContext(int Resetting);

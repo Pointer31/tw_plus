@@ -52,6 +52,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_DeepFreeze = false;
 	m_inTele = false;
 	m_slowDeathTick = 0;
+	m_healthArmorZoneTick = 0;
 }
 
 void CCharacter::Reset()
@@ -116,6 +117,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	GameServer()->m_World.InsertEntity(this);
 	m_Alive = true;
 	m_slowDeathTick = 0;
+	m_healthArmorZoneTick = 0;
 
 	GameServer()->m_pController->OnCharacterSpawn(this);
 
@@ -907,6 +909,40 @@ void CCharacter::Tick()
 		}
 	}
 
+	// healthzone and armorzone
+	if (GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_HEALTHZONE ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_HEALTHZONE ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_HEALTHZONE ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_HEALTHZONE)
+	{
+		m_healthArmorZoneTick--;
+		if (m_healthArmorZoneTick < 0) {
+			if (m_Health < 10) {
+				m_Health = m_Health + 1;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+			}
+			m_EmoteType = EMOTE_HAPPY;
+			m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+			m_healthArmorZoneTick = g_Config.m_SvHealthArmorZoneTicks;
+		}
+	}
+	if (GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_ARMORZONE ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_ARMORZONE ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_ARMORZONE ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_ARMORZONE)
+	{
+		m_healthArmorZoneTick--;
+		if (m_healthArmorZoneTick < 0) {
+			if (m_Armor < 10) {
+				m_Armor = m_Armor + 1;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
+			}
+			m_EmoteType = EMOTE_HAPPY;
+			m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+			m_healthArmorZoneTick = g_Config.m_SvHealthArmorZoneTicks;
+		}
+	}
+
 	// handle Weapons
 	HandleWeapons();
 
@@ -1475,4 +1511,12 @@ int CCharacter::StrLeftComp(const char *pOrigin, const char *pSub)
 			return 0;
 	}
 	return 0;
+}
+
+void CCharacter::SetHealth(int amount) {
+	m_Health = amount;
+}
+
+void CCharacter::SetShields(int amount) {
+	m_Armor = amount;
 }

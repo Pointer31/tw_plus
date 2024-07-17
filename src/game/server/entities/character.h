@@ -75,6 +75,9 @@ public:
 	bool TakeWeapon(int Weapon);
 	bool Spawnprotected();
 
+	void SetHealth(int amount);
+	void SetShields(int amount);
+
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;
@@ -154,6 +157,7 @@ private:
 
 	bool m_inTele; // whether the player is in a teleport or not
 	int m_slowDeathTick; // how many ticks are left before being hurt, while in a slow death zone.
+	int m_healthArmorZoneTick; // how many ticks are left before gaining a heart or shield in a health/armor-zone
 	int StrLeftComp(const char *pOrigin, const char *pSub);
 };
 

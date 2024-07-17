@@ -41,39 +41,48 @@ void CCollision::Init(class CLayers *pLayers)
 		switch(Index)
 		{
 		case TILE_DEATH:
-			m_pTiles[i].m_Index = COLFLAG_DEATH;
+			// m_pTiles[i].m_Index = COLFLAG_DEATH;
 			break;
 		case TILE_SOLID:
-			m_pTiles[i].m_Index = COLFLAG_SOLID;
+			// m_pTiles[i].m_Index = COLFLAG_SOLID;
 			break;
 		case TILE_NOHOOK:
-			m_pTiles[i].m_Index = COLFLAG_SOLID|COLFLAG_NOHOOK;
+			// m_pTiles[i].m_Index = COLFLAG_SOLID|COLFLAG_NOHOOK;
 			break;
 		case TILE_TELEONE:
 			if (m_telePositions[0].exists == false)
 				m_telePositions[0] = {x, y, true};
-			m_pTiles[i].m_Index = COLFLAG_TELEONE;
+			// m_pTiles[i].m_Index = COLFLAG_TELEONE;
 			break;
 		case TILE_TELETWO:
 			if (m_telePositions[1].exists == false)
 				m_telePositions[1] = {x, y, true};
-			m_pTiles[i].m_Index = COLFLAG_TELETWO;
+			// m_pTiles[i].m_Index = COLFLAG_TELETWO;
 			break;
 		case TILE_TELETHREE:
 			if (m_telePositions[2].exists == false)
 				m_telePositions[2] = {x, y, true};
-			m_pTiles[i].m_Index = COLFLAG_TELETHREE;
+			// m_pTiles[i].m_Index = COLFLAG_TELETHREE;
 			break;
 		case TILE_TELEFOUR:
 			if (m_telePositions[3].exists == false)
 				m_telePositions[3] = {x, y, true};
-			m_pTiles[i].m_Index = COLFLAG_TELEFOUR;
+			// m_pTiles[i].m_Index = COLFLAG_TELEFOUR;
 			break;
 		case TILE_SLOWDEATH:
-			m_pTiles[i].m_Index = COLFLAG_SLOWDEATH;
+			// m_pTiles[i].m_Index = COLFLAG_SLOWDEATH;
 			break;
-		default:
-			m_pTiles[i].m_Index = 0;
+		case TILE_NOFLAG:
+			// m_pTiles[i].m_Index = COLFLAG_SOLID;
+			break;
+		case TILE_HEALTHZONE:
+			// m_pTiles[i].m_Index = COLFLAG_SOLID;
+			break;
+		case TILE_ARMORZONE:
+			// m_pTiles[i].m_Index = COLFLAG_SOLID;
+			break;
+		// default:
+		// 	m_pTiles[i].m_Index = 0;
 		}
 	}
 }
@@ -83,7 +92,45 @@ int CCollision::GetTile(int x, int y)
 	int Nx = clamp(x/32, 0, m_Width-1);
 	int Ny = clamp(y/32, 0, m_Height-1);
 
-	return m_pTiles[Ny*m_Width+Nx].m_Index > 128 ? 0 : m_pTiles[Ny*m_Width+Nx].m_Index;
+	int i = m_pTiles[Ny*m_Width+Nx].m_Index;
+
+	switch(i) {
+	case TILE_DEATH:
+		return COLFLAG_DEATH;
+		break;
+	case TILE_SOLID:
+		return COLFLAG_SOLID;
+		break;
+	case TILE_NOHOOK:
+		return COLFLAG_SOLID|COLFLAG_NOHOOK;
+		break;
+	case TILE_TELEONE:
+		return COLFLAG_TELEONE;
+		break;
+	case TILE_TELETWO:
+		return COLFLAG_TELETWO;
+		break;
+	case TILE_TELETHREE:
+		return COLFLAG_TELETHREE;
+		break;
+	case TILE_TELEFOUR:
+		return COLFLAG_TELEFOUR;
+		break;
+	case TILE_SLOWDEATH:
+		return COLFLAG_SLOWDEATH;
+		break;
+	default:
+		return 0;
+	}
+	// return m_pTiles[Ny*m_Width+Nx].m_Index > 128 ? 0 : m_pTiles[Ny*m_Width+Nx].m_Index;
+}
+
+int CCollision::GetTileNew(int x, int y)
+{
+	int Nx = clamp(x/32, 0, m_Width-1);
+	int Ny = clamp(y/32, 0, m_Height-1);
+
+	return m_pTiles[Ny*m_Width+Nx].m_Index;
 }
 
 bool CCollision::IsTileSolid(int x, int y)

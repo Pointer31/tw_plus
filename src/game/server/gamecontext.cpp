@@ -1960,6 +1960,33 @@ void CGameContext::ConTeleport(IConsole::IResult *pResult, void *pUserData)
 			pSelf->m_apPlayers[TeleFrom]->m_ViewPos = pSelf->m_apPlayers[TeleTo]->m_ViewPos;
 	}
 }
+
+void CGameContext::ConPlayerSetHealth(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int playerID = pResult->GetInteger(0);
+	int amount = pResult->GetInteger(1);
+
+	if(pSelf->IsValidCID(playerID))	{
+		CCharacter* pChr = pSelf->GetPlayerChar(playerID);
+		if(pChr)
+			pChr->SetHealth(amount);
+	}
+}
+
+void CGameContext::ConPlayerSetShields(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int playerID = pResult->GetInteger(0);
+	int amount = pResult->GetInteger(1);
+
+	if(pSelf->IsValidCID(playerID))	{
+		CCharacter* pChr = pSelf->GetPlayerChar(playerID);
+		if(pChr)
+			pChr->SetShields(amount);
+	}
+}
+
 // #endif
 
 void CGameContext::OnConsoleInit()
@@ -2004,6 +2031,8 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("takeweapon", "ii", CFGFLAG_SERVER, ConTakeWeapon, this, "Takes away a weapon of a player (-2=Award;-1=All weapons;0=Hammer;1=Gun;2=Shotgun;3=Grenade;4=Riffle");
 	Console()->Register("tele", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player to another");
 	Console()->Register("teleport", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player to another");
+	Console()->Register("player_set_health", "ii", CFGFLAG_SERVER, ConPlayerSetHealth, this, "Sets the health of a player");
+	Console()->Register("player_set_shields", "ii", CFGFLAG_SERVER, ConPlayerSetShields, this, "Sets the armor of a player");
 // #endif
 	m_Mute.OnConsoleInit(m_pConsole);
 }
