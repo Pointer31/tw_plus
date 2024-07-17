@@ -186,6 +186,9 @@ public:
 	int m_HookState;
 	int m_HookedPlayer;
 
+	int m_LastHooked;
+	int m_LastHookedBy;
+
 	int m_Jumped;
 
 	int m_Direction;

@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "gamecore.h"
+#include <engine/shared/config.h>
 
 const char *CTuningParams::m_apNames[] =
 {
@@ -72,6 +73,7 @@ void CCharacterCore::Reset()
 	m_HookedPlayer = -1;
 	m_Jumped = 0;
 	m_TriggeredEvents = 0;
+	m_LastHooked = 0;
 }
 
 void CCharacterCore::Tick(bool UseInput)
@@ -224,6 +226,15 @@ void CCharacterCore::Tick(bool UseInput)
 						m_TriggeredEvents |= COREEVENT_HOOK_ATTACH_PLAYER;
 						m_HookState = HOOK_GRABBED;
 						m_HookedPlayer = i;
+						int selfID = 0;
+						for(int j = 0; j < MAX_CLIENTS; j++) {
+							CCharacterCore *pCharCoreB = m_pWorld->m_apCharacters[j];
+							if(pCharCoreB == this) {
+								selfID = j; break;
+							}
+						}
+						pCharCore->m_LastHookedBy = selfID;
+						pCharCore->m_LastHooked = g_Config.m_SvIndirectKillTicks;
 						Distance = distance(m_HookPos, pCharCore->m_Pos);
 					}
 				}
@@ -354,6 +365,11 @@ void CCharacterCore::Tick(bool UseInput)
 	// clamp the velocity to something sane
 	if(length(m_Vel) > 6000)
 		m_Vel = normalize(m_Vel) * 6000;
+
+	// for indirect kills
+	m_LastHooked = m_LastHooked - 1;
+	if (m_LastHooked < 0)
+		m_LastHooked = 0;
 }
 
 void CCharacterCore::Move()

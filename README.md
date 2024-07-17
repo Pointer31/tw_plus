@@ -14,7 +14,8 @@ Apart from the features of the standard server as well as the tw+ server by teet
 multiple flag stands per map (one stand is chosen randomly)  
 teleports (player, flag, and projectiles, (todo: laser?))  
 grenade fountains  
-slow killing death zone  
+slow killing death / slow healing / slow armor zone
+No-flag zone
 
 **Weapons**  
 ninja (toggle invincibility, crazy-weapons, slash speed, heart/armor bonusses on pickup)  

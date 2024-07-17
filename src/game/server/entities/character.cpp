@@ -783,29 +783,34 @@ void CCharacter::Tick()
 		if (!g_Config.m_SvHookkill) {
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
 		} else {
-			int j = m_pPlayer->GetCID();
-			for(int i = 0; i < MAX_CLIENTS; i++) {
-				CCharacter *charachter = GameServer()->GetPlayerChar(i);
-				if (charachter != 0) {
-					CCharacterCore pCharCore = *charachter->GetCore();
-
-					if (pCharCore.m_HookedPlayer == m_pPlayer->GetCID()) {
-						j = i;
-
-						// set attacker's face to happy (taunt!)
-						if (j >= 0 && j != m_pPlayer->GetCID() && GameServer()->m_apPlayers[j])
-						{
-							CCharacter *pChr = GameServer()->m_apPlayers[j]->GetCharacter();
-							if (pChr)
-							{
-								pChr->m_EmoteType = EMOTE_HAPPY;
-								pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
-							}
-						}
+			int From = m_pPlayer->GetCID();
+			CCharacterCore pCharCore = *GetCore();
+			if (pCharCore.m_LastHooked > 0) {
+				From = pCharCore.m_LastHookedBy;
+				pCharCore.m_LastHooked = 0;
+				// set attacker's face to happy (taunt!)
+				if (From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
+				{
+					CCharacter *pChr = GameServer()->m_apPlayers[From]->GetCharacter();
+					if (pChr)
+					{
+						pChr->m_EmoteType = EMOTE_HAPPY;
+						pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
 					}
 				}
+				// do damage Hit sound
+				if (From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
+				{
+					int Mask = CmaskOne(From);
+					for (int i = 0; i < MAX_CLIENTS; i++)
+					{
+						if (GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS && GameServer()->m_apPlayers[i]->m_SpectatorID == From)
+							Mask |= CmaskOne(i);
+					}
+					GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+				}
 			}
-			Die(j, WEAPON_NINJA);
+			Die(From, WEAPON_NINJA);
 		}
 	}
 

@@ -184,7 +184,8 @@ MACRO_CONFIG_INT(SvGrenadeFountainDelay, sv_grenade_fountain_delay, 1500, 0, 100
 MACRO_CONFIG_INT(SvSlowDeathTicks, sv_slowdeath_ticks, 10, 0, 100, CFGFLAG_SERVER, "How many ticks is a player allowed to be in a slow death zone before they are hurt?")
 MACRO_CONFIG_INT(SvHealthArmorZoneTicks, sv_healtharmor_zone_ticks, 25, 0, 500, CFGFLAG_SERVER, "How many ticks must a player be in a health/armor zone before they heal?")
 
-MACRO_CONFIG_INT(SvHookkill, sv_hook_kill, 1, 0, 1, CFGFLAG_SERVER, "(WIP) Whether or not killing tees by hooking them into spikes should count as a kill")
+MACRO_CONFIG_INT(SvHookkill, sv_indirect_kill, 1, 0, 1, CFGFLAG_SERVER, "(WIP) Whether or not killing tees by hooking them into spikes should count as a kill")
+MACRO_CONFIG_INT(SvIndirectKillTicks, sv_indirect_kill_ticks, 100, 0, 1000, CFGFLAG_SERVER, "Ticks after being hooked that will still count as a kill")
 
 // MACRO_CONFIG_INT(SvDiscordinviteProtection, sv_discordinvite_mute, 0, 0, 2, CFGFLAG_SERVER, "Whether or not to mute/kick players sending discord invites")
 
