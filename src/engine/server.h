@@ -24,6 +24,7 @@ public:
 	{
 		const char *m_pName;
 		int m_Latency;
+		int m_DDNetVersion;
 	};
 
 	int Tick() const { return m_CurrentGameTick; }
@@ -52,6 +53,7 @@ public:
 	virtual void SetClientClan(int ClientID, char const *pClan) = 0;
 	virtual void SetClientCountry(int ClientID, int Country) = 0;
 	virtual void SetClientScore(int ClientID, int Score) = 0;
+	virtual void SetClientDDNetVersion(int ClientID, int Version) = 0;
 
 	virtual int SnapNewID() = 0;
 	virtual void SnapFreeID(int ID) = 0;

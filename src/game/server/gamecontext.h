@@ -50,6 +50,8 @@ class CGameContext : public IGameServer
 	CTuningParams m_Tuning;
 	int m_client_msgcount[MAX_CLIENTS];
 
+	void OnIsDDNetLegacyNetMessage(const CNetMsg_Cl_IsDDNetLegacy *pMsg, int ClientID, CUnpacker *pUnpacker);
+
 	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
 	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
 	static void ConTuneDump(IConsole::IResult *pResult, void *pUserData);
@@ -160,13 +162,16 @@ public:
 		CHAT_ALL=-2,
 		CHAT_SPEC=-1,
 		CHAT_RED=0,
-		CHAT_BLUE=1
+		CHAT_BLUE=1,
+		CHAT_WHISPER_SEND=2,
+		CHAT_WHISPER_RECV=3,
 	};
 
 	CMute m_Mute;
 
 	// network
 	void SendChatTarget(int To, const char *pText);
+	void SendChatPrivate(int To, int ChatterClientID, int Team, const char *pText);
 	void SendChat(int ClientID, int Team, const char *pText);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);

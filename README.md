@@ -14,8 +14,8 @@ Apart from the features of the standard server as well as the tw+ server by teet
 multiple flag stands per map (one stand is chosen randomly)  
 teleports (player, flag, and projectiles, (todo: laser?))  
 grenade fountains  
-slow killing death / slow healing / slow armor zone
-No-flag zone
+slow killing death / slow healing / slow armor zone  
+No-flag zone  
 
 **Weapons**  
 ninja (toggle invincibility, crazy-weapons, slash speed, heart/armor bonusses on pickup)  
@@ -27,6 +27,9 @@ pistol autoshooting
 shutdown message  
 slash chat commands edited/added, including /me, /w, and /help  
 Spectator stays spectator after map change  
+broadcast \n (copied from DDnet)  
+end of round stats message  
+DDnet client support (whisper)  
 
 **Included Maps**  
 included extra maps to show the new features:  

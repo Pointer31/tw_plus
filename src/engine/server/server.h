@@ -119,6 +119,7 @@ public:
 
 		char m_aName[MAX_NAME_LENGTH];
 		char m_aClan[MAX_CLAN_LENGTH];
+		int m_DDNetVersion;
 		int m_Country;
 		int m_Score;
 		int m_Authed;
@@ -168,6 +169,7 @@ public:
 	virtual void SetClientClan(int ClientID, char const *pClan);
 	virtual void SetClientCountry(int ClientID, int Country);
 	virtual void SetClientScore(int ClientID, int Score);
+	virtual void SetClientDDNetVersion(int ClientID, int Version);
 
 	void Kick(int ClientID, const char *pReason);
 

@@ -87,7 +87,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		SendChatTarget(ClientID, "----- Commands -----");
 		SendChatTarget(ClientID, "\"/info\" Information about the mod");
 		SendChatTarget(ClientID, "\"/credits\" See some credits");
-		SendChatTarget(ClientID, "\"/stats\" Show player stats");
+		SendChatTarget(ClientID, "\"/stats or /stats_all\" Show player stats");
 		SendChatTarget(ClientID, "\"/help\" Show information about the current gamemode");
 
 		if(g_Config.m_SvPrivateMessage || AuthLevel)
@@ -215,6 +215,52 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}
 		return true;
 	}
+	else if((Len = StrLeftComp(pMessage, "stats_all")))
+	{
+		int ReceiverID = -1;
+		char aBuf[32] = { 0 };
+		CPlayer *pP = pPlayer;
+
+		if (sscanf(pMessage, "stats_all %2s", aBuf) > 0)
+		{
+			pMessage += Len;
+
+			ParsePlayerName((char*) pMessage, &ReceiverID);
+
+			if(IsValidCID(ReceiverID))
+			{
+				pP = m_apPlayers[ReceiverID];
+				str_format(aBuf, sizeof(aBuf), "(%s) ", Server()->ClientName(ReceiverID));
+			}
+			else
+			{
+				SendChatTarget(ClientID, "No player with this name ingame");
+				return false;
+			}
+		}
+		// 	struct Stats
+		// {
+		// 	int m_Shots[NUM_WEAPONS];
+		// 	int m_TotalShots;
+		// 	int m_Kills;
+		// 	int m_Deaths;
+		// 	int m_Hits;
+		// 	int m_Captures;
+		// 	int m_LostFlags;
+		// 	double m_FastestCapture;
+		// } m_Stats;
+		char aaBuf[5][128];
+		str_format(aaBuf[0], sizeof(aaBuf[0]), "--- Statistics %s---", aBuf);
+		str_format(aaBuf[1], sizeof(aaBuf[1]), "Shots: {%d, %d, %d, %d, %d, %d} Tot. %d", pP->m_Stats.m_Shots[0], pP->m_Stats.m_Shots[1], pP->m_Stats.m_Shots[2], pP->m_Stats.m_Shots[3], pP->m_Stats.m_Shots[4], pP->m_Stats.m_Shots[5], pP->m_Stats.m_TotalShots);
+		str_format(aaBuf[2], sizeof(aaBuf[2]), "Kills: %d, Deaths: %d, Hits: %d", pP->m_Stats.m_Kills, pP->m_Stats.m_Deaths, pP->m_Stats.m_Hits);
+		str_format(aaBuf[3], sizeof(aaBuf[3]), "Flags: %d, Lost: %d, Fastest: %.2f", pP->m_Stats.m_Captures, pP->m_Stats.m_LostFlags, pP->m_Stats.m_FastestCapture);
+		str_format(aaBuf[4], sizeof(aaBuf[4]), "K/D Ratio: %.2f", (pP->m_Stats.m_Deaths > 0) ? ((float) pP->m_Stats.m_Kills / (float) pP->m_Stats.m_Deaths) : 0);
+
+		for (int i = 0; i < 5; i++)
+			SendChatTarget(ClientID, aaBuf[i]);
+
+		return false;
+	}
 	else if((Len = StrLeftComp(pMessage, "stats")))
 	{
 		int ReceiverID = -1;
@@ -251,7 +297,8 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		return false;
 	}
-	else if((Len=StrLeftComp(pMessage, "sayto")) || (Len=StrLeftComp(pMessage, "st")) || (Len=StrLeftComp(pMessage, "pm")) || (Len=StrLeftComp(pMessage, "w")))
+	else if((Len=StrLeftComp(pMessage, "sayto")) || (Len=StrLeftComp(pMessage, "st")) || (Len=StrLeftComp(pMessage, "pm")) || 
+			(Len=StrLeftComp(pMessage, "w")) || (Len=StrLeftComp(pMessage, "whisper")))
 	{
 		if(!g_Config.m_SvPrivateMessage && !AuthLevel)
 			SendChatTarget(ClientID, "This feature is not available at the moment.");
@@ -263,7 +310,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 			if(pMsg[0] == '\0')
 			{
-				SendChatTarget(ClientID, "Usage: \"/sayto <Name/ID> <Message>\"");
+				SendChatTarget(ClientID, "Usage: \"/w <Name/ID> <Message>\"");
 				return false;
 			}
 
@@ -284,14 +331,26 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 					else
 					{
 						char aBuf[512];
-						str_format(aBuf, sizeof(aBuf), "You received a private message from %s (ID: %d)", Server()->ClientName(ClientID), ClientID);
-						SendChatTarget(ReceiverID, aBuf);
+						IServer::CClientInfo Info;
+						int infoExists = Server()->GetClientInfo(ReceiverID, &Info);
+						int ddnetversion = Info.m_DDNetVersion;
+						if (infoExists && ddnetversion > VERSION_DDNET_WHISPER) {
+							SendChatPrivate(ReceiverID, ClientID, CHAT_WHISPER_RECV, pMsg);
+						} else {
+							str_format(aBuf, sizeof(aBuf), "You received a private message from %s (ID: %d)", Server()->ClientName(ClientID), ClientID);
+							SendChatTarget(ReceiverID, aBuf);
+							str_format(aBuf, sizeof(aBuf), "← %s: %s", Server()->ClientName(ClientID), pMsg);
+							SendChatTarget(ReceiverID, aBuf);
+						}
 
-						str_format(aBuf, sizeof(aBuf), "← %s: %s", Server()->ClientName(ClientID), pMsg);
-						SendChatTarget(ReceiverID, aBuf);
-
-						str_format(aBuf, sizeof(aBuf), "→ %s: %s", Server()->ClientName(ReceiverID), pMsg);
-						SendChatTarget(ClientID, aBuf);
+						infoExists = Server()->GetClientInfo(ClientID, &Info);
+						ddnetversion = Info.m_DDNetVersion;
+						if (infoExists && ddnetversion > VERSION_DDNET_WHISPER) {
+							SendChatPrivate(ClientID, ReceiverID, CHAT_WHISPER_SEND, pMsg);
+						} else {
+							str_format(aBuf, sizeof(aBuf), "→ %s: %s", Server()->ClientName(ReceiverID), pMsg);
+							SendChatTarget(ClientID, aBuf);
+						}
 
 						m_apPlayers[ReceiverID]->m_LastPMReceivedFrom = ClientID;
 						m_apPlayers[ClientID]->m_LastPMReceivedFrom = ReceiverID;
@@ -358,12 +417,24 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 					// str_format(aBuf, sizeof(aBuf), "%s: %s", Server()->ClientName(ClientID), pMsg);
 					// SendChatTarget(LastChatterID, aBuf);
 					// SendChatTarget(ClientID, "PM successfully sent");
+					IServer::CClientInfo Info;
+					int infoExists = Server()->GetClientInfo(LastChatterID, &Info);
+					int ddnetversion = Info.m_DDNetVersion;
+					if (infoExists && ddnetversion > VERSION_DDNET_WHISPER) {
+						SendChatPrivate(LastChatterID, ClientID, CHAT_WHISPER_RECV, pMsg);
+					} else {
+						str_format(aBuf, sizeof(aBuf), "← %s: %s", Server()->ClientName(ClientID), pMsg);
+						SendChatTarget(LastChatterID, aBuf);
+					}
 
-					str_format(aBuf, sizeof(aBuf), "← %s: %s", Server()->ClientName(ClientID), pMsg);
-					SendChatTarget(LastChatterID, aBuf);
-
-					str_format(aBuf, sizeof(aBuf), "→ %s: %s", Server()->ClientName(LastChatterID), pMsg);
-					SendChatTarget(ClientID, aBuf);
+					infoExists = Server()->GetClientInfo(ClientID, &Info);
+					ddnetversion = Info.m_DDNetVersion;
+					if (infoExists && ddnetversion > VERSION_DDNET_WHISPER) {
+						SendChatPrivate(ClientID, LastChatterID, CHAT_WHISPER_SEND, pMsg);
+					} else {
+						str_format(aBuf, sizeof(aBuf), "→ %s: %s", Server()->ClientName(LastChatterID), pMsg);
+						SendChatTarget(ClientID, aBuf);
+					}
 
 					m_apPlayers[LastChatterID]->m_LastPMReceivedFrom = ClientID;
 					m_apPlayers[ClientID]->m_LastPMReceivedFrom = LastChatterID;
@@ -375,11 +446,11 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			else
 			{
 				if(LastChatterID == -1)
-					SendChatTarget(ClientID, "Please first write a PM with /sayto");
+					SendChatTarget(ClientID, "Please first write a PM with /sayto or /w");
 				else if(LastChatterID == -2)
-					SendChatTarget(ClientID, "The original player left, please use /sayto to write a new PM");
+					SendChatTarget(ClientID, "The original player left, please use /sayto or /w to write a new PM");
 				else //dafuq?
-					SendChatTarget(ClientID, "Something went kinda wrong. Use /sayto");
+					SendChatTarget(ClientID, "Something went kinda wrong. Use /sayto or /w");
 			}
 		}
 		return false;
