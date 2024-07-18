@@ -138,6 +138,7 @@ enum
 	NETMSGTYPE_CL_EMOTICON,
 	NETMSGTYPE_CL_VOTE,
 	NETMSGTYPE_CL_CALLVOTE,
+	NETMSGTYPE_CL_ISDDNETLEGACY,
 	NUM_NETMSGTYPES
 };
 
@@ -682,6 +683,16 @@ struct CNetMsg_Cl_CallVote
 		pPacker->AddString(m_Type, -1);
 		pPacker->AddString(m_Value, -1);
 		pPacker->AddString(m_Reason, -1);
+		return pPacker->Error() != 0;
+	}
+};
+
+struct CNetMsg_Cl_IsDDNetLegacy
+{
+	int MsgID() const { return NETMSGTYPE_CL_ISDDNETLEGACY; }
+	
+	bool Pack(CMsgPacker *pPacker)
+	{
 		return pPacker->Error() != 0;
 	}
 };

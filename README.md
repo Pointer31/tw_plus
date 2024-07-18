@@ -27,6 +27,9 @@ pistol autoshooting
 shutdown message  
 slash chat commands edited/added, including /me, /w, and /help  
 Spectator stays spectator after map change  
+broadcast \n (copied from DDnet)
+end of round stats message
+DDnet client support (whisper)
 
 **Included Maps**  
 included extra maps to show the new features:  

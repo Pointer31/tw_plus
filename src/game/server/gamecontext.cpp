@@ -235,6 +235,15 @@ void CGameContext::SendChatTarget(int To, const char *pText)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
 }
 
+void CGameContext::SendChatPrivate(int To, int ChatterClientID, int Team, const char *pText)
+{
+	CNetMsg_Sv_Chat Msg;
+	Msg.m_Team = Team;
+	Msg.m_ClientID = ChatterClientID;
+	Msg.m_pMessage = pText;
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
+}
+
 
 void CGameContext::SendChat(int ChatterClientID, int Team, const char *pText)
 {
@@ -1187,6 +1196,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			pPlayer->m_LastKill = Server()->Tick();
 			pPlayer->KillCharacter(WEAPON_SELF);
 		}
+		else if (MsgID == NETMSGTYPE_CL_ISDDNETLEGACY) {OnIsDDNetLegacyNetMessage(static_cast<CNetMsg_Cl_IsDDNetLegacy *>(pRawMsg), ClientID, pUnpacker);}
 	}
 	else
 	{
@@ -1288,6 +1298,31 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			Server()->SendPackMsg(&m, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 		}
 	}
+}
+
+void CGameContext::OnIsDDNetLegacyNetMessage(const CNetMsg_Cl_IsDDNetLegacy *pMsg, int ClientID, CUnpacker *pUnpacker)
+{
+	IServer::CClientInfo Info;
+	Server()->GetClientInfo(ClientID, &Info);
+	// if(Server()->GetClientInfo(ClientID, &Info) && Info.m_GotDDNetVersion)
+	// {
+	// 	return;
+	// }
+	int DDNetVersion = pUnpacker->GetInt();
+	Info.m_DDNetVersion = DDNetVersion;
+	Server()->SetClientDDNetVersion(ClientID, DDNetVersion);
+
+	char aBuf[256];
+	// str_format(aBuf, sizeof(aBuf), "ClientID=%d ddnet version %d", ClientID, DDNetVersion);
+	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+
+	// std::cout << DDNetVersion << '\n';
+	// if(pUnpacker->Error() || DDNetVersion < 0)
+	// {
+	// 	DDNetVersion = VERSION_DDRACE;
+	// }
+	// Server()->SetClientDDNetVersion(ClientID, DDNetVersion);
+	// OnClientDDNetVersionKnown(ClientID);
 }
 
 void CGameContext::ConTuneParam(IConsole::IResult *pResult, void *pUserData)

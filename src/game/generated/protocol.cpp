@@ -100,6 +100,7 @@ const char *CNetObjHandler::ms_apMsgNames[] = {
 	"Cl_Emoticon",
 	"Cl_Vote",
 	"Cl_CallVote",
+	"Cl_IsDDNetLegacy",
 	""
 };
 
@@ -542,6 +543,12 @@ void *CNetObjHandler::SecureUnpackMsg(int Type, CUnpacker *pUnpacker)
 		pMsg->m_Type = pUnpacker->GetString(CUnpacker::SANITIZE_CC|CUnpacker::SKIP_START_WHITESPACES);
 		pMsg->m_Value = pUnpacker->GetString(CUnpacker::SANITIZE_CC|CUnpacker::SKIP_START_WHITESPACES);
 		pMsg->m_Reason = pUnpacker->GetString(CUnpacker::SANITIZE_CC|CUnpacker::SKIP_START_WHITESPACES);
+	} break;
+	
+	case NETMSGTYPE_CL_ISDDNETLEGACY:
+	{
+		CNetMsg_Cl_IsDDNetLegacy *pMsg = (CNetMsg_Cl_IsDDNetLegacy *)m_aMsgData;
+		(void)pMsg;
 	} break;
 	
 	default:
