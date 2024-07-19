@@ -30,6 +30,7 @@ Spectator stays spectator after map change
 broadcast \n (copied from DDnet)  
 end of round stats message  
 DDnet client support (whisper)  
+Experimental 64 player support (requires ddnet client)  
 
 **Included Maps**  
 included extra maps to show the new features:  
@@ -39,3 +40,4 @@ dm_gfountain (teleports, grenade fountain)
 ctf_tele (teleports)  
 ctf_sixflags (multiple flag stands)  
 ctf_quadflags (multiple flag stands)  
+ctf_flagged (teleports, health/shield zone and no-flag zone)  

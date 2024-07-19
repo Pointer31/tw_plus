@@ -1118,7 +1118,13 @@ void CServer::SendServerInfo(const NETADDR *pAddr, int Token)
 	p.AddString(aBuf, 6);
 
 	p.AddString(GameServer()->Version(), 32);
-	p.AddString(g_Config.m_SvName, 64);
+
+	char bBuf[128];
+	if (m_NetServer.MaxClients() > NET_MAX_CLIENTS_VANILLA)
+		str_format(bBuf, sizeof(bBuf), "%s [%d/%d]", g_Config.m_SvName, ClientCount, m_NetServer.MaxClients());
+	else
+		str_format(bBuf, sizeof(bBuf), "%s", g_Config.m_SvName);
+	p.AddString(bBuf, 64);
 	p.AddString(GetMapName(), 32);
 
 	// gametype
@@ -1131,16 +1137,32 @@ void CServer::SendServerInfo(const NETADDR *pAddr, int Token)
 	str_format(aBuf, sizeof(aBuf), "%d", i);
 	p.AddString(aBuf, 2);
 
-	str_format(aBuf, sizeof(aBuf), "%d", PlayerCount);
+	int supposedMaxClients = m_NetServer.MaxClients();
+	if (supposedMaxClients > NET_MAX_CLIENTS_VANILLA)
+		supposedMaxClients = NET_MAX_CLIENTS_VANILLA;
+
+	int supposedClients = ClientCount;
+	if (supposedClients > NET_MAX_CLIENTS_VANILLA)
+		supposedClients = NET_MAX_CLIENTS_VANILLA;
+
+	int supposedPlayers = PlayerCount;
+	if (supposedPlayers > NET_MAX_CLIENTS_VANILLA)
+		supposedPlayers = NET_MAX_CLIENTS_VANILLA;
+
+	str_format(aBuf, sizeof(aBuf), "%d", supposedPlayers);
 	p.AddString(aBuf, 3); // num players
-	str_format(aBuf, sizeof(aBuf), "%d", m_NetServer.MaxClients() - g_Config.m_SvSpectatorSlots);
+	str_format(aBuf, sizeof(aBuf), "%d", supposedMaxClients - g_Config.m_SvSpectatorSlots);
 	p.AddString(aBuf, 3); // max players
-	str_format(aBuf, sizeof(aBuf), "%d", ClientCount);
+	str_format(aBuf, sizeof(aBuf), "%d", supposedClients);
 	p.AddString(aBuf, 3); // num clients
-	str_format(aBuf, sizeof(aBuf), "%d", m_NetServer.MaxClients());
+	str_format(aBuf, sizeof(aBuf), "%d", supposedMaxClients);
 	p.AddString(aBuf, 3); // max clients
 
-	for (i = 0; i < MAX_CLIENTS; i++)
+	int max = MAX_CLIENTS;
+	if (MAX_CLIENTS > NET_MAX_CLIENTS_VANILLA)
+		max = NET_MAX_CLIENTS_VANILLA;
+
+	for (i = 0; i < max; i++)
 	{
 		if (m_aClients[i].m_State != CClient::STATE_EMPTY)
 		{

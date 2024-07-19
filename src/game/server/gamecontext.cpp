@@ -562,8 +562,9 @@ void CGameContext::OnClientEnter(int ClientID)
 	
 	//Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", Server()->ClientName(ClientID));
 	//std::cout << m_playerNames[ClientID] << "=?" << name << "\n";
+	// spectator stay spectator after map change
 	if (Server()->m_playerNames[ClientID].compare(name) == 0) {
-		m_apPlayers[ClientID]->SetTeam(TEAM_SPECTATORS);
+		m_apPlayers[ClientID]->SetTeam(TEAM_SPECTATORS, false);
 	}
 
 	m_client_msgcount[ClientID] = 0;
@@ -1314,7 +1315,7 @@ void CGameContext::OnIsDDNetLegacyNetMessage(const CNetMsg_Cl_IsDDNetLegacy *pMs
 
 	char aBuf[256];
 	// str_format(aBuf, sizeof(aBuf), "ClientID=%d ddnet version %d", ClientID, DDNetVersion);
-	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+	// Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 
 	// std::cout << DDNetVersion << '\n';
 	// if(pUnpacker->Error() || DDNetVersion < 0)
@@ -2170,25 +2171,45 @@ void CGameContext::OnShutdown()
 
 void CGameContext::OnSnap(int ClientID)
 {
-	// add tuning to demo
-	CTuningParams StandardTuning;
-	if(ClientID == -1 && Server()->DemoRecorder_IsRecording() && mem_comp(&StandardTuning, &m_Tuning, sizeof(CTuningParams)) != 0)
-	{
-		CMsgPacker Msg(NETMSGTYPE_SV_TUNEPARAMS);
-		int *pParams = (int *)&m_Tuning;
-		for(unsigned i = 0; i < sizeof(m_Tuning)/sizeof(int); i++)
-			Msg.AddInt(pParams[i]);
-		Server()->SendMsg(&Msg, MSGFLAG_RECORD|MSGFLAG_NOSEND, ClientID);
+	// make sure vanilla clients don't crash if there are more than 16 tees online possible
+	bool actuallySnap = true;
+	if (g_Config.m_SvMaxClients <= MAX_CLIENTS_VANILLA)
+		actuallySnap = true;
+	else {
+		IServer::CClientInfo Info;
+		int infoExists = Server()->GetClientInfo(ClientID, &Info);
+		int ddnetversion = Info.m_DDNetVersion;
+		if (infoExists && ddnetversion > VERSION_DDNET_WHISPER)
+			actuallySnap = true;
+		else
+			actuallySnap = false;
 	}
 
-	m_World.Snap(ClientID);
-	m_pController->Snap(ClientID);
-	m_Events.Snap(ClientID);
+	if (actuallySnap) {
+		// add tuning to demo
+		CTuningParams StandardTuning;
+		if(ClientID == -1 && Server()->DemoRecorder_IsRecording() && mem_comp(&StandardTuning, &m_Tuning, sizeof(CTuningParams)) != 0)
+		{
+			CMsgPacker Msg(NETMSGTYPE_SV_TUNEPARAMS);
+			int *pParams = (int *)&m_Tuning;
+			for(unsigned i = 0; i < sizeof(m_Tuning)/sizeof(int); i++)
+				Msg.AddInt(pParams[i]);
+			Server()->SendMsg(&Msg, MSGFLAG_RECORD|MSGFLAG_NOSEND, ClientID);
+		}
 
-	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-		if(m_apPlayers[i])
-			m_apPlayers[i]->Snap(ClientID);
+		m_World.Snap(ClientID);
+		m_pController->Snap(ClientID);
+		m_Events.Snap(ClientID);
+
+		
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(m_apPlayers[i])
+				m_apPlayers[i]->Snap(ClientID);
+		}
+	} else {
+		// snap only own tee so the ddnet client version is still given
+		m_apPlayers[ClientID]->Snap(ClientID);
 	}
 }
 void CGameContext::OnPreSnap() {}

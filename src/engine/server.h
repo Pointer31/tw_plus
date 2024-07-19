@@ -16,7 +16,7 @@ protected:
 public:
 
 // for spectators to stay spectators after map change
-	std::string m_playerNames[16]; // MAX_CLIENTS
+	std::string m_playerNames[64]; // MAX_CLIENTS
 	/*
 		Structure: CClientInfo
 	*/

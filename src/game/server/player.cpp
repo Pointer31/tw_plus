@@ -74,6 +74,17 @@ void CPlayer::Tick()
 		}
 	}
 
+	// Make player receive message if they are not using the ddnet client while the server supports > 16 players
+	// each 5 seconds
+	if(Server()->Tick()%(Server()->TickSpeed()*5) == 0)
+	{
+		IServer::CClientInfo Info;
+		int infoExists = Server()->GetClientInfo(m_ClientID, &Info);
+		int ddnetversion = Info.m_DDNetVersion;
+		if (!((infoExists && ddnetversion > VERSION_DDNET_WHISPER) || g_Config.m_SvMaxClients <= MAX_CLIENTS_VANILLA))
+			m_pGameServer->SendChatTarget(m_ClientID, "If you are not using the ddnet client please download it from https://ddnet.org/ This server only properly supports ddnet clients.");
+	}
+
 	if(m_ChatTicks)
 		m_ChatTicks--;
 
