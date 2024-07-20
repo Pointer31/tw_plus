@@ -31,6 +31,7 @@ broadcast \n (copied from DDnet)
 end of round stats message  
 DDnet client support (whisper)  
 Experimental 64 player support (requires ddnet client)  
+new gametype: Hold the flag (HTF); teamless mode where you gain points by holding the flag  
 
 **Included Maps**  
 included extra maps to show the new features:  
@@ -41,3 +42,4 @@ ctf_tele (teleports)
 ctf_sixflags (multiple flag stands)  
 ctf_quadflags (multiple flag stands)  
 ctf_flagged (teleports, health/shield zone and no-flag zone)  
+htf_1 (shield, no-flag zone, HTF)  

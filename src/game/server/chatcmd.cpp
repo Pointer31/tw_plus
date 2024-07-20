@@ -69,6 +69,13 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		} else if (StrLeftComp(GameType(), "iTDM+")) {
 			SendChatTarget(ClientID, "iTDM+ gametype: 'team death match'. Kill tees of the other team for points. You can only use your laser rifle, and it insta-kills");
 		} 
+		else if (StrLeftComp(GameType(), "HTF")) {
+			SendChatTarget(ClientID, "HTF gametype: 'hold the flag'. While holding the flag you gain points. You can pick up weapons to use. Pick up hearts and shields to restore your health and armor!");
+		} else if (StrLeftComp(GameType(), "gHTF")) {
+			SendChatTarget(ClientID, "gHTF gametype: 'hold the flag'. While holding the flag you gain points. You can only use your grenade launcher, and it insta-kills");
+		} else if (StrLeftComp(GameType(), "iHTF")) {
+			SendChatTarget(ClientID, "iHTF gametype: 'hold the flag'. While holding the flag you gain points. You can only use your laser rifle, and it insta-kills");
+		} 
 		else if (StrLeftComp(GameType(), "iFreeze+")) {
 			SendChatTarget(ClientID, "iFreeze gametype: freeze all tees of the other team to win. Stand near a frozen teammate to melt them.");
 		}

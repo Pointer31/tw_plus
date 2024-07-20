@@ -899,7 +899,8 @@ void CCharacter::Tick()
 		if (m_slowDeathTick < 0) {
 			if (StrLeftComp(GameServer()->GameType(), "DM+")
 			|| StrLeftComp(GameServer()->GameType(), "TDM+")
-			|| StrLeftComp(GameServer()->GameType(), "CTF+")) {
+			|| StrLeftComp(GameServer()->GameType(), "CTF+")
+			|| StrLeftComp(GameServer()->GameType(), "HTF")) {
 				TakeDamage({0,0}, 1, -1, WEAPON_NINJA);
 			} else {
 				m_Health = m_Health - 1;

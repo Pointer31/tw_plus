@@ -7,6 +7,7 @@
 #include "ctf.h"
 #include "dm.h"
 #include "tdm.h"
+#include "htf.h"
 
 
 class CGameControllerGCTF : public CGameControllerCTF
@@ -29,6 +30,14 @@ class CGameControllerGTDM : public CGameControllerTDM
 {
 public:
 	CGameControllerGTDM(class CGameContext *pGameServer, int);
+	virtual void OnCharacterSpawn(class CCharacter *pChr);
+	virtual void Tick();
+};
+
+class CGameControllerGHTF : public CGameControllerHTF
+{
+public:
+	CGameControllerGHTF(class CGameContext *pGameServer, int);
 	virtual void OnCharacterSpawn(class CCharacter *pChr);
 	virtual void Tick();
 };

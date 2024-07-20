@@ -19,6 +19,7 @@
 #include "gamemodes/mod.h"
 #include "gamemodes/grenade.h"
 #include "gamemodes/ifreeze.h"
+#include "gamemodes/htf.h"
 
 enum
 {
@@ -2115,6 +2116,12 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		m_pController = new CGameControllerGTDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
 	else if(!str_comp_nocase(g_Config.m_SvGametype, "ifreeze") || !str_comp_nocase(g_Config.m_SvGametype, "ifreeze+"))	// iFreeze
 		m_pController = new CGameControllerIFreeze(this, IGameController::GAMETYPE_IFREEZE|IGameController::GAMETYPE_INSTAGIB);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "htf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "htf+"))		// HTF
+		m_pController = new CGameControllerHTF(this, IGameController::GAMETYPE_VANILLA);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "ghtf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "ghtf+"))		// gHTF
+		m_pController = new CGameControllerGHTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "ihtf") || !str_comp_nocase(g_Config.m_SvGametype, "ihtf+"))		// iHTF
+		m_pController = new CGameControllerHTF(this, IGameController::GAMETYPE_INSTAGIB);
 	else
 		m_pController = new CGameControllerDM(this, IGameController::GAMETYPE_VANILLA);
 

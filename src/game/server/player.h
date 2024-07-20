@@ -76,6 +76,7 @@ public:
 	int m_RespawnTick;
 	int m_DieTick;
 	int m_Score;
+	int m_ScoreTick; // can be used to have partial scores
 	int m_ScoreStartTick;
 	bool m_ForceBalanced;
 	int m_LastActionTick;

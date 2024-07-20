@@ -67,3 +67,23 @@ void CGameControllerGTDM::Tick()
 {
 	CGameControllerTDM::Tick();
 }
+
+// gHTF
+
+CGameControllerGHTF::CGameControllerGHTF(class CGameContext *pGameServer, int TypeFlags)
+: CGameControllerHTF(pGameServer, TypeFlags)
+{
+	m_Flags = TypeFlags;
+	m_pGameType = "gHTF";
+}
+
+void CGameControllerGHTF::OnCharacterSpawn(CCharacter* pChr)
+{
+	pChr->IncreaseHealth(10);
+	pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmo);
+}
+
+void CGameControllerGHTF::Tick()
+{
+	CGameControllerHTF::Tick();
+}
