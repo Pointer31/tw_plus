@@ -26,7 +26,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 	if(StrLeftComp(pMessage, "info"))
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "TW+ Mod v.%s created by Teetime, modified by Pointer.", MOD_VERSION);
+		str_format(aBuf, sizeof(aBuf), "TW+ Mod v.%s created by Teetime, Modified v%s by Pointer.", MOD_VERSION_TEETIME, MOD_VERSION);
 		SendChatTarget(ClientID, aBuf);
 
 		SendChatTarget(ClientID, "For a list of available commands type \"/cmdlist\"");

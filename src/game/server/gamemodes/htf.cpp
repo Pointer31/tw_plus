@@ -182,7 +182,7 @@ void CGameControllerHTF::Tick()
 				else
 				{
 					// a person cannot take two flags at the same time
-					if (m_apFlags[1-fi]->m_pCarryingCharacter == apCloseCCharacters[i])
+					if (m_apFlags[1-fi] != NULL && m_apFlags[1-fi]->m_pCarryingCharacter == apCloseCCharacters[i])
 						return;
 
 					// take the flag

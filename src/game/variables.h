@@ -182,7 +182,7 @@ MACRO_CONFIG_INT(SvGrenadeFountainHarm, sv_grenade_fountain_harm, 0, 0, 1, CFGFL
 MACRO_CONFIG_INT(SvGrenadeFountainDelay, sv_grenade_fountain_delay, 1500, 0, 10000, CFGFLAG_SERVER, "Grenade fountain fire delay (default: 1500)")
 
 MACRO_CONFIG_INT(SvSlowDeathTicks, sv_slowdeath_ticks, 10, 0, 100, CFGFLAG_SERVER, "How many ticks is a player allowed to be in a slow death zone before they are hurt?")
-MACRO_CONFIG_INT(SvHealthArmorZoneTicks, sv_healtharmor_zone_ticks, 25, 0, 500, CFGFLAG_SERVER, "How many ticks must a player be in a health/armor zone before they heal?")
+MACRO_CONFIG_INT(SvHealthArmorZoneTicks, sv_healtharmor_zone_ticks, 10, 0, 500, CFGFLAG_SERVER, "How many ticks must a player be in a health/armor zone before they heal?")
 
 MACRO_CONFIG_INT(SvHookkill, sv_indirect_kill, 1, 0, 1, CFGFLAG_SERVER, "(WIP) Whether or not killing tees by hooking them into spikes should count as a kill")
 MACRO_CONFIG_INT(SvIndirectKillTicks, sv_indirect_kill_ticks, 100, 0, 1000, CFGFLAG_SERVER, "Ticks after being hooked that will still count as a kill")
