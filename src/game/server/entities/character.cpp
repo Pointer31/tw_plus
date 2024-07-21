@@ -932,10 +932,11 @@ void CCharacter::Tick()
 			m_healthArmorZoneTick = g_Config.m_SvHealthArmorZoneTicks;
 		}
 	}
-	if (GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_ARMORZONE ||
+	if (!GameServer()->m_pController->IsInstagib() && (
+			GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_ARMORZONE ||
 			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_ARMORZONE ||
 			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_ARMORZONE ||
-			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_ARMORZONE)
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_ARMORZONE))
 	{
 		m_healthArmorZoneTick--;
 		if (m_healthArmorZoneTick < 0) {
