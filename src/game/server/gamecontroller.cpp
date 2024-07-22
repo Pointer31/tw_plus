@@ -239,9 +239,9 @@ void IGameController::EndRound()
 			int scoreRed = m_aTeamscore[TEAM_RED];
 			int scoreBlue = m_aTeamscore[TEAM_BLUE];
 			if (scoreRed > scoreBlue)
-				str_format(aBuf, sizeof(aBuf), "★ Red team has won the round! Red: %d, Blue: %d\n", scoreRed, scoreBlue);
+				str_format(aBuf, sizeof(aBuf), "★ Red team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
 			else
-				str_format(aBuf, sizeof(aBuf), "★ Blue team has won the round! Red: %d, Blue: %d\n", scoreRed, scoreBlue);
+				str_format(aBuf, sizeof(aBuf), "★ Blue team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
 			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 
 			char bBuf[1024] = "No message2 (this should not appear)";

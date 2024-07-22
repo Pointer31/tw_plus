@@ -90,7 +90,14 @@ void dbg_msg(const char *sys, const char *fmt, ...)
 	char *msg;
 	int i, len;
 
-	str_format(str, sizeof(str), "[%08x][%s]: ", (int)time(0), sys);
+	time_t     now = time(0);
+    struct tm  timestruct;
+    char       timestamp[80];
+    timestruct = *localtime(&now);
+
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %X", &timestruct);
+	// str_format(str, sizeof(str), "[%08x][%s]: ", (int)time(0), sys);
+	str_format(str, sizeof(str), "[%s][%s]: ", timestamp, sys);
 	len = strlen(str);
 	msg = (char *)str + len;
 
