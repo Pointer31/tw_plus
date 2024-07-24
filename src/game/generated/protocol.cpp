@@ -45,6 +45,7 @@ const char *CNetObjHandler::ms_apObjNames[] = {
 	"SoundGlobal",
 	"SoundWorld",
 	"DamageInd",
+	"GameInfoEx",
 	""
 };
 
@@ -70,6 +71,7 @@ int CNetObjHandler::ms_aObjSizes[] = {
 	sizeof(CNetEvent_SoundGlobal),
 	sizeof(CNetEvent_SoundWorld),
 	sizeof(CNetEvent_DamageInd),
+	sizeof(CNetObj_GameInfoEx),
 	0
 };
 
@@ -299,6 +301,13 @@ int CNetObjHandler::ValidateObj(int Type, void *pData, int Size)
 	case NETEVENTTYPE_DAMAGEIND:
 	{
 		CNetEvent_DamageInd *pObj = (CNetEvent_DamageInd *)pData;
+		if(sizeof(*pObj) != Size) return -1;
+		return 0;
+	}
+	
+	case NETOBJTYPE_GAMEINFOEX:
+	{
+		CNetObj_GameInfoEx *pObj = (CNetObj_GameInfoEx *)pData;
 		if(sizeof(*pObj) != Size) return -1;
 		return 0;
 	}

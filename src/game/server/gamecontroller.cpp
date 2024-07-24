@@ -722,6 +722,36 @@ void IGameController::Snap(int SnappingClient)
 
 	pGameInfoObj->m_RoundNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
 	pGameInfoObj->m_RoundCurrent = m_RoundCount+1;
+
+	// WARNING, this is very hardcoded; for ddnet support
+	CNetObj_GameInfoEx *pGameInfoEx = (CNetObj_GameInfoEx *)Server()->SnapNewItem(32767, 0, 12);
+	if(!pGameInfoEx)
+		return;
+
+	pGameInfoEx->m_Flags =
+		GAMEINFOFLAG_GAMETYPE_PLUS |
+		GAMEINFOFLAG_ALLOW_EYE_WHEEL |
+		GAMEINFOFLAG_ALLOW_HOOK_COLL |
+		GAMEINFOFLAG_PREDICT_VANILLA |
+		GAMEINFOFLAG_ENTITIES_DDNET |
+		GAMEINFOFLAG_ENTITIES_DDRACE |
+		GAMEINFOFLAG_ENTITIES_RACE;
+	// if (false)
+	// 	pGameInfoEx->m_Flags |= GAMEINFOFLAG_ALLOW_ZOOM;
+	pGameInfoEx->m_Flags2 = 
+		GAMEINFOFLAG2_HUD_HEALTH_ARMOR |
+		GAMEINFOFLAG2_HUD_AMMO;
+	pGameInfoEx->m_Version = 8;
+
+	// This object needs to be snapped alongside pGameInfoObj for that object to work properly
+	int *pUuidItem = (int *)Server()->SnapNewItem(0, 32767, 16); // NETOBJTYPE_EX
+	if(pUuidItem)
+	{
+		pUuidItem[0] = -1824658838;
+		pUuidItem[1] = -629591830;
+		pUuidItem[2] = -1450210576;
+		pUuidItem[3] = 914991429;
+	}
 }
 
 int IGameController::GetAutoTeam(int NotThisID)
