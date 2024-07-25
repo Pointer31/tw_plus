@@ -65,7 +65,7 @@ MACRO_CONFIG_INT(SvRoundSwap, sv_round_swap, 1, 0, 1, CFGFLAG_SERVER, "Swap team
 MACRO_CONFIG_INT(SvPowerups, sv_powerups, 1, 0, 1, CFGFLAG_SERVER, "Allow powerups like ninja")
 MACRO_CONFIG_INT(SvScorelimit, sv_scorelimit, 20, 0, 1000, CFGFLAG_SERVER, "Score limit (0 disables)")
 MACRO_CONFIG_INT(SvTimelimit, sv_timelimit, 0, 0, 1000, CFGFLAG_SERVER, "Time limit in minutes (0 disables)")
-MACRO_CONFIG_STR(SvGametype, sv_gametype, 32, "dm", CFGFLAG_SERVER, "Game type (dm, tdm, ctf, idm, itdm, ictf, ifreeze, gdm, gtdm, gctf)")
+MACRO_CONFIG_STR(SvGametype, sv_gametype, 32, "dm", CFGFLAG_SERVER, "Game type (dm, tdm, ctf, idm, itdm, ictf, ifreeze, gdm, gtdm, gctf, htf, ghtf, ihtf)")
 MACRO_CONFIG_INT(SvTournamentMode, sv_tournament_mode, 0, 0, 1, CFGFLAG_SERVER, "Tournament mode. When enabled, players joins the server as spectator")
 MACRO_CONFIG_INT(SvSpamprotection, sv_spamprotection, 1, 0, 1, CFGFLAG_SERVER, "Spam protection")
 
@@ -197,5 +197,14 @@ MACRO_CONFIG_INT(SvRoundendMessage, sv_roundend_message, 1, 0, 1, CFGFLAG_SERVER
 
 //
 MACRO_CONFIG_STR(SvShutdownMessage, sv_shutdown_msg, 128, "Server shutdown", CFGFLAG_SERVER, "Message displayed on server shutdown (old, use shutdown <message>)")
+
+// info shown on /info
+MACRO_CONFIG_STR(SvInfoGithub, sv_info_github, 128, "Github: https://github.com/Pointer31/tw_plus", CFGFLAG_SERVER, "Github link shown when /info is used")
+MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Contact link shown when /info is used")
+
+// ddnet client support togglables
+MACRO_CONFIG_INT(SvDDAllowZoom, sv_dd_allow_zoom, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to allow clients to zoom out")
+MACRO_CONFIG_INT(SvDDInstagibHideHealth, sv_dd_instagib_hide_health, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to hide health and shield HUD on instagib modes")
+MACRO_CONFIG_INT(SvDDShowHud, sv_dd_show_hud, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to enable the ddrace HUD")
 
 #endif

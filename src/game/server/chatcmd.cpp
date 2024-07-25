@@ -36,6 +36,10 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 
 		if(m_pController->IsIFreeze())
 				SendChatTarget(ClientID, "iFreeze is originally created by Tom94. Big thanks to him");
+		if (strcmp(g_Config.m_SvInfoGithub, "") != 0)
+			SendChatTarget(ClientID, g_Config.m_SvInfoGithub);
+		if (strcmp(g_Config.m_SvInfoContact, "") != 0)
+			SendChatTarget(ClientID, g_Config.m_SvInfoContact);
 		return false;
 	}
 	else if(StrLeftComp(pMessage, "credits"))

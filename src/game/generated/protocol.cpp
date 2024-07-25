@@ -45,6 +45,7 @@ const char *CNetObjHandler::ms_apObjNames[] = {
 	"SoundGlobal",
 	"SoundWorld",
 	"DamageInd",
+	"DDNetCharacter",
 	"GameInfoEx",
 	""
 };
@@ -71,6 +72,7 @@ int CNetObjHandler::ms_aObjSizes[] = {
 	sizeof(CNetEvent_SoundGlobal),
 	sizeof(CNetEvent_SoundWorld),
 	sizeof(CNetEvent_DamageInd),
+	sizeof(CNetObj_DDNetCharacter),
 	sizeof(CNetObj_GameInfoEx),
 	0
 };
@@ -302,6 +304,19 @@ int CNetObjHandler::ValidateObj(int Type, void *pData, int Size)
 	{
 		CNetEvent_DamageInd *pObj = (CNetEvent_DamageInd *)pData;
 		if(sizeof(*pObj) != Size) return -1;
+		return 0;
+	}
+	
+	case NETOBJTYPE_DDNETCHARACTER:
+	{
+		CNetObj_DDNetCharacter *pObj = (CNetObj_DDNetCharacter *)pData;
+		if(sizeof(*pObj) != Size) return -1;
+		ClampInt("m_FreezeEnd", pObj->m_FreezeEnd, 0, max_int);
+		ClampInt("m_Jumps", pObj->m_Jumps, -1, 255);
+		ClampInt("m_StrongWeakId", pObj->m_StrongWeakId, 0, MAX_CLIENTS-1);
+		ClampInt("m_JumpedTotal", pObj->m_JumpedTotal, -1, 255);
+		ClampInt("m_NinjaActivationTick", pObj->m_NinjaActivationTick, 0, max_int);
+		ClampInt("m_FreezeStart", pObj->m_FreezeStart, 0, max_int);
 		return 0;
 	}
 	

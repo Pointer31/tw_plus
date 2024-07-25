@@ -2214,6 +2214,17 @@ void CGameContext::OnSnap(int ClientID)
 			if(m_apPlayers[i])
 				m_apPlayers[i]->Snap(ClientID);
 		}
+
+		// WARNING, this is very hardcoded; for ddnet client support
+		// This object needs to be snapped alongside pDDNetCharacter for that object to work properly
+		int *pUuidItem = (int *)Server()->SnapNewItem(0, 32764, 16); // NETOBJTYPE_EX
+		if(pUuidItem)
+		{
+			pUuidItem[0] = 1993229659;
+			pUuidItem[1] = -102024632;
+			pUuidItem[2] = -1378361269;
+			pUuidItem[3] = -1810037668;
+		}
 	} else {
 		// snap only own tee so the ddnet client version is still given
 		m_apPlayers[ClientID]->Snap(ClientID);

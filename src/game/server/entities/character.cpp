@@ -1322,6 +1322,52 @@ void CCharacter::Snap(int SnappingClient)
 	}
 
 	pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
+
+	// WARNING, this is very hardcoded; for ddnet client support
+	// if (SnappingClient == m_pPlayer->GetCID()) {
+		CNetObj_DDNetCharacter *pDDNetCharacter = (CNetObj_DDNetCharacter *)Server()->SnapNewItem(32764, m_pPlayer->GetCID(), 40);
+		if(!pDDNetCharacter)
+			return;
+
+		pDDNetCharacter->m_Flags = 0;
+		if (m_aWeapons[0].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_HAMMER;
+		if (m_aWeapons[1].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_GUN;
+		if (m_aWeapons[2].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_SHOTGUN;
+		if (m_aWeapons[3].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_GRENADE;
+		if (m_aWeapons[4].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_LASER;
+		if (m_aWeapons[5].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_NINJA;
+		if (m_FreezeTicks > 0)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_IN_FREEZE | CHARACTERFLAG_MOVEMENTS_DISABLED;
+		pDDNetCharacter->m_FreezeEnd = 0;
+		pDDNetCharacter->m_Jumps = 2;
+		pDDNetCharacter->m_TeleCheckpoint = -1;
+		pDDNetCharacter->m_StrongWeakId = 0;
+		
+		pDDNetCharacter->m_JumpedTotal = m_Core.m_Jumped;
+		pDDNetCharacter->m_NinjaActivationTick = -1;
+		if (m_ActiveWeapon == WEAPON_NINJA)
+			pDDNetCharacter->m_NinjaActivationTick = m_Ninja.m_ActivationTick;
+		pDDNetCharacter->m_FreezeStart = -1;
+		pDDNetCharacter->m_TargetX = 0;
+		pDDNetCharacter->m_TargetY = 0;
+		// default values
+		// pDDNetCharacter->m_Flags = 0;
+		// pDDNetCharacter->m_FreezeEnd = 0;
+		// pDDNetCharacter->m_Jumps = 2;
+		// pDDNetCharacter->m_TeleCheckpoint = -1;
+		// pDDNetCharacter->m_StrongWeakId = 0;
+		// pDDNetCharacter->m_JumpedTotal = -1;
+		// pDDNetCharacter->m_NinjaActivationTick = -1;
+		// pDDNetCharacter->m_FreezeStart = -1;
+		// pDDNetCharacter->m_TargetX = 0;
+		// pDDNetCharacter->m_TargetY = 0;
+	// }
 }
 
 int CCharacter::Anticamper()

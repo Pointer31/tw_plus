@@ -723,7 +723,7 @@ void IGameController::Snap(int SnappingClient)
 	pGameInfoObj->m_RoundNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;
 	pGameInfoObj->m_RoundCurrent = m_RoundCount+1;
 
-	// WARNING, this is very hardcoded; for ddnet support
+	// WARNING, this is very hardcoded; for ddnet client support
 	CNetObj_GameInfoEx *pGameInfoEx = (CNetObj_GameInfoEx *)Server()->SnapNewItem(32767, 0, 12);
 	if(!pGameInfoEx)
 		return;
@@ -736,11 +736,15 @@ void IGameController::Snap(int SnappingClient)
 		GAMEINFOFLAG_ENTITIES_DDNET |
 		GAMEINFOFLAG_ENTITIES_DDRACE |
 		GAMEINFOFLAG_ENTITIES_RACE;
-	// if (false)
-	// 	pGameInfoEx->m_Flags |= GAMEINFOFLAG_ALLOW_ZOOM;
+	if (g_Config.m_SvDDAllowZoom)
+		pGameInfoEx->m_Flags |= GAMEINFOFLAG_ALLOW_ZOOM;
 	pGameInfoEx->m_Flags2 = 
-		GAMEINFOFLAG2_HUD_HEALTH_ARMOR |
 		GAMEINFOFLAG2_HUD_AMMO;
+	if (!(g_Config.m_SvDDInstagibHideHealth && IsInstagib()))
+		pGameInfoEx->m_Flags2 |= GAMEINFOFLAG2_HUD_HEALTH_ARMOR;
+	if (g_Config.m_SvDDShowHud)
+		pGameInfoEx->m_Flags2 |= GAMEINFOFLAG2_HUD_DDRACE;
+		
 	pGameInfoEx->m_Version = 8;
 
 	// This object needs to be snapped alongside pGameInfoObj for that object to work properly
