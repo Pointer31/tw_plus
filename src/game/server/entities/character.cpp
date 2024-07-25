@@ -1354,8 +1354,8 @@ void CCharacter::Snap(int SnappingClient)
 		if (m_ActiveWeapon == WEAPON_NINJA)
 			pDDNetCharacter->m_NinjaActivationTick = m_Ninja.m_ActivationTick;
 		pDDNetCharacter->m_FreezeStart = -1;
-		pDDNetCharacter->m_TargetX = 0;
-		pDDNetCharacter->m_TargetY = 0;
+		pDDNetCharacter->m_TargetX = m_LatestInput.m_TargetX;
+		pDDNetCharacter->m_TargetY = m_LatestInput.m_TargetY;
 		// default values
 		// pDDNetCharacter->m_Flags = 0;
 		// pDDNetCharacter->m_FreezeEnd = 0;
