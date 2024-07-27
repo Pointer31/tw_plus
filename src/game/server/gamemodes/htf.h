@@ -6,6 +6,7 @@
 
 class CGameControllerHTF : public IGameController
 {
+	int Anticamper(CFlag* F);
 public:
 	CGameControllerHTF(class CGameContext *pGameServer, int);
 	// virtual void Tick();

@@ -195,7 +195,8 @@ MACRO_CONFIG_INT(SvChatMe, sv_slash_me, 1, 0, 1, CFGFLAG_SERVER, "Whether or not
 
 MACRO_CONFIG_INT(SvRoundendMessage, sv_roundend_message, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable the system message that shows who won on round end")
 
-//
+MACRO_CONFIG_INT(SvHTFAnticamper, sv_htf_anticamper, 1, 0, 1, CFGFLAG_SERVER, "Enable anticamper for the player who is holding the flag in HTF")
+
 MACRO_CONFIG_STR(SvShutdownMessage, sv_shutdown_msg, 128, "Server shutdown", CFGFLAG_SERVER, "Message displayed on server shutdown (old, use shutdown <message>)")
 
 // info shown on /info
@@ -205,6 +206,6 @@ MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Conta
 // ddnet client support togglables
 MACRO_CONFIG_INT(SvDDAllowZoom, sv_dd_allow_zoom, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to allow clients to zoom out")
 MACRO_CONFIG_INT(SvDDInstagibHideHealth, sv_dd_instagib_hide_health, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to hide health and shield HUD on instagib modes")
-MACRO_CONFIG_INT(SvDDShowHud, sv_dd_show_hud, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to enable the ddrace HUD")
+MACRO_CONFIG_INT(SvDDShowHud, sv_dd_show_hud, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable the ddrace HUD")
 
 #endif
