@@ -187,8 +187,6 @@ MACRO_CONFIG_INT(SvHealthArmorZoneTicks, sv_healtharmor_zone_ticks, 10, 0, 500, 
 MACRO_CONFIG_INT(SvHookkill, sv_indirect_kill, 1, 0, 1, CFGFLAG_SERVER, "(WIP) Whether or not killing tees by hooking them into spikes should count as a kill")
 MACRO_CONFIG_INT(SvIndirectKillTicks, sv_indirect_kill_ticks, 100, 0, 1000, CFGFLAG_SERVER, "Ticks after being hooked that will still count as a kill")
 
-// MACRO_CONFIG_INT(SvDiscordinviteProtection, sv_discordinvite_mute, 0, 0, 2, CFGFLAG_SERVER, "Whether or not to mute/kick players sending discord invites")
-
 MACRO_CONFIG_INT(SvChatMe, sv_slash_me, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable /me usage")
 
 //MACRO_CONFIG_INT(SvTuneReset, sv_tune_reset, 5, 0, 10, CFGFLAG_SERVER, "(WIP) Whether tuning is reset after each map change or not")

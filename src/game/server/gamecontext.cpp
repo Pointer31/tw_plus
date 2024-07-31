@@ -11,7 +11,6 @@
 #include <game/server/entities/loltext.h>
 #include <game/gamecore.h>
 #include <string>
-#include <iostream>
 
 #include "gamemodes/dm.h"
 #include "gamemodes/tdm.h"
@@ -671,18 +670,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			
 			// trim right and set maximum length to 128 utf8-characters //updated to 512
 			int Length = 0;
-			char msg[512];
-			for (int i = 0; i < 512; i++) {
-				msg[i] = ' ';
-			}
 			const char *p = pMsg->m_pMessage;
 			const char *pEnd = 0;
 			while(*p)
  			{
 				const char *pStrOld = p;
 				int Code = str_utf8_decode(&p);
-
-				msg[Length] = *pStrOld;
 
 				// check if unicode is not empty
 				if(Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
@@ -709,66 +702,6 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			pPlayer->m_LastChat = Server()->Tick();
 
-			// poor protection against discordinvites (maybe remove this entirely)
-
-			// m_client_msgcount[ClientID] = m_client_msgcount[ClientID] + 1;
-
-			// int i = 0;
-			// int j = 0;
-			// char test[512] = "discord.gg/";
-			// bool badmsg = false;
-			// if (g_Config.m_SvDiscordinviteProtection > 0 && (m_client_msgcount[ClientID] == 1 || m_client_msgcount[ClientID] == 2)) {
-			// 	while (i < 512) {
-			// 		if (msg[i] == test[j]) {
-			// 			j++;
-			// 			if (j > 9) {
-			// 				badmsg = true;
-			// 				//Server()->SetClientName(ClientID, "bot");
-			// 				//m_Mute.AddMute(ClientID, g_Config.m_SvMuteDuration);
-			// 				if (g_Config.m_SvDiscordinviteProtection == 2) {
-			// 					Server()->Kick(ClientID, "bot");
-			// 					return;
-			// 				}
-			// 			}
-			// 		} else {
-			// 			j = 0;
-			// 		}
-			// 		i++;
-			// 	}
-			// }
-			// i = 0;
-			// j = 0;
-			// char test2[128] = "bot";
-			// if (g_Config.m_SvDiscordinviteProtection) {
-			// 	while (i < 128) {
-			// 		if (msg[i] == test2[j]) {
-			// 			j++;
-			// 			if (j > 2) {
-			// 				badmsg = true;
-			// 			}
-			// 		} else {
-			// 			j = 0;
-			// 		}
-			// 		i++;
-			// 	}
-			// }
-			// i = 0;
-			// j = 0;
-			// char test3[128] = "client";
-			// if (g_Config.m_SvDiscordinviteProtection) {
-			// 	while (i < 128) {
-			// 		if (msg[i] == test3[j]) {
-			// 			j++;
-			// 			if (j > 5) {
-			// 				badmsg = true;
-			// 			}
-			// 		} else {
-			// 			j = 0;
-			// 		}
-			// 		i++;
-			// 	}
-			// }
-
 			//Check if the player is muted
 			CMute::CMuteEntry *pMute = m_Mute.Muted(ClientID);
 			if(pMute)
@@ -780,7 +713,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			}
 			//mute the player if he's spamming
-			else if(/*badmsg ||*//*m_SvDiscordinviteProtection, should be removed*/ (g_Config.m_SvMuteDuration && ((pPlayer->m_ChatTicks += g_Config.m_SvChatValue) > g_Config.m_SvChatThreshold)))
+			else if((g_Config.m_SvMuteDuration && ((pPlayer->m_ChatTicks += g_Config.m_SvChatValue) > g_Config.m_SvChatThreshold)))
 			{
 				m_Mute.AddMute(ClientID, g_Config.m_SvMuteDuration);
 				pPlayer->m_ChatTicks = 0;
