@@ -189,6 +189,20 @@ void CPlayer::Snap(int SnappingClient)
 		pSpectatorInfo->m_X = m_ViewPos.x;
 		pSpectatorInfo->m_Y = m_ViewPos.y;
 	}
+
+	// WARNING, this is very hardcoded; for ddnet client support
+	CNetObj_DDNetPlayer *pDDNetPlayer = (CNetObj_DDNetPlayer *)Server()->SnapNewItem(32765, GetCID(), 8);
+	if(!pDDNetPlayer)
+		return;
+
+	pDDNetPlayer->m_Flags = 0;
+	if (Server()->Tick() > m_LastActionTick + Server()->TickSpeed()*(max(g_Config.m_SvInactiveKickTime, 60)))
+		pDDNetPlayer->m_Flags |= EXPLAYERFLAG_AFK;
+
+	if (g_Config.m_SvDDExposeAuthed && Server()->IsAuthed(GetCID()))
+		pDDNetPlayer->m_AuthLevel = AUTHED_MOD;
+	else
+		pDDNetPlayer->m_AuthLevel = AUTHED_NO;
 }
 
 void CPlayer::OnDisconnect(const char *pReason)

@@ -25,11 +25,12 @@ GameInfoFlags2 = [
 	"ALLOW_X_SKINS", "GAMETYPE_CITY", "GAMETYPE_FDDRACE", "ENTITIES_FDDRACE", "HUD_HEALTH_ARMOR", "HUD_AMMO",
 	"HUD_DDRACE", "NO_WEAK_HOOK", "NO_SKIN_CHANGE_FOR_FROZEN"
 ]
-# ExPlayerFlags = ["AFK", "PAUSED", "SPEC"]
+ExPlayerFlags = ["AFK", "PAUSED", "SPEC"]
 
 Emoticons = ["OOP", "EXCLAMATION", "HEARTS", "DROP", "DOTDOT", "MUSIC", "SORRY", "GHOST", "SUSHI", "SPLATTEE", "DEVILTEE", "ZOMG", "ZZZ", "WTF", "EYES", "QUESTION"]
 
 Powerups = ["HEALTH", "ARMOR", "WEAPON", "NINJA"]
+Authed = ["NO", "HELPER", "MOD", "ADMIN"]
 
 RawHeader = '''
 
@@ -63,16 +64,17 @@ Enums = [
 	Enum("EMOTE", Emotes),
 	Enum("POWERUP", Powerups),
 	Enum("EMOTICON", Emoticons),
+	Enum("AUTHED", Authed),
 ]
 
 Flags = [
 	Flags("PLAYERFLAG", PlayerFlags),
 	Flags("GAMEFLAG", GameFlags),
 	Flags("GAMESTATEFLAG", GameStateFlags),
-	Flags("CHARACTERFLAG", CharacterFlags), #not used
+	Flags("CHARACTERFLAG", CharacterFlags),
 	Flags("GAMEINFOFLAG", GameInfoFlags),
 	Flags("GAMEINFOFLAG2", GameInfoFlags2), 
-	# Flags("EXPLAYERFLAG", ExPlayerFlags), #not used
+	Flags("EXPLAYERFLAG", ExPlayerFlags),
 ]
 
 Objects = [
@@ -263,6 +265,11 @@ Objects = [
 		NetIntAny("m_Flags"),
 		NetIntAny("m_Version"),
 		NetIntAny("m_Flags2"),
+	]),
+
+	NetObject("DDNetPlayer", [
+		NetIntAny("m_Flags"),
+		NetIntRange("m_AuthLevel", "AUTHED_NO", "AUTHED_ADMIN"),
 	]),
 ]
 

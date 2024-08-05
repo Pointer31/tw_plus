@@ -65,6 +65,15 @@ enum
 
 enum
 {
+	AUTHED_NO=0,
+	AUTHED_HELPER,
+	AUTHED_MOD,
+	AUTHED_ADMIN,
+	NUM_AUTHEDS
+};
+
+enum
+{
 	PLAYERFLAG_PLAYING = 1<<0,
 	PLAYERFLAG_IN_MENU = 1<<1,
 	PLAYERFLAG_CHATTING = 1<<2,
@@ -162,6 +171,13 @@ enum
 
 enum
 {
+	EXPLAYERFLAG_AFK = 1<<0,
+	EXPLAYERFLAG_PAUSED = 1<<1,
+	EXPLAYERFLAG_SPEC = 1<<2,
+};
+
+enum
+{
 	NETOBJ_INVALID=0,
 	NETOBJTYPE_PLAYERINPUT,
 	NETOBJTYPE_PROJECTILE,
@@ -185,6 +201,7 @@ enum
 	NETEVENTTYPE_DAMAGEIND,
 	NETOBJTYPE_DDNETCHARACTER,
 	NETOBJTYPE_GAMEINFOEX,
+	NETOBJTYPE_DDNETPLAYER,
 	NUM_NETOBJTYPES
 };
 
@@ -412,6 +429,12 @@ struct CNetObj_GameInfoEx
 	int m_Flags;
 	int m_Version;
 	int m_Flags2;
+};
+
+struct CNetObj_DDNetPlayer
+{
+	int m_Flags;
+	int m_AuthLevel;
 };
 
 struct CNetMsg_Sv_Motd

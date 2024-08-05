@@ -5,7 +5,7 @@
 #include "generated/nethash.cpp"
 
 #define MOD_VERSION_TEETIME "0.7.5"
-#define MOD_VERSION "0.8.0"
+#define MOD_VERSION "0.8.1b"
 #define GAME_VERSION "0.6.3"//, " MOD_VERSION
 #define GAME_NETVERSION "0.6 " GAME_NETVERSION_HASH
 static const char GAME_RELEASE_VERSION[8] = {'0', '.', '6', '.', '2', 0};

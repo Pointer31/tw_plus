@@ -47,6 +47,7 @@ const char *CNetObjHandler::ms_apObjNames[] = {
 	"DamageInd",
 	"DDNetCharacter",
 	"GameInfoEx",
+	"DDNetPlayer",
 	""
 };
 
@@ -74,6 +75,7 @@ int CNetObjHandler::ms_aObjSizes[] = {
 	sizeof(CNetEvent_DamageInd),
 	sizeof(CNetObj_DDNetCharacter),
 	sizeof(CNetObj_GameInfoEx),
+	sizeof(CNetObj_DDNetPlayer),
 	0
 };
 
@@ -324,6 +326,14 @@ int CNetObjHandler::ValidateObj(int Type, void *pData, int Size)
 	{
 		CNetObj_GameInfoEx *pObj = (CNetObj_GameInfoEx *)pData;
 		if(sizeof(*pObj) != Size) return -1;
+		return 0;
+	}
+	
+	case NETOBJTYPE_DDNETPLAYER:
+	{
+		CNetObj_DDNetPlayer *pObj = (CNetObj_DDNetPlayer *)pData;
+		if(sizeof(*pObj) != Size) return -1;
+		ClampInt("m_AuthLevel", pObj->m_AuthLevel, AUTHED_NO, AUTHED_ADMIN);
 		return 0;
 	}
 	

@@ -205,5 +205,6 @@ MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Conta
 MACRO_CONFIG_INT(SvDDAllowZoom, sv_dd_allow_zoom, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to allow clients to zoom out")
 MACRO_CONFIG_INT(SvDDInstagibHideHealth, sv_dd_instagib_hide_health, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to hide health and shield HUD on instagib modes")
 MACRO_CONFIG_INT(SvDDShowHud, sv_dd_show_hud, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable the ddrace HUD")
+MACRO_CONFIG_INT(SvDDExposeAuthed, sv_dd_expose_authed, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to color client's names if they are authenticated in rcon")
 
 #endif
