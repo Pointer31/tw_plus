@@ -171,6 +171,9 @@ MACRO_CONFIG_INT(SvBouncyGrenade, sv_bouncy_grenade, 0, 0, 1, CFGFLAG_SERVER, "(
 MACRO_CONFIG_INT(SvBouncyGrenadeN, sv_bouncy_grenade_n, 5, 0, 50, CFGFLAG_SERVER, "(buggy WIP) (currently does not change anything)")
 
 MACRO_CONFIG_INT(SvExplosiveShotgun, sv_explosive_shotgun, 0, 0, 1, CFGFLAG_SERVER, "whether or not shotgun bullets should be explosive")
+MACRO_CONFIG_INT(SvShotgunRepeater, sv_shotgun_repeater, 0, 0, 1, CFGFLAG_SERVER, "whether or not the shotgun should shoot very fast and fewer bullets")
+MACRO_CONFIG_INT(SvShotgunRepeaterAmmo, sv_shotgun_repeater_ammo, 30, 10, 200, CFGFLAG_SERVER, "How much ammo the repeater shotgun should have")
+MACRO_CONFIG_INT(SvShotgunRepeaterFireDelay, sv_shotgun_repeater_fire_delay, 200, 100, 1000, CFGFLAG_SERVER, "How fast the shotgun repeater can shoot")
 
 MACRO_CONFIG_INT(SvPistolAuto, sv_pistol_auto, 1, 0, 1, CFGFLAG_SERVER, "Whether or not the pistol should autofire")
 

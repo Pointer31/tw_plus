@@ -391,6 +391,8 @@ void CCharacter::FireWeapon()
 	case WEAPON_SHOTGUN:
 	{
 		int ShotSpread = 2;
+		if (g_Config.m_SvShotgunRepeater)
+			ShotSpread = 1;
 
 		CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
 		Msg.AddInt(ShotSpread * 2 + 1);
@@ -556,6 +558,9 @@ void CCharacter::FireWeapon()
 			FireDelay = g_Config.m_SvLaserReloadTime;
 			if (g_Config.m_SvPlasmaGun)
 				FireDelay = g_Config.m_SvPlasmaGunFireDelay;
+		} else if (m_ActiveWeapon == WEAPON_SHOTGUN && g_Config.m_SvShotgunRepeater) 
+		{
+			FireDelay = g_Config.m_SvShotgunRepeaterFireDelay;
 		}
 
 		if (m_pPlayer->m_GotAward)
@@ -612,10 +617,12 @@ void CCharacter::HandleWeapons()
 
 bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 {
-	if (m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got)
+	if (m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got || (g_Config.m_SvShotgunRepeater && m_aWeapons[Weapon].m_Ammo < g_Config.m_SvShotgunRepeaterAmmo))
 	{
 		m_aWeapons[Weapon].m_Got = true;
 		m_aWeapons[Weapon].m_Ammo = min(g_pData->m_Weapons.m_aId[Weapon].m_Maxammo, Ammo);
+		if (Weapon == WEAPON_SHOTGUN && g_Config.m_SvShotgunRepeater)
+			m_aWeapons[Weapon].m_Ammo = g_Config.m_SvShotgunRepeaterAmmo;
 		return true;
 	}
 	return false;
@@ -1313,6 +1320,9 @@ void CCharacter::Snap(int SnappingClient)
 		pCharacter->m_Armor = (m_FreezeTicks) ? (m_FreezeTicks / Server()->TickSpeed()) % 10 + 1 : m_Armor;
 		if (m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
 			pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo;
+
+		if (m_aWeapons[m_ActiveWeapon].m_Ammo > 0 && m_ActiveWeapon == WEAPON_SHOTGUN && g_Config.m_SvShotgunRepeater)
+			pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo * 10 / g_Config.m_SvShotgunRepeaterAmmo;
 	}
 
 	if (pCharacter->m_Emote == EMOTE_NORMAL)
