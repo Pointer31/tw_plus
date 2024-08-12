@@ -956,6 +956,13 @@ void CCharacter::Tick()
 			m_healthArmorZoneTick = g_Config.m_SvHealthArmorZoneTicks;
 		}
 	}
+if ((GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST ||
+			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST))
+	{
+		m_Core.m_Vel += {0, -5};
+	}
 
 	// handle Weapons
 	HandleWeapons();
