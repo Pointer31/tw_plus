@@ -668,6 +668,13 @@ void CCharacter::Tick()
 		GameServer()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, true);
 		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
 	}
+	if ((GameServer()->Collision()->GetCollisionAtId(m_Pos.x + CCharacterCore::PHYS_SIZE / 3.f, m_Pos.y - CCharacterCore::PHYS_SIZE / 3.f) == TILE_SPEEDUPFAST ||
+			 GameServer()->Collision()->GetCollisionAtId(m_Pos.x + CCharacterCore::PHYS_SIZE / 3.f, m_Pos.y + CCharacterCore::PHYS_SIZE / 3.f) == TILE_SPEEDUPFAST ||
+			 GameServer()->Collision()->GetCollisionAtId(m_Pos.x - CCharacterCore::PHYS_SIZE / 3.f, m_Pos.y - CCharacterCore::PHYS_SIZE / 3.f) == TILE_SPEEDUPFAST ||
+			 GameServer()->Collision()->GetCollisionAtId(m_Pos.x - CCharacterCore::PHYS_SIZE / 3.f, m_Pos.y + CCharacterCore::PHYS_SIZE / 3.f) == TILE_SPEEDUPFAST))
+	{
+		m_Core.m_Vel += {0, -5};
+	}
 
 	// handle Weapons
 	HandleWeapons();
