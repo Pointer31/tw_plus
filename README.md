@@ -5,11 +5,19 @@ tw+ server by Teetime can be found here: https://github.com/Teetime/teeworlds/tr
 This modification adds a new gametype (Hold The Flag), map-based features, some ddnetclient support, and some other miscellaneous silly and useful additions.  
 
 ## How to build
+**Bam**  
 It can be built like a normal 0.6.3 teeworlds server.  
 You may need bam 0.4.0 which can be downloaded from: https://www.teeworlds.com/files/bam-0.4.0.zip  
 Build bam using <code>make_unix.sh</code> or one of the other files included in the download.  
 Using bam, use build target server_debug:  
 <code>./bam-0.4.0/bam server_debug</code>  
+
+**CMake**  
+The server can be built using CMake:  
+<code>mkdir build
+cd build
+cmake ..
+make</code>  
 
 ## Features
 Apart from the features of the standard server as well as the tw+ server by teetime, the server include the following:  

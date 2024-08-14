@@ -12,6 +12,7 @@ SDL.dll
 freetype.dll
 autoexec.cfg
 autoexec_server.log
+Info.plist
 
 crapnet*
 dilate*
@@ -27,3 +28,19 @@ versionsrv*
 
 stats.txt
 tw+*
+
+# CMake
+data
+!/data
+src
+!/src
+
+*.ninja
+.ninja*
+CMakeCache.txt
+CMakeFiles/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+Makefile
+cmake_install.cmake
+install_manifest.txt
