@@ -28,10 +28,11 @@ teleports (player, flag, and projectiles, (todo: laser?))
 grenade fountains  
 slow killing death / slow healing / slow armor zone  
 No-flag zone  
+boost zone  
 
 **Weapons**  
 ninja (toggle invincibility, crazy-weapons, slash speed, heart/armor bonusses on pickup)  
-toggleable silly custom weapons (laser->plasmagun, grenade->(wip)bouncy grenade, shotgun->explosive shotgun)  
+toggleable silly custom weapons (laser->plasmagun, grenade->(wip)bouncy grenade, shotgun->explosive shotgun; repeater)  
 pistol autoshooting  
 (wip) indirect killing by hooking tee into spikes
 
@@ -52,9 +53,11 @@ included extra maps to show the new features:
 dm_island (slowdeath zone)  
 dm_tele (teleports)  
 dm_gfountain (teleports, grenade fountain)  
+dm_towerravine_tele (teleports, boost)  
 ctf_tele (teleports)  
 ctf_sixflags (multiple flag stands)  
 ctf_quadflags (multiple flag stands)  
 ctf_flagged (teleports, health/shield zone and no-flag zone)  
 htf_1 (shield, no-flag zone, HTF)  
 htf_dm1 (shield, heart, no-flag zone, HTF) (made by yuiluy)  
+htf_towerravine_tele (teleports, boost, HTF)  

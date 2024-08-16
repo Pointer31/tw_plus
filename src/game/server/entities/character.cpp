@@ -1233,7 +1233,14 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			if (GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS && GameServer()->m_apPlayers[i]->m_SpectatorID == From)
 				Mask |= CmaskOne(i);
 		}
-		GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+		if (GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From2)) {
+			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_PLAYER_PAIN_SHORT, Mask);
+			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+		}
+		else if (m_Health <= 0 && g_Config.m_SvKillSound)
+			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_CTF_GRAB_PL, Mask);
+		else
+			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
 	}
 
 	m_pPlayer->m_Stats.m_Hits++;
@@ -1249,7 +1256,10 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			CCharacter *pChr = GameServer()->m_apPlayers[From]->GetCharacter();
 			if (pChr)
 			{
-				pChr->m_EmoteType = EMOTE_HAPPY;
+				if (GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From2))
+					pChr->m_EmoteType = EMOTE_PAIN;
+				else
+					pChr->m_EmoteType = EMOTE_HAPPY;
 				pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
 			}
 		}
