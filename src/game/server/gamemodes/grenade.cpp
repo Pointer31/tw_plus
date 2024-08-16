@@ -87,3 +87,24 @@ void CGameControllerGHTF::Tick()
 {
 	CGameControllerHTF::Tick();
 }
+
+
+// gLMS
+
+CGameControllerGLMS::CGameControllerGLMS(class CGameContext *pGameServer, int TypeFlags)
+: CGameControllerLMS(pGameServer, TypeFlags)
+{
+	m_Flags = TypeFlags;
+	m_pGameType = "gLMS+";
+}
+
+void CGameControllerGLMS::OnCharacterSpawn(CCharacter* pChr)
+{
+	pChr->IncreaseHealth(10);
+	pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmo);
+}
+
+void CGameControllerGLMS::Tick()
+{
+	CGameControllerLMS::Tick();
+}

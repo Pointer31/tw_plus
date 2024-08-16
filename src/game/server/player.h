@@ -123,6 +123,8 @@ public:
 	bool m_GotAward;
 
 	bool m_FreezeOnSpawn;
+
+	int m_Lives;
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;

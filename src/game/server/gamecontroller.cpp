@@ -326,6 +326,7 @@ void IGameController::StartRound()
 			mem_zero(&GameServer()->m_apPlayers[i]->m_Stats, sizeof(GameServer()->m_apPlayers[i]->m_Stats));
 			GameServer()->m_apPlayers[i]->m_GotAward = false;
 			GameServer()->m_apPlayers[i]->m_Spree = 0;
+			GameServer()->m_apPlayers[i]->m_Lives = g_Config.m_SvLMSLives;
 		}
 
 	m_RoundStartTick = Server()->Tick();
@@ -717,7 +718,10 @@ void IGameController::Snap(int SnappingClient)
 	else
 		pGameInfoObj->m_WarmupTimer = m_Warmup;
 
-	pGameInfoObj->m_ScoreLimit = g_Config.m_SvScorelimit;
+	if (GameServer()->m_pController->IsLMS())
+		pGameInfoObj->m_ScoreLimit = g_Config.m_SvLMSLives;
+	else
+		pGameInfoObj->m_ScoreLimit = g_Config.m_SvScorelimit;
 	pGameInfoObj->m_TimeLimit = g_Config.m_SvTimelimit;
 
 	pGameInfoObj->m_RoundNum = (str_length(g_Config.m_SvMaprotation) && g_Config.m_SvRoundsPerMap) ? g_Config.m_SvRoundsPerMap : 0;

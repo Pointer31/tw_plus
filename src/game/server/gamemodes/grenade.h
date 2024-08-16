@@ -8,7 +8,7 @@
 #include "dm.h"
 #include "tdm.h"
 #include "htf.h"
-
+#include "lms.h"
 
 class CGameControllerGCTF : public CGameControllerCTF
 {
@@ -38,6 +38,14 @@ class CGameControllerGHTF : public CGameControllerHTF
 {
 public:
 	CGameControllerGHTF(class CGameContext *pGameServer, int);
+	virtual void OnCharacterSpawn(class CCharacter *pChr);
+	virtual void Tick();
+};
+
+class CGameControllerGLMS : public CGameControllerLMS
+{
+public:
+	CGameControllerGLMS(class CGameContext *pGameServer, int);
 	virtual void OnCharacterSpawn(class CCharacter *pChr);
 	virtual void Tick();
 };

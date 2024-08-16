@@ -35,6 +35,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_SetEmoteType = EMOTE_NORMAL;
 	m_LastPMReceivedFrom = -1;
 	m_FreezeOnSpawn = false;
+
+	m_Lives = g_Config.m_SvLMSLives;
 }
 
 CPlayer::~CPlayer()
@@ -90,13 +92,13 @@ void CPlayer::Tick()
 
 	if(!GameServer()->m_World.m_Paused)
 	{
-		if(!m_pCharacter && m_Team == TEAM_SPECTATORS && m_SpectatorID == SPEC_FREEVIEW)
+		if((!m_pCharacter && m_Team == TEAM_SPECTATORS && m_SpectatorID == SPEC_FREEVIEW) || m_Lives <= 0)
 			m_ViewPos -= vec2(clamp(m_ViewPos.x-m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y-m_LatestActivity.m_TargetY, -400.0f, 400.0f));
 
 		if(!m_pCharacter && m_DieTick+Server()->TickSpeed()*3 <= Server()->Tick())
 			m_Spawning = true;
 
-		if(m_pCharacter)
+		if(m_pCharacter && m_Lives > 0)
 		{
 			if(m_pCharacter->IsAlive())
 			{
@@ -173,13 +175,16 @@ void CPlayer::Snap(int SnappingClient)
 	pPlayerInfo->m_Latency = SnappingClient == -1 ? m_Latency.m_Min : GameServer()->m_apPlayers[SnappingClient]->m_aActLatency[m_ClientID];
 	pPlayerInfo->m_Local = 0;
 	pPlayerInfo->m_ClientID = m_ClientID;
-	pPlayerInfo->m_Score = m_Score;
+	if (GameServer()->m_pController->IsLMS())
+		pPlayerInfo->m_Score = m_Lives;
+	else
+		pPlayerInfo->m_Score = m_Score;
 	pPlayerInfo->m_Team = m_Team;
 
 	if(m_ClientID == SnappingClient)
 		pPlayerInfo->m_Local = 1;
 
-	if(m_ClientID == SnappingClient && m_Team == TEAM_SPECTATORS)
+	if((m_ClientID == SnappingClient && m_Team == TEAM_SPECTATORS) || (GameServer()->m_pController->IsLMS() && m_Lives <= 0))
 	{
 		CNetObj_SpectatorInfo *pSpectatorInfo = static_cast<CNetObj_SpectatorInfo *>(Server()->SnapNewItem(NETOBJTYPE_SPECTATORINFO, m_ClientID, sizeof(CNetObj_SpectatorInfo)));
 		if(!pSpectatorInfo)
@@ -198,6 +203,8 @@ void CPlayer::Snap(int SnappingClient)
 	pDDNetPlayer->m_Flags = 0;
 	if (Server()->Tick() > m_LastActionTick + Server()->TickSpeed()*(max(g_Config.m_SvInactiveKickTime, 60)))
 		pDDNetPlayer->m_Flags |= EXPLAYERFLAG_AFK;
+	if (m_Lives <= 0)
+		pDDNetPlayer->m_Flags |= EXPLAYERFLAG_SPEC;
 
 	if (g_Config.m_SvDDExposeAuthed && Server()->IsAuthed(GetCID()))
 		pDDNetPlayer->m_AuthLevel = AUTHED_MOD;
@@ -335,7 +342,7 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 
-	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos))
+	if(!GameServer()->m_pController->CanSpawn(m_Team, &SpawnPos) || m_Lives <= 0)
 		return;
 
 	m_Spawning = false;

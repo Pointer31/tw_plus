@@ -101,7 +101,7 @@ MACRO_CONFIG_INT(SvVoteMute, sv_vote_mute, 1, 0, 1, CFGFLAG_SERVER, "Allow votin
 MACRO_CONFIG_INT(SvVoteMuteDuration, sv_vote_mute_duration, 300, 0, 600, CFGFLAG_SERVER, "How many seconds to mute a player after being muted by vote.")
 
 // Anti Capslock
-MACRO_CONFIG_INT(SvAntiCapslock, sv_anticapslock, 1, 0, 1, CFGFLAG_SERVER, "If all letters of a chat-message are capitalized they will be lowercased")
+MACRO_CONFIG_INT(SvAntiCapslock, sv_anticapslock, 0, 0, 1, CFGFLAG_SERVER, "If all letters of a chat-message are capitalized they will be lowercased")
 MACRO_CONFIG_INT(SvAntiCapslockTolerance, sv_anticapslock_tolerance, 5, 0, 10, CFGFLAG_SERVER, "How many letters of 10 are allowed to be lowercased that it just work")
 MACRO_CONFIG_INT(SvAntiCapslockMinimum, sv_anticapslock_minimum, 8, 1, 128, CFGFLAG_SERVER, "Minimum number of letters that the anti-capslock feature works")
 
@@ -201,6 +201,8 @@ MACRO_CONFIG_INT(SvHTFAnticamper, sv_htf_anticamper, 1, 0, 1, CFGFLAG_SERVER, "E
 MACRO_CONFIG_STR(SvShutdownMessage, sv_shutdown_msg, 128, "Server shutdown", CFGFLAG_SERVER, "Message displayed on server shutdown (old, use shutdown <message>)")
 
 MACRO_CONFIG_INT(SvKillSound, sv_kill_sound, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enbale kill sounds")
+
+MACRO_CONFIG_INT(SvLMSLives, sv_lms_lives, 3, 1, 10, CFGFLAG_SERVER, "Amount of lives on LMS gamemodes")
 
 // info shown on /info
 MACRO_CONFIG_STR(SvInfoGithub, sv_info_github, 128, "Github: https://github.com/Pointer31/tw_plus", CFGFLAG_SERVER, "Github link shown when /info is used")

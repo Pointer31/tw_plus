@@ -769,6 +769,8 @@ set_glob(GAME_SERVER GLOB_RECURSE src/game/server
   gamemodes/tdm.h
   gamemodes/htf.cpp
   gamemodes/htf.h
+  gamemodes/lms.cpp
+  gamemodes/lms.h
   gamemodes/grenade.cpp
   gamemodes/grenade.h
   gamemodes/ifreeze.cpp

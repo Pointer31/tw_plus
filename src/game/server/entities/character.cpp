@@ -1134,6 +1134,9 @@ void CCharacter::Die(int Killer, int Weapon)
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
 
+	if (GameServer()->m_pController->IsLMS())
+		GetPlayer()->m_Lives--;
+
 	m_Alive = false;
 	GameServer()->m_World.RemoveEntity(this);
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
@@ -1346,6 +1349,10 @@ void CCharacter::Snap(int SnappingClient)
 	{
 		if (250 - ((Server()->Tick() - m_LastAction) % (250)) < 5)
 			pCharacter->m_Emote = EMOTE_BLINK;
+	}
+
+	if (GameServer()->m_pController->IsLMS() && GameServer()->m_pController->IsInstagib()) {
+		pCharacter->m_Armor = GetPlayer()->m_Lives;
 	}
 
 	pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
