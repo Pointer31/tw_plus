@@ -787,7 +787,7 @@ void CCharacter::Tick()
 		GameServer()->Collision()->GetCollisionAt(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) & CCollision::COLFLAG_DEATH ||
 		GameLayerClipped(m_Pos))
 	{
-		if (!g_Config.m_SvHookkill) {
+		if (!g_Config.m_SvHookkill || GameServer()->m_pController->IsIFreeze()) {
 			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
 		} else {
 			int From = m_pPlayer->GetCID();

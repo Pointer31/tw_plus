@@ -240,8 +240,10 @@ void IGameController::EndRound()
 			int scoreBlue = m_aTeamscore[TEAM_BLUE];
 			if (scoreRed > scoreBlue)
 				str_format(aBuf, sizeof(aBuf), "★ Red team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
-			else
+			else if (scoreRed < scoreBlue)
 				str_format(aBuf, sizeof(aBuf), "★ Blue team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
+			else
+				str_format(aBuf, sizeof(aBuf), "★ Draw! Red: %d, Blue: %d", scoreRed, scoreBlue);
 			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 
 			char bBuf[1024] = "No message2 (this should not appear)";
@@ -268,6 +270,8 @@ void IGameController::EndRound()
 				m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, bBuf);
 		} else { // Non-team gamemode
 			char aBuf[1024] = "No message (this should not appear)";
+			if (GameServer()->m_pController->IsLMS())
+				str_format(aBuf, sizeof(aBuf), "★ Draw! There are no players alive");
 			char bBuf[1024] = "No message2 (this should not appear)";
 			int highestScore = -99;
 			float bestRatio = -1;
@@ -276,15 +280,24 @@ void IGameController::EndRound()
 					continue;
 				CPlayer* pP = GameServer()->m_apPlayers[i];
 
-				if (pP->m_Score > highestScore) {
+				if (pP->m_Score > highestScore && !GameServer()->m_pController->IsLMS()) {
 					highestScore = pP->m_Score;
 					str_format(aBuf, sizeof(aBuf), "★ '%s' has won the round with a score of %d!", Server()->ClientName(i), pP->m_Score);
+				} else if (pP->m_Score == highestScore && !GameServer()->m_pController->IsLMS()) {
+					highestScore = pP->m_Score;
+					str_format(aBuf, sizeof(aBuf), "★ Draw! Multiple players have a score of %d!", pP->m_Score);
+				}
+				if (highestScore < 0 && pP->m_Lives > 0 && GameServer()->m_pController->IsLMS()) {
+					highestScore = 0;
+					str_format(aBuf, sizeof(aBuf), "★ '%s' has won the round with %d lives left!", Server()->ClientName(i), pP->m_Lives);
+				} else if (highestScore == 0 && pP->m_Lives > 0 && GameServer()->m_pController->IsLMS()) {
+					str_format(aBuf, sizeof(aBuf), "★ Draw! There are multiple players alive");
 				}
 				if (((pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 99999) > bestRatio) {
 					bestRatio = ((pP->m_Stats.m_Deaths > 0) ? ((float)pP->m_Stats.m_Kills / (float)pP->m_Stats.m_Deaths) : 99999);
 					str_format(bBuf, sizeof(bBuf), "★ '%s' has the best kill/death ratio with %d kills and %d deaths!", Server()->ClientName(i), pP->m_Stats.m_Kills, pP->m_Stats.m_Deaths);
 				}
-				}
+			}
 			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, bBuf);
 		}
