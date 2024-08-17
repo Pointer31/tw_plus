@@ -911,8 +911,12 @@ void CCharacter::Tick()
 				TakeDamage({0,0}, 1, -1, WEAPON_NINJA);
 			} else {
 				m_Health = m_Health - 1;
-				if (m_Health < 1)
-					Die(m_pPlayer->GetCID(), WEAPON_NINJA);
+				if (m_Health < 1) {
+					if (!g_Config.m_SvHookkill || GameServer()->m_pController->IsIFreeze())
+						Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+					else
+						Die(m_pPlayer->GetCID(), WEAPON_NINJA);
+				}
 					
 				GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
 				m_EmoteType = EMOTE_PAIN;
