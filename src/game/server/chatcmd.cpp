@@ -561,6 +561,23 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		else {SendChatTarget(ClientID, "No such command. Type \"/cmdlist\" to get a list of available commands");}
 		return false; //true;
 	}
+	else if(StrLeftComp(pMessage, "pause") && m_pController->IsLMS() && m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_Lives <= 0)
+	{
+		int PlayerCount = 0, AliveCount = 0;
+		for (int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if (m_apPlayers[i] && m_apPlayers[i]->m_IsReady && IsClientPlayer(i)) {
+				if (m_apPlayers[i] && m_apPlayers[i]->m_Lives > 0)
+					AliveCount++;
+
+				PlayerCount++;
+			}
+		}
+		if (PlayerCount <= 1)
+			m_apPlayers[ClientID]->m_Lives = g_Config.m_SvLMSLives;
+		else	
+			SendBroadcast("Please wait until the end of the round", ClientID);
+	}
 	else
 		SendChatTarget(ClientID, "No such command. Type \"/cmdlist\" to get a list of available commands");
 

@@ -3,6 +3,7 @@
 #include <game/generated/protocol.h>
 #include <game/server/gamecontext.h>
 #include "pickup.h"
+#include "projectile.h"
 
 CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP)
@@ -29,6 +30,14 @@ void CPickup::Tick()
 	// wait for respawn
 	if(m_SpawnTick > 0)
 	{
+		if (Server()->Tick() % 2 == 0 && g_Config.m_SvPickupParticles) {
+			CProjectile *pProj = new CProjectile(GameWorld(), WEAPON_HAMMER,
+											 -1,
+											 {m_Pos.x - WIDTH_TILE/2 + rand() % WIDTH_TILE, m_Pos.y - WIDTH_TILE/2 + rand() % WIDTH_TILE},
+											 {0,1},
+											 10,
+											 0, 0, 0, -1, WEAPON_HAMMER);
+		}
 		if(Server()->Tick() > m_SpawnTick)
 		{
 			// respawn

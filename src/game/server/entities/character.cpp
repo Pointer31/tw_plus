@@ -904,10 +904,7 @@ void CCharacter::Tick()
 	{
 		m_slowDeathTick--;
 		if (m_slowDeathTick < 0) {
-			if (StrLeftComp(GameServer()->GameType(), "DM+")
-			|| StrLeftComp(GameServer()->GameType(), "TDM+")
-			|| StrLeftComp(GameServer()->GameType(), "CTF+")
-			|| StrLeftComp(GameServer()->GameType(), "HTF")) {
+			if (!GameServer()->m_pController->IsInstagib()) {
 				TakeDamage({0,0}, 1, -1, WEAPON_NINJA);
 			} else {
 				m_Health = m_Health - 1;
@@ -1027,8 +1024,12 @@ void CCharacter::TickDefered()
 	int Events = m_Core.m_TriggeredEvents;
 	int Mask = CmaskAllExceptOne(m_pPlayer->GetCID());
 
-	if (Events & COREEVENT_GROUND_JUMP)
+	if (Events & COREEVENT_GROUND_JUMP) {
 		GameServer()->CreateSound(m_Pos, SOUND_PLAYER_JUMP, Mask);
+		if (GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + 2*WIDTH_TILE) == TILE_SPEEDUPFAST ||
+			GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y + 2*WIDTH_TILE) == TILE_SPEEDUPFAST)
+			m_Core.m_Vel = {m_Core.m_Vel.x, m_Core.m_Vel.y * 2};
+	}
 
 	if (Events & COREEVENT_HOOK_ATTACH_PLAYER)
 		GameServer()->CreateSound(m_Pos, SOUND_HOOK_ATTACH_PLAYER, CmaskAll());

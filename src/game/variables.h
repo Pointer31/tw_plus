@@ -200,7 +200,9 @@ MACRO_CONFIG_INT(SvHTFAnticamper, sv_htf_anticamper, 1, 0, 1, CFGFLAG_SERVER, "E
 
 MACRO_CONFIG_STR(SvShutdownMessage, sv_shutdown_msg, 128, "Server shutdown", CFGFLAG_SERVER, "Message displayed on server shutdown (old, use shutdown <message>)")
 
-MACRO_CONFIG_INT(SvKillSound, sv_kill_sound, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enbale kill sounds")
+MACRO_CONFIG_INT(SvKillSound, sv_kill_sound, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable kill sounds")
+
+MACRO_CONFIG_INT(SvPickupParticles, sv_pickup_particles, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable particles when a pickup is yet to respawn")
 
 MACRO_CONFIG_INT(SvLMSLives, sv_lms_lives, 3, 1, 10, CFGFLAG_SERVER, "Amount of lives on LMS gamemodes")
 
