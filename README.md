@@ -28,7 +28,7 @@ teleports (player, flag, and projectiles, (todo: laser?))
 grenade fountains  
 slow killing death / slow healing / slow armor zone  
 No-flag zone  
-boost zone  
+boost zone, boost-pad  
 
 **Weapons**  
 ninja (toggle invincibility, crazy-weapons, slash speed, heart/armor bonusses on pickup)  
@@ -46,7 +46,10 @@ more types of characters in names allowed, like in ddnet
 end of round stats message  
 DDnet client support (whisper, HUD)  
 Experimental 64 player support (requires ddnet client)  
+Particles appearing when a pickup (shield, heart, weapon) is respawning  
+Play a sound different from the normal hit sound when the player kills a tee, like in some other gametypes  
 new gametype: Hold the flag (HTF); teamless mode where you gain points by holding the flag  
+new gametype: Last man standing (LMS); teamless mode where you must avoid dying while killing others  
 
 **Included Maps**  
 included extra maps to show the new features:  
@@ -54,6 +57,7 @@ dm_island (slowdeath zone)
 dm_tele (teleports)  
 dm_gfountain (teleports, grenade fountain)  
 dm_towerravine_tele (teleports, boost)  
+dm_deserttower (boost-pad)  
 ctf_tele (teleports)  
 ctf_sixflags (multiple flag stands)  
 ctf_quadflags (multiple flag stands)  
@@ -61,3 +65,5 @@ ctf_flagged (teleports, health/shield zone and no-flag zone)
 htf_1 (shield, no-flag zone, HTF)  
 htf_dm1 (shield, heart, no-flag zone, HTF) (made by yuiluy)  
 htf_towerravine_tele (teleports, boost, HTF)  
+htf_skytower (boost-pad, HTF)  
+htf_plush (boost-pad, teleports, HTF)  
