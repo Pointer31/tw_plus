@@ -628,6 +628,12 @@ bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 	return false;
 }
 
+void CCharacter::SetAmmo(int Weapon, int Ammo)
+{
+	m_aWeapons[Weapon].m_Got = true;
+	m_aWeapons[Weapon].m_Ammo = Ammo;
+}
+
 void CCharacter::GiveNinja()
 {
 	m_Ninja.m_ActivationTick = Server()->Tick();

@@ -144,7 +144,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	else if(Index == ENTITY_SPAWN_BLUE)
 		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
 
-	if(!IsInstagib())
+	if(!IsInstagib() && !IsNoPickups())
 	{
 		if(Index == ENTITY_ARMOR_1)
 			Type = POWERUP_ARMOR;

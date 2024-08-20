@@ -153,11 +153,13 @@ public:
 		GAMETYPE_GCTF = 1<<2,
 		GAMETYPE_IFREEZE = 1<<3,
 		GAMETYPE_LMS = 1<<4,
+		GAMETYPE_NOPICKUPS = 1<<5,
 	};
 	int m_Flags;
 
 	virtual bool IsInstagib() { return m_Flags&GAMETYPE_INSTAGIB; }
 	virtual bool IsLMS() { return m_Flags&GAMETYPE_LMS; }
+	virtual bool IsNoPickups() { return m_Flags&GAMETYPE_NOPICKUPS; }
 	virtual bool IsIFreeze() { return m_Flags&GAMETYPE_IFREEZE; }
 	int IsWarmup() { return m_Warmup; }
 	int m_FakeWarmup;

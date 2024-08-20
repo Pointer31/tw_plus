@@ -20,6 +20,7 @@
 #include "gamemodes/ifreeze.h"
 #include "gamemodes/htf.h"
 #include "gamemodes/lms.h"
+#include "gamemodes/ndm.h"
 
 enum
 {
@@ -2071,6 +2072,8 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 	// 	m_pController = new CGameControllerGHTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS);
 	// else if(!str_comp_nocase(g_Config.m_SvGametype, "itlms") || !str_comp_nocase(g_Config.m_SvGametype, "itlms+"))		// iTLMS
 	// 	m_pController = new CGameControllerLMS(this, IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS);
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "ndm") || !str_comp_nocase(g_Config.m_SvGametype, "ndm+"))		// iLMS
+		m_pController = new CGameControllerNDM(this, IGameController::GAMETYPE_VANILLA);
 	else
 		m_pController = new CGameControllerDM(this, IGameController::GAMETYPE_VANILLA);
 
