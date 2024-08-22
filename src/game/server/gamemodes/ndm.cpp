@@ -16,8 +16,6 @@ CGameControllerNDM::CGameControllerNDM(class CGameContext *pGameServer, int Type
 
 void CGameControllerNDM::OnCharacterSpawn(CCharacter* pChr)
 {
-	pChr->IncreaseHealth(10);
-	pChr->IncreaseArmor(10);
 	pChr->GiveWeapon(m_CurrentWeapon, 10);
 	pChr->SetWeapon(m_CurrentWeapon);
 	if (m_CurrentWeapon == WEAPON_NINJA)
@@ -26,6 +24,9 @@ void CGameControllerNDM::OnCharacterSpawn(CCharacter* pChr)
 		pChr->SetAmmo(m_CurrentWeapon, 9999);
 	else
 		pChr->SetAmmo(m_CurrentWeapon, 15);
+	
+	pChr->SetHealth(10);
+	pChr->IncreaseArmor(5);
 }
 
 void CGameControllerNDM::Tick()
