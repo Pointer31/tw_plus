@@ -11,6 +11,7 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType)
 	m_Type = Type;
 	m_Subtype = SubType;
 	m_ProximityRadius = PickupPhysSize;
+	m_ID2 = Server()->SnapNewID();
 
 	Reset();
 
@@ -55,10 +56,13 @@ void CPickup::Tick()
 	{
 		// player picked us up, is someone was hooking us, let them go
 		int RespawnTime = -1;
+		int amount = 1; // amount of heart/shields
 		switch (m_Type)
 		{
 			case POWERUP_HEALTH:
-				if(pChr->IncreaseHealth(1))
+				if (m_Subtype == 1)
+					amount = 5;
+				if(pChr->IncreaseHealth(amount))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
 					RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
@@ -66,7 +70,9 @@ void CPickup::Tick()
 				break;
 
 			case POWERUP_ARMOR:
-				if(pChr->IncreaseArmor(1))
+				if (m_Subtype == 1)
+					amount = 5;
+				if(pChr->IncreaseArmor(amount))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
 					RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
@@ -74,21 +80,26 @@ void CPickup::Tick()
 				break;
 
 			case POWERUP_WEAPON:
-				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS)
+				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS+NUM_WEAPONS_EXTRA)
 				{
 					if(pChr->GiveWeapon(m_Subtype, 10))
 					{
 						RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
 
-						if(m_Subtype == WEAPON_GRENADE)
+						if(m_Subtype == WEAPON_GRENADE || m_Subtype == WEAPON_HAMMER_SUPER || m_Subtype == WEAPON_GUN_SUPER)
 							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
-						else if(m_Subtype == WEAPON_SHOTGUN)
-							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
-						else if(m_Subtype == WEAPON_RIFLE)
+						else if(m_Subtype == WEAPON_SHOTGUN || m_Subtype == WEAPON_PLASMAGUN || m_Subtype == WEAPON_RIFLE)
 							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
 
+						int weapon = m_Subtype;
+						if(m_Subtype == WEAPON_PLASMAGUN)
+							weapon = WEAPON_RIFLE;
+						if(m_Subtype == WEAPON_GUN_SUPER)
+							weapon = WEAPON_GUN;
+						if(m_Subtype == WEAPON_HAMMER_SUPER)
+							weapon = WEAPON_HAMMER;
 						if(pChr->GetPlayer())
-							GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), m_Subtype);
+							GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), weapon);
 					}
 				}
 				break;
@@ -137,12 +148,43 @@ void CPickup::Snap(int SnappingClient)
 	if(m_SpawnTick != -1 || NetworkClipped(SnappingClient))
 		return;
 
-	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID, sizeof(CNetObj_Pickup)));
-	if(!pP)
-		return;
+	if ((m_Type == POWERUP_HEALTH || m_Type == POWERUP_ARMOR) && m_Subtype == 1) {
+		CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID, sizeof(CNetObj_Pickup)));
+		if(!pP)
+			return;
+		CNetObj_Pickup *pP2 = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID2, sizeof(CNetObj_Pickup)));
+		if(!pP2)
+			return;
+		pP->m_X = (int)m_Pos.x + 16*sin((float)Server()->Tick() / 25.0);
+		pP->m_Y = (int)m_Pos.y + 16*sin((float)Server()->Tick() / 25.0);
+		pP->m_Type = m_Type;
+		pP->m_Subtype = 0;
+		pP2->m_X = (int)m_Pos.x + 16*cos((float)Server()->Tick() / 25.0);
+		pP2->m_Y = (int)m_Pos.y + -16*cos((float)Server()->Tick() / 25.0);
+		pP2->m_Type = m_Type;
+		pP2->m_Subtype = 0;
+	} else {
+		CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID, sizeof(CNetObj_Pickup)));
+		if(!pP)
+			return;
 
-	pP->m_X = (int)m_Pos.x;
-	pP->m_Y = (int)m_Pos.y;
-	pP->m_Type = m_Type;
-	pP->m_Subtype = m_Subtype;
+		pP->m_X = (int)m_Pos.x;
+		pP->m_Y = (int)m_Pos.y;
+		pP->m_Type = m_Type;
+		pP->m_Subtype = m_Subtype;
+		if (pP->m_Subtype == WEAPON_PLASMAGUN) {
+			pP->m_Subtype = WEAPON_RIFLE;
+			CNetObj_Pickup *pP2 = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID2, sizeof(CNetObj_Pickup)));
+			if(!pP2)
+				return;
+			pP2->m_X = (int)m_Pos.x + 16*cos((float)Server()->Tick() / 10.0);
+			pP2->m_Y = (int)m_Pos.y;
+			pP2->m_Type = POWERUP_ARMOR;
+			pP2->m_Subtype = 0;
+		}
+		else if (pP->m_Subtype == WEAPON_HAMMER_SUPER)
+			pP->m_Subtype = WEAPON_HAMMER;
+		else if (pP->m_Subtype == WEAPON_GUN_SUPER)
+			pP->m_Subtype = WEAPON_GUN;
+	}
 }

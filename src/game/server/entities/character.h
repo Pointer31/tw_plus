@@ -163,6 +163,11 @@ private:
 	int m_slowDeathTick; // how many ticks are left before being hurt, while in a slow death zone.
 	int m_healthArmorZoneTick; // how many ticks are left before gaining a heart or shield in a health/armor-zone
 	int StrLeftComp(const char *pOrigin, const char *pSub);
+
+	bool m_has_plasmagun;
+	bool m_has_superhammer;
+	bool m_has_supergun;
+	int m_superhammer_charge_time;
 };
 
 #endif

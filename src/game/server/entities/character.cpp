@@ -53,6 +53,10 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_inTele = false;
 	m_slowDeathTick = 0;
 	m_healthArmorZoneTick = 0;
+	m_has_plasmagun = false;
+	m_has_superhammer = false;
+	m_has_supergun = false;
+	m_superhammer_charge_time = 0;
 }
 
 void CCharacter::Reset()
@@ -139,6 +143,12 @@ void CCharacter::SetWeapon(int W)
 	m_QueuedWeapon = -1;
 	m_ActiveWeapon = W;
 	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SWITCH);
+	if (m_ActiveWeapon == WEAPON_PLASMAGUN)
+		m_ActiveWeapon = WEAPON_RIFLE;
+	else if (m_ActiveWeapon == WEAPON_GUN_SUPER)
+		m_ActiveWeapon = WEAPON_GUN;
+	else if (m_ActiveWeapon == WEAPON_HAMMER_SUPER)
+		m_ActiveWeapon = WEAPON_HAMMER;
 
 	if (m_ActiveWeapon < 0 || m_ActiveWeapon >= NUM_WEAPONS)
 		m_ActiveWeapon = 0;
@@ -303,6 +313,23 @@ void CCharacter::FireWeapon()
 	if (FullAuto && (m_LatestInput.m_Fire & 1) && m_aWeapons[m_ActiveWeapon].m_Ammo)
 		WillFire = true;
 
+	if (m_has_superhammer && (m_LatestInput.m_Fire & 1) && m_ActiveWeapon == WEAPON_HAMMER) {
+		m_superhammer_charge_time++;
+		if (m_superhammer_charge_time <= 60 && m_superhammer_charge_time % 15 == 0)
+			GameServer()->CreateSound(m_Pos, SOUND_WEAPON_NOAMMO);
+	} else {
+		if (m_superhammer_charge_time > 15 && m_has_superhammer) {
+			GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*4, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+			if (m_superhammer_charge_time > 30)
+				GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*7, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+			if (m_superhammer_charge_time > 45)
+				GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*10, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+			if (m_superhammer_charge_time > 60)
+				GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*13, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+		}
+		m_superhammer_charge_time = 0;
+	}
+
 	if (!WillFire)
 		return;
 
@@ -361,17 +388,27 @@ void CCharacter::FireWeapon()
 		// if we Hit anything, we have to wait for the reload
 		if (Hits)
 			m_ReloadTimer = Server()->TickSpeed() / 3;
+
+		if (m_has_superhammer) {
+			GameServer()->CreateSound(m_Pos + Direction*WIDTH_TILE*4, SOUND_GRENADE_EXPLODE);
+			GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*4, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+			// GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*6, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+			// GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*8, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
+		}
 	}
 	break;
 
 	case WEAPON_GUN:
 	{
+		bool explosive = false;
+		if (m_has_supergun)
+			explosive = true;
 		CProjectile *pProj = new CProjectile(GameWorld(), WEAPON_GUN,
 											 m_pPlayer->GetCID(),
 											 ProjStartPos,
 											 Direction,
 											 (int)(Server()->TickSpeed() * GameServer()->Tuning()->m_GunLifetime),
-											 1, 0, 0, -1, WEAPON_GUN);
+											 1, explosive, 0, -1, WEAPON_GUN);
 
 		// pack the Projectile and send it to the client Directly
 		CNetObj_Projectile p;
@@ -450,7 +487,7 @@ void CCharacter::FireWeapon()
 
 	case WEAPON_RIFLE:
 	{
-		if (g_Config.m_SvPlasmaGun)
+		if (g_Config.m_SvPlasmaGun || m_has_plasmagun)
 		{
 			vec2 dir1 = Direction;
 			vec2 dir2 = Direction;
@@ -556,7 +593,7 @@ void CCharacter::FireWeapon()
 		if (m_ActiveWeapon == WEAPON_RIFLE)
 		{
 			FireDelay = g_Config.m_SvLaserReloadTime;
-			if (g_Config.m_SvPlasmaGun)
+			if (g_Config.m_SvPlasmaGun || m_has_plasmagun)
 				FireDelay = g_Config.m_SvPlasmaGunFireDelay;
 		} else if (m_ActiveWeapon == WEAPON_SHOTGUN && g_Config.m_SvShotgunRepeater) 
 		{
@@ -618,6 +655,32 @@ void CCharacter::HandleWeapons()
 
 bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 {
+	// potentially disable custom weapons
+	if (Weapon == WEAPON_RIFLE && m_has_plasmagun) {
+		m_aWeapons[Weapon].m_Ammo = 0; m_has_plasmagun = false;
+	} else if (Weapon == WEAPON_HAMMER && m_has_superhammer) {
+		m_aWeapons[Weapon].m_Ammo = 0; m_has_superhammer = false;
+	} else if (Weapon == WEAPON_GUN && m_has_supergun) {
+		m_aWeapons[Weapon].m_Ammo = 0; m_has_supergun = false;
+	}
+
+	// hammer has infinite ammo, always
+	if (Weapon == WEAPON_HAMMER || Weapon == WEAPON_HAMMER_SUPER)
+		Ammo = -1;
+
+	// enable custom weapons
+	if (Weapon >= NUM_WEAPONS)
+	{
+		if (Weapon == WEAPON_PLASMAGUN) {
+			Weapon = WEAPON_RIFLE; m_aWeapons[Weapon].m_Ammo = 0; m_has_plasmagun = true;
+		} else if (Weapon == WEAPON_HAMMER_SUPER) {
+			Weapon = WEAPON_HAMMER; m_aWeapons[Weapon].m_Ammo = 0; m_has_superhammer = true;
+		} else if (Weapon == WEAPON_GUN_SUPER) {
+			Weapon = WEAPON_GUN; m_aWeapons[Weapon].m_Ammo = 0; m_has_supergun = true;
+		} else 
+			Weapon = WEAPON_SHOTGUN;
+	}
+
 	if (m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got || (g_Config.m_SvShotgunRepeater && m_aWeapons[Weapon].m_Ammo < g_Config.m_SvShotgunRepeaterAmmo))
 	{
 		m_aWeapons[Weapon].m_Got = true;
@@ -1567,6 +1630,12 @@ void CCharacter::Melt(int MelterID)
 
 bool CCharacter::TakeWeapon(int Weapon)
 {
+	if (Weapon == WEAPON_PLASMAGUN)
+		Weapon = WEAPON_RIFLE;
+	else if (Weapon == WEAPON_HAMMER_SUPER)
+		Weapon = WEAPON_HAMMER;
+	else if (Weapon == WEAPON_GUN_SUPER)
+		Weapon = WEAPON_GUN;
 	m_aWeapons[Weapon].m_Got = false;
 	// if active weapon search another
 	if (m_ActiveWeapon == Weapon)

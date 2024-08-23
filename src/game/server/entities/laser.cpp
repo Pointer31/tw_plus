@@ -44,7 +44,8 @@ void CLaser::DoBounce()
 		return;
 	}
 
-	if (g_Config.m_SvPlasmaGun) {
+	// if (g_Config.m_SvPlasmaGun) {
+	if (m_Clockwise != 0) {
 		vec2 new_dir = m_Dir;
 
 		double deg = 20*m_Clockwise;

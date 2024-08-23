@@ -37,7 +37,7 @@ void CGameControllerNDM::Tick()
 							+ (float)Server()->TickSpeed() * (float)time_between_changes;
 
 		int old_weapon = m_CurrentWeapon;
-		int new_weapon = rand() % (NUM_WEAPONS-1);
+		int new_weapon = rand() % (NUM_WEAPONS-1 + NUM_WEAPONS_EXTRA);
 		if (new_weapon >= m_CurrentWeapon)
 			m_CurrentWeapon = new_weapon+1;
 		else
@@ -57,7 +57,11 @@ void CGameControllerNDM::Tick()
 						pChr->SetAmmo(m_CurrentWeapon, 9999);
 					else
 						pChr->SetAmmo(m_CurrentWeapon, 15);
-					pChr->TakeWeapon(old_weapon);
+
+					if (!((m_CurrentWeapon == WEAPON_RIFLE && old_weapon == WEAPON_PLASMAGUN) || (old_weapon == WEAPON_RIFLE && m_CurrentWeapon == WEAPON_PLASMAGUN) ||
+							(m_CurrentWeapon == WEAPON_HAMMER && old_weapon == WEAPON_HAMMER_SUPER) || (old_weapon == WEAPON_HAMMER && m_CurrentWeapon == WEAPON_HAMMER_SUPER) ||
+							(m_CurrentWeapon == WEAPON_GUN && old_weapon == WEAPON_GUN_SUPER) || (old_weapon == WEAPON_GUN && m_CurrentWeapon == WEAPON_GUN_SUPER)))
+						pChr->TakeWeapon(old_weapon);
 				}
 			}
 		}

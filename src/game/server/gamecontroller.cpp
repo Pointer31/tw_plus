@@ -150,6 +150,10 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 			Type = POWERUP_ARMOR;
 		else if(Index == ENTITY_HEALTH_1)
 			Type = POWERUP_HEALTH;
+		else if(Index == ENTITY_ARMOR_5)
+			{Type = POWERUP_ARMOR; SubType = 1;}
+		else if(Index == ENTITY_HEALTH_5)
+			{Type = POWERUP_HEALTH; SubType = 1;}
 		if (!IsNoPickups()) 
 		{
 			if(Index == ENTITY_WEAPON_SHOTGUN)
@@ -172,7 +176,22 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 				Type = POWERUP_NINJA;
 				SubType = WEAPON_NINJA;
 			}
-	}	
+			else if(Index == ENTITY_WEAPON_PLASMAGUN)
+			{
+				Type = POWERUP_WEAPON;
+				SubType = WEAPON_PLASMAGUN;
+			}
+			else if(Index == ENTITY_POWERUP_HAMMER)
+			{
+				Type = POWERUP_WEAPON;
+				SubType = WEAPON_HAMMER_SUPER;
+			}
+			else if(Index == ENTITY_POWERUP_GUN)
+			{
+				Type = POWERUP_WEAPON;
+				SubType = WEAPON_GUN_SUPER;
+			}
+		}	
 	}
 	if(Index == ENTITY_GRENADE_FOUNTAIN)
 	{
