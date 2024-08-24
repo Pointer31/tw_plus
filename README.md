@@ -21,6 +21,7 @@ make</code>
 
 ## Features
 Apart from the features of the standard server as well as the tw+ server by teetime, the server include the following:  
+Note that the folder ./client-files contains some data that may be useful when making maps for this mod.  
 
 **Map**  
 multiple flag stands per map (one stand is chosen randomly)  
@@ -29,12 +30,14 @@ grenade fountains
 slow killing death / slow healing / slow armor zone  
 No-flag zone  
 boost zone, boost-pad  
+custom weapon spawns  
 
 **Weapons**  
 ninja (toggle invincibility, crazy-weapons, slash speed, heart/armor bonusses on pickup)  
 toggleable silly custom weapons (laser->plasmagun, grenade->(wip)bouncy grenade, shotgun->explosive shotgun; repeater)  
 pistol autoshooting  
-(wip) indirect killing by hooking tee into spikes
+indirect killing by hooking tee into spikes  
+custom weapons, of which spawns can be placed in a map: plasmagun, charge hammer, super pistol  
 
 **Other**  
 shutdown message  
@@ -50,6 +53,7 @@ Particles appearing when a pickup (shield, heart, weapon) is respawning
 Play a sound different from the normal hit sound when the player kills a tee, like in some other gametypes  
 new gametype: Hold the flag (HTF); teamless mode where you gain points by holding the flag  
 new gametype: Last man standing (LMS); teamless mode where you must avoid dying while killing others  
+new gametype: No Items Death Match (nDM): teamless mode where you can only use one weapon, which is randomly chosen every 15s by default.  
 
 **Included Maps**  
 included extra maps to show the new features:  

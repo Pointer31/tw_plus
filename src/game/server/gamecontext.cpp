@@ -1842,7 +1842,7 @@ void CGameContext::ConGive(IConsole::IResult *pResult, void *pUserData)
 
 	//Single weapon
 	int Weapon = pResult->GetInteger(1);
-	if(Weapon >= 0 && Weapon < NUM_WEAPONS)
+	if(Weapon >= 0 && Weapon < NUM_WEAPONS+NUM_WEAPONS_EXTRA)
 	{
 		if(Weapon == WEAPON_NINJA)
 		{
