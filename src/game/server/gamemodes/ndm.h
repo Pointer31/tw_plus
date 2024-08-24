@@ -12,6 +12,7 @@ public:
 	virtual void Tick();
 private:
 	int m_CurrentWeapon;
-	int m_LastSwitchTick;
+	int m_NextWeapon;
+	int m_NextSwitchTick;
 };
 #endif

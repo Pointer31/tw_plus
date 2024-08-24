@@ -319,6 +319,7 @@ void CCharacter::FireWeapon()
 			GameServer()->CreateSound(m_Pos, SOUND_WEAPON_NOAMMO);
 	} else {
 		if (m_superhammer_charge_time > 15 && m_has_superhammer) {
+			GameServer()->CreateSound(m_Pos + Direction*WIDTH_TILE*4, SOUND_GRENADE_EXPLODE);
 			GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*4, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
 			if (m_superhammer_charge_time > 30)
 				GameServer()->CreateExplosion(m_Pos + Direction*WIDTH_TILE*7, m_pPlayer->GetCID(), WEAPON_HAMMER, false);
@@ -694,6 +695,12 @@ bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 
 void CCharacter::SetAmmo(int Weapon, int Ammo)
 {
+	if (Weapon == WEAPON_PLASMAGUN)
+		Weapon = WEAPON_RIFLE;
+	else if (Weapon == WEAPON_HAMMER_SUPER)
+		Weapon = WEAPON_HAMMER;
+	else if (Weapon == WEAPON_GUN_SUPER)
+		Weapon = WEAPON_GUN;
 	m_aWeapons[Weapon].m_Got = true;
 	m_aWeapons[Weapon].m_Ammo = Ammo;
 }
