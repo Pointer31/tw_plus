@@ -17,7 +17,10 @@ CGameControllerHTF::CGameControllerHTF(class CGameContext *pGameServer, int Type
 : IGameController(pGameServer)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = (IsInstagib()) ? "iHTF" : "HTF";
+	if (TypeFlags&IGameController::GAMETYPE_ISTEAM)
+		m_pGameType = (IsInstagib()) ? "iTHTF" : "THTF";
+	else
+		m_pGameType = (IsInstagib()) ? "iHTF" : "HTF";
 
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
@@ -25,6 +28,8 @@ CGameControllerHTF::CGameControllerHTF(class CGameContext *pGameServer, int Type
 	m_flagstand_temp_i_0 = 0;
 	m_flagstand_temp_i_1 = 0;
 	m_GameFlags = GAMEFLAG_FLAGS;
+	if (TypeFlags&IGameController::GAMETYPE_ISTEAM)
+		m_GameFlags |= GAMEFLAG_TEAMS;
 }
 
 // returns 0 if no anticamper is happening, 1 if warning, 2 if flag is reset
@@ -67,7 +72,10 @@ int CGameControllerHTF::Anticamper(CFlag* F)
 		{ // Send Warning
 			if (!F->m_pCarryingCharacter->m_SentCampMsg) {
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "                   %d/%ds\nANTICAMPER: move or lose flag", F->m_pCarryingCharacter->GetPlayer()->m_Score, g_Config.m_SvScorelimit);
+				int score = F->m_pCarryingCharacter->GetPlayer()->m_Score;
+				if (IsTeamplay())
+					score = m_aTeamscore[F->m_pCarryingCharacter->GetPlayer()->GetTeam()];
+				str_format(aBuf, sizeof(aBuf), "                   %d/%ds\nANTICAMPER: move or lose flag", score, g_Config.m_SvScorelimit);
 				GameServer()->SendBroadcast(aBuf, F->m_pCarryingCharacter->GetPlayer()->GetCID());
 				F->m_pCarryingCharacter->m_SentCampMsg = true;
 			}
@@ -118,12 +126,17 @@ void CGameControllerHTF::Tick()
 			if (player->m_ScoreTick >= Server()->TickSpeed()) {
 				player->m_ScoreTick = 0;
 				player->m_Score++;
+				m_aTeamscore[player->GetTeam()]++;
+
+				int score = player->m_Score;
+				if (IsTeamplay())
+					score = m_aTeamscore[player->GetTeam()];
 
 				char aBuf[128];
 				if (anticamp == 0)
-					str_format(aBuf, sizeof(aBuf), "%d/%ds", player->m_Score, g_Config.m_SvScorelimit);
+					str_format(aBuf, sizeof(aBuf), "%d/%ds", score, g_Config.m_SvScorelimit);
 				else if (anticamp == 1)
-					str_format(aBuf, sizeof(aBuf), "                   %d/%ds\nANTICAMPER: move or lose flag", player->m_Score, g_Config.m_SvScorelimit);
+					str_format(aBuf, sizeof(aBuf), "                   %d/%ds\nANTICAMPER: move or lose flag", score, g_Config.m_SvScorelimit);
 				else if (anticamp == 2)
 					str_format(aBuf, sizeof(aBuf), "");
 				GameServer()->SendBroadcast(aBuf, player->GetCID());
@@ -185,7 +198,7 @@ void CGameControllerHTF::Tick()
 				// take the flag
 				if(F->m_AtStand)
 				{
-					m_aTeamscore[fi^1]++;
+					// m_aTeamscore[fi^1]++;
 					F->m_GrabTick = Server()->Tick();
 				}
 
@@ -216,7 +229,10 @@ void CGameControllerHTF::Tick()
 						GameServer()->CreateSoundGlobal(SOUND_CTF_GRAB_PL, c);
 				}
 
-				str_format(aBuf, sizeof(aBuf), "%d/%ds", F->m_pCarryingCharacter->GetPlayer()->m_Score, g_Config.m_SvScorelimit);
+				int score = F->m_pCarryingCharacter->GetPlayer()->m_Score;
+				if (IsTeamplay())
+					score = m_aTeamscore[F->m_pCarryingCharacter->GetPlayer()->GetTeam()];
+				str_format(aBuf, sizeof(aBuf), "%d/%ds", score, g_Config.m_SvScorelimit);
 				GameServer()->SendBroadcast(aBuf, F->m_pCarryingCharacter->GetPlayer()->GetCID());
 
 				// demo record entry

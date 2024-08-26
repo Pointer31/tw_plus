@@ -75,6 +75,10 @@ CGameControllerGHTF::CGameControllerGHTF(class CGameContext *pGameServer, int Ty
 {
 	m_Flags = TypeFlags;
 	m_pGameType = "gHTF";
+	if (TypeFlags&IGameController::GAMETYPE_ISTEAM)
+		m_pGameType = "gTHTF";
+	else
+		m_pGameType = "gHTF";
 }
 
 void CGameControllerGHTF::OnCharacterSpawn(CCharacter* pChr)
@@ -95,7 +99,10 @@ CGameControllerGLMS::CGameControllerGLMS(class CGameContext *pGameServer, int Ty
 : CGameControllerLMS(pGameServer, TypeFlags)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = "gLMS+";
+	if (TypeFlags&IGameController::GAMETYPE_ISTEAM)
+		m_pGameType = "gLTS+";
+	else
+		m_pGameType = "gLMS+";
 }
 
 void CGameControllerGLMS::OnCharacterSpawn(CCharacter* pChr)

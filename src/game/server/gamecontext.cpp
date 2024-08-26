@@ -2058,6 +2058,12 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		m_pController = new CGameControllerGHTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
 	else if(!str_comp_nocase(g_Config.m_SvGametype, "ihtf") || !str_comp_nocase(g_Config.m_SvGametype, "ihtf+"))		// iHTF
 		m_pController = new CGameControllerHTF(this, IGameController::GAMETYPE_INSTAGIB);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "thtf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "thtf+"))		// HTF (team)
+		m_pController = new CGameControllerHTF(this, IGameController::GAMETYPE_VANILLA | IGameController::GAMETYPE_ISTEAM);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "gthtf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "gthtf+"))		// gHTF (team)
+		m_pController = new CGameControllerGHTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB | IGameController::GAMETYPE_ISTEAM);
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "ithtf") || !str_comp_nocase(g_Config.m_SvGametype, "ithtf+"))		// iHTF (team)
+		m_pController = new CGameControllerHTF(this, IGameController::GAMETYPE_INSTAGIB | IGameController::GAMETYPE_ISTEAM);
 
 	else if(str_comp_nocase(g_Config.m_SvGametype, "lms") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "lms+"))		// LMS
 		m_pController = new CGameControllerLMS(this, IGameController::GAMETYPE_VANILLA|IGameController::GAMETYPE_LMS);
@@ -2065,13 +2071,13 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		m_pController = new CGameControllerGLMS(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS);
 	else if(!str_comp_nocase(g_Config.m_SvGametype, "ilms") || !str_comp_nocase(g_Config.m_SvGametype, "ilms+"))		// iLMS
 		m_pController = new CGameControllerLMS(this, IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS);
-	
-	// else if(str_comp_nocase(g_Config.m_SvGametype, "tlms") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "tlms+"))		// TLMS
-	// 	m_pController = new CGameControllerLMS(this, IGameController::GAMETYPE_VANILLA|IGameController::GAMETYPE_LMS);
-	// else if(str_comp_nocase(g_Config.m_SvGametype, "gtlms") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "gtlms+"))		// gTLMS
-	// 	m_pController = new CGameControllerGHTF(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS);
-	// else if(!str_comp_nocase(g_Config.m_SvGametype, "itlms") || !str_comp_nocase(g_Config.m_SvGametype, "itlms+"))		// iTLMS
-	// 	m_pController = new CGameControllerLMS(this, IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "lts") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "lts+"))		// TLMS
+		m_pController = new CGameControllerLMS(this, IGameController::GAMETYPE_VANILLA|IGameController::GAMETYPE_LMS | IGameController::GAMETYPE_ISTEAM);
+	else if(str_comp_nocase(g_Config.m_SvGametype, "glts") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "glts+"))		// gTLMS
+		m_pController = new CGameControllerGLMS(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS | IGameController::GAMETYPE_ISTEAM);
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "ilts") || !str_comp_nocase(g_Config.m_SvGametype, "ilts+"))		// iTLMS
+		m_pController = new CGameControllerLMS(this, IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_LMS | IGameController::GAMETYPE_ISTEAM);
+
 	else if(!str_comp_nocase(g_Config.m_SvGametype, "ndm") || !str_comp_nocase(g_Config.m_SvGametype, "ndm+"))		// iLMS
 		m_pController = new CGameControllerNDM(this, IGameController::GAMETYPE_VANILLA);
 	else

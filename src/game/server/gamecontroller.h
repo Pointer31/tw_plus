@@ -154,6 +154,7 @@ public:
 		GAMETYPE_IFREEZE = 1<<3,
 		GAMETYPE_LMS = 1<<4,
 		GAMETYPE_NOPICKUPS = 1<<5,
+		GAMETYPE_ISTEAM = 1<<6,
 	};
 	int m_Flags;
 

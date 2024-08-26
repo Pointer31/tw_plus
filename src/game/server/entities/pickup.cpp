@@ -155,12 +155,16 @@ void CPickup::Snap(int SnappingClient)
 		CNetObj_Pickup *pP2 = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID2, sizeof(CNetObj_Pickup)));
 		if(!pP2)
 			return;
-		pP->m_X = (int)m_Pos.x + 16*sin((float)Server()->Tick() / 25.0);
-		pP->m_Y = (int)m_Pos.y + 16*sin((float)Server()->Tick() / 25.0);
+		
+		float t = Server()->Tick();
+		if (GameServer()->m_World.m_Paused)
+			t = 0.0;
+		pP->m_X = (int)m_Pos.x + 16*sin(t / 25.0);
+		pP->m_Y = (int)m_Pos.y + 16*sin(t / 25.0);
 		pP->m_Type = m_Type;
 		pP->m_Subtype = 0;
-		pP2->m_X = (int)m_Pos.x + 16*cos((float)Server()->Tick() / 25.0);
-		pP2->m_Y = (int)m_Pos.y + -16*cos((float)Server()->Tick() / 25.0);
+		pP2->m_X = (int)m_Pos.x + 16*cos(t / 25.0);
+		pP2->m_Y = (int)m_Pos.y + -16*cos(t / 25.0);
 		pP2->m_Type = m_Type;
 		pP2->m_Subtype = 0;
 	} else {
@@ -177,7 +181,11 @@ void CPickup::Snap(int SnappingClient)
 			CNetObj_Pickup *pP2 = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID2, sizeof(CNetObj_Pickup)));
 			if(!pP2)
 				return;
-			pP2->m_X = (int)m_Pos.x + 16*cos((float)Server()->Tick() / 10.0);
+
+			float t = Server()->Tick();
+			if (GameServer()->m_World.m_Paused)
+				t = 0.0;
+			pP2->m_X = (int)m_Pos.x + 16*cos(t / 10.0);
 			pP2->m_Y = (int)m_Pos.y;
 			pP2->m_Type = POWERUP_ARMOR;
 			pP2->m_Subtype = 0;

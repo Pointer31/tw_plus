@@ -79,6 +79,12 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			SendChatTarget(ClientID, "gHTF gametype: 'hold the flag'. While holding the flag you gain points. You can only use your grenade launcher, and it insta-kills");
 		} else if (StrLeftComp(GameType(), "iHTF")) {
 			SendChatTarget(ClientID, "iHTF gametype: 'hold the flag'. While holding the flag you gain points. You can only use your laser rifle, and it insta-kills");
+		} else if (StrLeftComp(GameType(), "THTF")) {
+			SendChatTarget(ClientID, "THTF gametype: 'team hold the flag'. While holding the flag your team gains points. You can pick up weapons to use. Pick up hearts and shields to restore your health and armor!");
+		} else if (StrLeftComp(GameType(), "gTHTF")) {
+			SendChatTarget(ClientID, "gTHTF gametype: 'team hold the flag'. While holding the flag your team gains points. You can only use your grenade launcher, and it insta-kills");
+		} else if (StrLeftComp(GameType(), "iTHTF")) {
+			SendChatTarget(ClientID, "iTHTF gametype: ' team hold the flag'. While holding the flag your team gains points. You can only use your laser rifle, and it insta-kills");
 		}
 		else if (StrLeftComp(GameType(), "LMS+")) {
 			SendChatTarget(ClientID, "LMS+ gametype: 'last man standing'. Kill all others, but avoid dying too much to win. You can pick up weapons to use. Pick up hearts and shields to restore your health and armor!");
@@ -86,9 +92,19 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 			SendChatTarget(ClientID, "gLMS+ gametype: 'last man standing'. Kill all others, but avoid dying too much to win. You can only use your grenade launcher, and it insta-kills");
 		} else if (StrLeftComp(GameType(), "iLMS+")) {
 			SendChatTarget(ClientID, "iLMS+ gametype: 'last man standing'. Kill all others, but avoid dying too much to win. You can only use your laser rifle, and it insta-kills");
+		} else if (StrLeftComp(GameType(), "LTS+")) {
+			SendChatTarget(ClientID, "LTS+ gametype: 'last team standing'. Kill the other team, but avoid dying too much to win. You can pick up weapons to use. Pick up hearts and shields to restore your health and armor!");
+		} else if (StrLeftComp(GameType(), "gLTS+")) {
+			SendChatTarget(ClientID, "gLTS+ gametype: 'last team standing'. Kill the other team, but avoid dying too much to win. You can only use your grenade launcher, and it insta-kills");
+		} else if (StrLeftComp(GameType(), "iLTS+")) {
+			SendChatTarget(ClientID, "iLTS+ gametype: 'last team standing'. Kill the other team, but avoid dying too much to win. You can only use your laser rifle, and it insta-kills");
 		}  
 		else if (StrLeftComp(GameType(), "iFreeze+")) {
 			SendChatTarget(ClientID, "iFreeze gametype: freeze all tees of the other team to win. Stand near a frozen teammate to melt them.");
+		} else if (StrLeftComp(GameType(), "ndm+")) {
+			char aBuf[1024] = "No message (this should not appear)";
+			str_format(aBuf, sizeof(aBuf), "No items Death Match: Kill other tees for points. You can only use one weapon. The weapon will change every %d seconds", g_Config.m_SvNDMTime);
+			SendChatTarget(ClientID, aBuf);
 		}
 		else {
 			SendChatTarget(ClientID, "The current gametype is unknown");

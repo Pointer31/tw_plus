@@ -258,14 +258,34 @@ void IGameController::EndRound()
 		if(IsTeamplay())
 		{
 			char aBuf[1024] = "No message (this should not appear)";
-			int scoreRed = m_aTeamscore[TEAM_RED];
-			int scoreBlue = m_aTeamscore[TEAM_BLUE];
-			if (scoreRed > scoreBlue)
-				str_format(aBuf, sizeof(aBuf), "★ Red team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
-			else if (scoreRed < scoreBlue)
-				str_format(aBuf, sizeof(aBuf), "★ Blue team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
-			else
-				str_format(aBuf, sizeof(aBuf), "★ Draw! Red: %d, Blue: %d", scoreRed, scoreBlue);
+			if (IsLMS()) {
+				int scoreRed = 0;
+				int scoreBlue = 0;
+				for (int i = 0; i < MAX_CLIENTS; i++)
+				{
+					if (GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->m_IsReady && GameServer()->IsClientPlayer(i)) {
+						if (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_BLUE && GameServer()->m_apPlayers[i]->m_Lives > 0)
+							scoreBlue++;
+						else if (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_RED && GameServer()->m_apPlayers[i]->m_Lives > 0)
+							scoreRed++;
+					}
+				}
+				if (scoreRed > scoreBlue)
+					str_format(aBuf, sizeof(aBuf), "★ Red team has won the round! Alive, Red: %d, Blue: %d", scoreRed, scoreBlue);
+				else if (scoreRed < scoreBlue)
+					str_format(aBuf, sizeof(aBuf), "★ Blue team has won the round! Alive, Red: %d, Blue: %d", scoreRed, scoreBlue);
+				else
+					str_format(aBuf, sizeof(aBuf), "★ Draw! Alive, Red: %d, Blue: %d", scoreRed, scoreBlue);
+			} else {
+				int scoreRed = m_aTeamscore[TEAM_RED];
+				int scoreBlue = m_aTeamscore[TEAM_BLUE];
+				if (scoreRed > scoreBlue)
+					str_format(aBuf, sizeof(aBuf), "★ Red team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
+				else if (scoreRed < scoreBlue)
+					str_format(aBuf, sizeof(aBuf), "★ Blue team has won the round! Red: %d, Blue: %d", scoreRed, scoreBlue);
+				else
+					str_format(aBuf, sizeof(aBuf), "★ Draw! Red: %d, Blue: %d", scoreRed, scoreBlue);
+			}
 			m_pGameServer->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
 
 			char bBuf[1024] = "No message2 (this should not appear)";

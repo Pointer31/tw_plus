@@ -34,6 +34,11 @@ void CGameControllerNDM::OnCharacterSpawn(CCharacter* pChr)
 
 void CGameControllerNDM::Tick()
 {
+	IGameController::Tick();
+
+	if(GameServer()->m_World.m_ResetRequested || GameServer()->m_World.m_Paused)
+		return;
+		
 	if (Server()->Tick() == m_NextSwitchTick - Server()->TickSpeed() || Server()->Tick() == m_NextSwitchTick - Server()->TickSpeed()*2
 		|| Server()->Tick() == m_NextSwitchTick - Server()->TickSpeed()*3 || Server()->Tick() == m_NextSwitchTick - Server()->TickSpeed()*4) {
 		char aBuf[1024] = "No message (this should not appear)";
@@ -99,5 +104,4 @@ void CGameControllerNDM::Tick()
 			}
 		}
 	}
-	IGameController::Tick();
 }
