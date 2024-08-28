@@ -22,6 +22,8 @@ void CPickup::Reset()
 {
 	if (g_pData->m_aPickups[m_Type].m_Spawndelay > 0)
 		m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * g_pData->m_aPickups[m_Type].m_Spawndelay;
+	else if (m_Type == POWERUP_WEAPON && (m_Subtype == WEAPON_GUN_SUPER || m_Subtype == WEAPON_HAMMER_SUPER))
+		m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * g_pData->m_aPickups[POWERUP_NINJA].m_Spawndelay/2;
 	else
 		m_SpawnTick = -1;
 }
@@ -66,6 +68,8 @@ void CPickup::Tick()
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
 					RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
+					if (m_Subtype == 1)
+						RespawnTime = RespawnTime*2;
 				}
 				break;
 
@@ -76,6 +80,8 @@ void CPickup::Tick()
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
 					RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
+					if (m_Subtype == 1)
+						RespawnTime = RespawnTime*2;
 				}
 				break;
 
@@ -98,6 +104,8 @@ void CPickup::Tick()
 							weapon = WEAPON_GUN;
 						if(m_Subtype == WEAPON_HAMMER_SUPER)
 							weapon = WEAPON_HAMMER;
+						if (m_Subtype == WEAPON_GUN_SUPER || m_Subtype == WEAPON_HAMMER_SUPER)
+							RespawnTime = g_pData->m_aPickups[POWERUP_NINJA].m_Respawntime/2;
 						if(pChr->GetPlayer())
 							GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), weapon);
 					}
