@@ -119,6 +119,13 @@ if gen_network_header:
 	EmitEnum(["WEAPON_%s"%i.name.value.upper() for i in content.container.weapons.id.items], "NUM_WEAPONS")
 
 	print("""
+enum
+{
+	WEAPON_PLASMAGUN=6,
+	WEAPON_HAMMER_SUPER,
+	WEAPON_GUN_SUPER,
+	NUM_WEAPONS_EXTRA=3,
+};
 
 class CNetObjHandler
 {
