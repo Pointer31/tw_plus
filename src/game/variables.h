@@ -208,6 +208,8 @@ MACRO_CONFIG_INT(SvLMSLives, sv_lms_lives, 3, 1, 10, CFGFLAG_SERVER, "Amount of 
 
 MACRO_CONFIG_INT(SvNDMTime, sv_ndm_time, 15, 1, 60, CFGFLAG_SERVER, "Time before switching weapons in nDM, in seconds")
 
+MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 2, CFGFLAG_SERVER, "0 = off, 1 = laser, 2 = grenade (when available)")
+
 // info shown on /info
 MACRO_CONFIG_STR(SvInfoGithub, sv_info_github, 128, "Github: https://github.com/Pointer31/tw_plus", CFGFLAG_SERVER, "Github link shown when /info is used")
 MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Contact link shown when /info is used")
