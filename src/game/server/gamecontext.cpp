@@ -9,6 +9,9 @@
 #include <game/version.h>
 #include <game/collision.h>
 #include <game/server/entities/loltext.h>
+// #ifdef USECHEATS
+#include <game/server/entities/pickup.h>
+// #endif
 #include <game/gamecore.h>
 #include <string>
 
@@ -1959,6 +1962,25 @@ void CGameContext::ConPlayerSetShields(IConsole::IResult *pResult, void *pUserDa
 	}
 }
 
+void CGameContext::ConAddPickup(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int x = pResult->GetInteger(0) * WIDTH_TILE;
+	int y = pResult->GetInteger(1) * WIDTH_TILE;
+	int type = pResult->GetInteger(2);
+	int sub = pResult->GetInteger(3);
+	if (type == POWERUP_WEAPON && sub == WEAPON_NINJA)
+		type = POWERUP_NINJA;
+
+	CPickup *pPickup = new CPickup(&pSelf->m_World, type, sub, true);
+	pPickup->m_Pos = {x, y};
+	// if(pSelf->IsValidCID(playerID))	{
+	// 	CCharacter* pChr = pSelf->GetPlayerChar(playerID);
+	// 	if(pChr)
+	// 		pChr->SetShields(amount);
+	// }
+}
+
 // #endif
 
 void CGameContext::OnConsoleInit()
@@ -2005,6 +2027,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("teleport", "ii", CFGFLAG_SERVER, ConTeleport, this, "Teleports a player to another");
 	Console()->Register("player_set_health", "ii", CFGFLAG_SERVER, ConPlayerSetHealth, this, "Sets the health of a player");
 	Console()->Register("player_set_shields", "ii", CFGFLAG_SERVER, ConPlayerSetShields, this, "Sets the armor of a player");
+	Console()->Register("add_pickup", "iiii", CFGFLAG_SERVER, ConAddPickup, this, "Add a one-time pickup at your position (x, y, type, sub)");
 // #endif
 	m_Mute.OnConsoleInit(m_pConsole);
 }

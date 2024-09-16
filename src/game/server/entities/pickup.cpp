@@ -5,15 +5,18 @@
 #include "pickup.h"
 #include "projectile.h"
 
-CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType)
+CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType, bool remove_on_pickup)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP)
 {
 	m_Type = Type;
 	m_Subtype = SubType;
 	m_ProximityRadius = PickupPhysSize;
 	m_ID2 = Server()->SnapNewID();
+	m_Remove_on_pickup = remove_on_pickup;
 
 	Reset();
+	if (m_Remove_on_pickup)
+		m_SpawnTick = -1;
 
 	GameWorld()->InsertEntity(this);
 }
@@ -141,6 +144,10 @@ void CPickup::Tick()
 				pChr->GetPlayer()->GetCID(), Server()->ClientName(pChr->GetPlayer()->GetCID()), m_Type, m_Subtype);
 			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 			m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * RespawnTime;
+
+			if (m_Remove_on_pickup) {
+				GameWorld()->DestroyEntity(this);
+			}
 		}
 	}
 }

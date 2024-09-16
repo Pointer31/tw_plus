@@ -86,6 +86,7 @@ class CGameContext : public IGameServer
 	static void ConTeleport(IConsole::IResult *pResult, void *pUserData);
 	static void ConPlayerSetHealth(IConsole::IResult *pResult, void *pUserData);
 	static void ConPlayerSetShields(IConsole::IResult *pResult, void *pUserData);
+	static void ConAddPickup(IConsole::IResult *pResult, void *pUserData);
 // #endif
 
 	CGameContext(int Resetting);
