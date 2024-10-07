@@ -407,5 +407,5 @@ if platform == "macosx" then
 else
 	build(debug_settings)
 	build(release_settings)
-	DefaultTarget("game_debug")
+	DefaultTarget("server_debug")
 end

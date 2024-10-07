@@ -101,7 +101,7 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		}  
 		else if (StrLeftComp(GameType(), "iFreeze+")) {
 			SendChatTarget(ClientID, "iFreeze gametype: freeze all tees of the other team to win. Stand near a frozen teammate to melt them.");
-		} else if (StrLeftComp(GameType(), "ndm+")) {
+		} else if (StrLeftComp(GameType(), "nDM+")) {
 			char aBuf[1024] = "No message (this should not appear)";
 			str_format(aBuf, sizeof(aBuf), "No items Death Match: Kill other tees for points. You can only use one weapon. The weapon will change every %d seconds", g_Config.m_SvNDMTime);
 			SendChatTarget(ClientID, aBuf);

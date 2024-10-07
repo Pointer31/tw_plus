@@ -836,13 +836,13 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			if (m_aClients[ClientID].m_State == CClient::STATE_AUTH)
 			{
 				const char *pVersion = Unpacker.GetString(CUnpacker::SANITIZE_CC);
-				if (str_comp(pVersion, GameServer()->NetVersion()) != 0)
-				{
+				if (str_comp(pVersion, GameServer()->NetVersion()) != 0 && str_comp_num(pVersion, "0.6 ", 3) != 0)
+				{	// checking could be better
 					// wrong version
 					char aReason[256];
 					str_format(aReason, sizeof(aReason), "Wrong version. Server is running '%s' and client '%s'", GameServer()->NetVersion(), pVersion);
-					// m_NetServer.Drop(ClientID, aReason);
-					// return;
+					m_NetServer.Drop(ClientID, aReason);
+					return;
 				}
 
 				const char *pPassword = Unpacker.GetString(CUnpacker::SANITIZE_CC);
