@@ -205,6 +205,8 @@ public:
 	void Read(const CNetObj_CharacterCore *pObjCore);
 	void Write(CNetObj_CharacterCore *pObjCore);
 	void Quantize();
+
+	bool m_WillExplode; // whether or not to explode next tick
 };
 
 #endif

@@ -797,6 +797,8 @@ void IGameController::Snap(int SnappingClient)
 		GAMEINFOFLAG_ENTITIES_RACE;
 	if (g_Config.m_SvDDAllowZoom)
 		pGameInfoEx->m_Flags |= GAMEINFOFLAG_ALLOW_ZOOM;
+	if (g_Config.m_SvGrenadeAmmo == -1 && IsGrenade())
+		pGameInfoEx->m_Flags |= GAMEINFOFLAG_UNLIMITED_AMMO;
 	pGameInfoEx->m_Flags2 = 
 		GAMEINFOFLAG2_HUD_AMMO;
 	if (!(g_Config.m_SvDDInstagibHideHealth && IsInstagib()))

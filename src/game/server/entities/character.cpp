@@ -995,6 +995,7 @@ void CCharacter::Tick()
 				GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
 				m_EmoteType = EMOTE_PAIN;
 				m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+				GameServer()->CreateDamageInd(m_Pos, 0, 1);
 			}
 			m_slowDeathTick = g_Config.m_SvSlowDeathTicks;
 		}
@@ -1040,6 +1041,12 @@ if ((GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 
 			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST))
 	{
 		m_Core.m_Vel += {0, -5};
+	}
+
+	if (m_Core.m_WillExplode) {
+		Die(m_pPlayer->GetCID(), WEAPON_NINJA);
+		GameServer()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_RIFLE, true);
+		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
 	}
 
 	// handle Weapons

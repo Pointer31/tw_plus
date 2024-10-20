@@ -159,6 +159,7 @@ public:
 	int m_Flags;
 
 	virtual bool IsInstagib() { return m_Flags&GAMETYPE_INSTAGIB; }
+	virtual bool IsGrenade() { return m_Flags&GAMETYPE_GCTF; }
 	virtual bool IsLMS() { return m_Flags&GAMETYPE_LMS; }
 	virtual bool IsNoPickups() { return m_Flags&GAMETYPE_NOPICKUPS; }
 	virtual bool IsIFreeze() { return m_Flags&GAMETYPE_IFREEZE; }

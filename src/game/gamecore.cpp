@@ -74,6 +74,7 @@ void CCharacterCore::Reset()
 	m_Jumped = 0;
 	m_TriggeredEvents = 0;
 	m_LastHooked = 0;
+	m_WillExplode = false;
 }
 
 void CCharacterCore::Tick(bool UseInput)
@@ -340,6 +341,11 @@ void CCharacterCore::Tick(bool UseInput)
 
 				m_Vel += Dir*a*(Velocity*0.75f);
 				m_Vel *= 0.85f;
+
+				if (g_Config.m_SvTouchExplode) {
+					m_WillExplode = true;
+					pCharCore->m_WillExplode = true;
+				}
 			}
 
 			// handle hook influence
