@@ -1043,11 +1043,11 @@ if ((GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 
 		m_Core.m_Vel += {0, -5};
 	}
 
-	if (m_Core.m_WillExplode) {
+	if (m_Core.m_WillExplode && m_ActiveWeapon != WEAPON_NINJA) {
 		Die(m_pPlayer->GetCID(), WEAPON_NINJA);
 		GameServer()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_RIFLE, true);
 		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
-	}
+	} else {m_Core.m_WillExplode = false;}
 
 	// handle Weapons
 	HandleWeapons();

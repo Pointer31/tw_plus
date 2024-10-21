@@ -944,7 +944,7 @@ void IGameController::DoWincheck()
 		else
 		{
 			// gather some stats
-			int Topscore = 0;
+			int Topscore = -9999;
 			int TopscoreCount = 0;
 			for(int i = 0; i < MAX_CLIENTS; i++)
 			{
