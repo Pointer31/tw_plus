@@ -21,7 +21,7 @@ make</code>
 
 ## Features
 Apart from the features of the standard server as well as the tw+ server by teetime, the server include the following:  
-Note that the folder ./client-files contains some data that may be useful when making maps for this mod.  
+Note that the folder ./client-files contains some data that may be useful when making maps for this mod. You may want to see the wiki for examples on how to add teleports and boost/jump pads.  
 
 **Map**  
 multiple flag stands per map (one stand is chosen randomly)  
@@ -40,6 +40,7 @@ indirect killing by hooking tee into spikes
 custom weapons, of which spawns can be placed in a map: plasmagun, charge hammer, super pistol  
 
 **Other**  
+sv_touch_explode  
 shutdown message  
 slash chat commands edited/added, including /me, /w, and /help  
 Spectator stays spectator after map change  
@@ -51,8 +52,8 @@ DDnet client support (whisper, HUD)
 Experimental 64 player support (requires ddnet client)  
 Particles appearing when a pickup (shield, heart, weapon) is respawning  
 Play a sound different from the normal hit sound when the player kills a tee, like in some other gametypes  
-new gametype: Hold the flag (HTF); teamless mode where you gain points by holding the flag  
-new gametype: Last man standing (LMS); teamless mode where you must avoid dying while killing others  
+new gametype: Hold the flag (HTF); (teamless) mode where you gain points by holding the flag  
+new gametype: Last man standing (LMS); (teamless) mode where you must avoid dying while killing others  
 new gametype: No Items Death Match (nDM): teamless mode where you can only use one weapon, which is randomly chosen every 15s by default.  
 
 **Included Maps**  

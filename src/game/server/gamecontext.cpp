@@ -2076,8 +2076,12 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		(!str_comp_nocase(g_Config.m_SvGametype, "tdm") && g_Config.m_SvInstagib == 2))		// gTDM
 		m_pController = new CGameControllerGTDM(this, IGameController::GAMETYPE_GCTF|IGameController::GAMETYPE_INSTAGIB);
 
+	else if(!str_comp_nocase(g_Config.m_SvGametype, "gfreeze") || !str_comp_nocase(g_Config.m_SvGametype, "gfreeze+") ||
+		(!str_comp_nocase(g_Config.m_SvGametype, "ifreeze") && g_Config.m_SvInstagib == 2))	// gFreeze
+		m_pController = new CGameControllerIFreeze(this, IGameController::GAMETYPE_IFREEZE|IGameController::GAMETYPE_INSTAGIB|IGameController::GAMETYPE_GCTF);
 	else if(!str_comp_nocase(g_Config.m_SvGametype, "ifreeze") || !str_comp_nocase(g_Config.m_SvGametype, "ifreeze+"))	// iFreeze
 		m_pController = new CGameControllerIFreeze(this, IGameController::GAMETYPE_IFREEZE|IGameController::GAMETYPE_INSTAGIB);
+	
 
 	else if(str_comp_nocase(g_Config.m_SvGametype, "ghtf") == 0 || !str_comp_nocase(g_Config.m_SvGametype, "ghtf+") ||
 		(!str_comp_nocase(g_Config.m_SvGametype, "htf") && g_Config.m_SvInstagib == 2))		// gHTF

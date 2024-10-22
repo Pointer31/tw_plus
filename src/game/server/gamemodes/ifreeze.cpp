@@ -17,7 +17,8 @@
 CGameControllerIFreeze::CGameControllerIFreeze(class CGameContext *pGameServer, int TypeFlags) : CGameControllerTDM(pGameServer, TypeFlags)
 {
 	m_Flags = TypeFlags;
-	m_pGameType = "iFreeze+";
+	// m_pGameType = "iFreeze+";
+	m_pGameType = (IsGrenade()) ? "gFreeze+" : "iFreeze+";
 }
 
 int CGameControllerIFreeze::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
