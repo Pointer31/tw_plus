@@ -66,6 +66,7 @@ class CGameContext : public IGameServer
 	static void ConShuffleTeams(IConsole::IResult *pResult, void *pUserData);
 	static void ConLockTeams(IConsole::IResult *pResult, void *pUserData);
 	static void ConAddVote(IConsole::IResult *pResult, void *pUserData);
+	static void ConAddVoteIf(IConsole::IResult *pResult, void *pUserData); // conditionally adding vote
 	static void ConRemoveVote(IConsole::IResult *pResult, void *pUserData);
 	static void ConForceVote(IConsole::IResult *pResult, void *pUserData);
 	static void ConClearVotes(IConsole::IResult *pResult, void *pUserData);

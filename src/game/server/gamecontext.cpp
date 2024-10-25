@@ -1460,6 +1460,98 @@ void CGameContext::ConLockTeams(IConsole::IResult *pResult, void *pUserData)
 		pSelf->SendChat(-1, CGameContext::CHAT_ALL, "Teams were unlocked");
 }
 
+void CGameContext::ConAddVoteIf(IConsole::IResult *pResult, void *pUserData)
+{
+	// TODO: make this function duplicate less code from ConAddVote()
+	// NOTE: will only work properly if sv_instagib is used accordingly, and thus sv_gametype will not be something like "gdm", but rather "dm" and sv_instagib be 2
+	// NOTE: -1 can be used to ignore the corresponding condition
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	const char *pDescription = pResult->GetString(0);
+	const char *pCommand = pResult->GetString(1);
+
+	// to check the condition
+	int instagib = clamp(pResult->GetInteger(2), -1, 10);
+	int gametype = clamp(pResult->GetInteger(3), -1, 10);;
+
+	// check if instagib settings are correct
+	if (instagib == 0 && g_Config.m_SvInstagib != 0)//&& (pSelf->m_pController->IsGrenade() || pSelf->m_pController->IsInstagib()))
+		return;
+	else if (instagib == 1 && g_Config.m_SvInstagib != 1)// && (!pSelf->m_pController->IsInstagib() || pSelf->m_pController->IsGrenade()))
+		return;
+	else if (instagib == 2 && g_Config.m_SvInstagib != 2)// && (!pSelf->m_pController->IsGrenade()))
+		return;
+
+	// check if flags are correct
+	if (gametype == 0 && (str_comp_nocase_num(g_Config.m_SvGametype, "ctf", 3)==0 || str_comp_nocase_num(g_Config.m_SvGametype, "htf", 3)==0 || str_comp_nocase_num(g_Config.m_SvGametype, "thtf", 4)==0))
+		return; // is not a gametype that needs 0 flags
+	else if (gametype == 1 && !(str_comp_nocase_num(g_Config.m_SvGametype, "htf", 3)==0 || str_comp_nocase_num(g_Config.m_SvGametype, "thtf", 4)==0))
+		return;
+	else if (gametype == 2 && !(str_comp_nocase_num(g_Config.m_SvGametype, "ctf", 3)==0))
+		return;
+
+	if(pSelf->m_NumVoteOptions == MAX_VOTE_OPTIONS)
+	{
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "maximum number of vote options reached");
+		return;
+	}
+
+	// check for valid option
+	if(!pSelf->Console()->LineIsValid(pCommand) || str_length(pCommand) >= VOTE_CMD_LENGTH)
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "skipped invalid command '%s'", pCommand);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+		return;
+	}
+	while(*pDescription && *pDescription == ' ')
+		pDescription++;
+	if(str_length(pDescription) >= VOTE_DESC_LENGTH || *pDescription == 0)
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "skipped invalid option '%s'", pDescription);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+		return;
+	}
+
+	// check for duplicate entry
+	CVoteOptionServer *pOption = pSelf->m_pVoteOptionFirst;
+	while(pOption)
+	{
+		if(str_comp_nocase(pDescription, pOption->m_aDescription) == 0)
+		{
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "option '%s' already exists", pDescription);
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+			return;
+		}
+		pOption = pOption->m_pNext;
+	}
+
+	// add the option
+	++pSelf->m_NumVoteOptions;
+	int Len = str_length(pCommand);
+
+	pOption = (CVoteOptionServer *)pSelf->m_pVoteOptionHeap->Allocate(sizeof(CVoteOptionServer) + Len);
+	pOption->m_pNext = 0;
+	pOption->m_pPrev = pSelf->m_pVoteOptionLast;
+	if(pOption->m_pPrev)
+		pOption->m_pPrev->m_pNext = pOption;
+	pSelf->m_pVoteOptionLast = pOption;
+	if(!pSelf->m_pVoteOptionFirst)
+		pSelf->m_pVoteOptionFirst = pOption;
+
+	str_copy(pOption->m_aDescription, pDescription, sizeof(pOption->m_aDescription));
+	mem_copy(pOption->m_aCommand, pCommand, Len+1);
+	char aBuf[256];
+	str_format(aBuf, sizeof(aBuf), "added option '%s' '%s'", pOption->m_aDescription, pOption->m_aCommand);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+
+	// inform clients about added option
+	CNetMsg_Sv_VoteOptionAdd OptionMsg;
+	OptionMsg.m_pDescription = pOption->m_aDescription;
+	pSelf->Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, -1);
+}
+
 void CGameContext::ConAddVote(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
@@ -2004,6 +2096,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("lock_teams", "", CFGFLAG_SERVER, ConLockTeams, this, "Lock/unlock teams");
 
 	Console()->Register("add_vote", "sr", CFGFLAG_SERVER, ConAddVote, this, "Add a voting option");
+	Console()->Register("add_vote_if", "sr?ii", CFGFLAG_SERVER, ConAddVoteIf, this, "Add a voting option, if certain conditions are met (instagib, #flags)");
 	Console()->Register("remove_vote", "s", CFGFLAG_SERVER, ConRemoveVote, this, "remove a voting option");
 	Console()->Register("force_vote", "ss?r", CFGFLAG_SERVER, ConForceVote, this, "Force a voting option");
 	Console()->Register("clear_votes", "", CFGFLAG_SERVER, ConClearVotes, this, "Clears the voting options");
