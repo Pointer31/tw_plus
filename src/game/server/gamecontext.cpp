@@ -476,7 +476,7 @@ void CGameContext::OnTick()
 				bool aVoteChecked[MAX_CLIENTS] = {0};
 				for(int i = 0; i < MAX_CLIENTS; i++)
 				{
-					if(!m_apPlayers[i] || m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS || aVoteChecked[i])	// don't count in votes by spectators
+					if(!m_apPlayers[i] || m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS || aVoteChecked[i] || m_apPlayers[i]->m_isBot)	// don't count in votes by spectators
 						continue;
 
 					int ActVote = m_apPlayers[i]->m_Vote;
@@ -545,6 +545,20 @@ void CGameContext::OnTick()
 		}
 	}
 #endif
+
+	// count the players
+	m_PlayerCount = 0;
+	m_ClientCount = 0;
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if (m_apPlayers[i] && m_apPlayers[i]->m_IsReady && IsClientPlayer(i))
+		{
+			if (IsClientPlayer(i))
+				m_PlayerCount++;
+
+			m_ClientCount++;
+		}
+	}
 }
 
 // Server hooks
@@ -568,7 +582,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	//Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", Server()->ClientName(ClientID));
 	//std::cout << m_playerNames[ClientID] << "=?" << name << "\n";
 	// spectator stay spectator after map change
-	if (Server()->m_playerNames[ClientID].compare(name) == 0) {
+	if (!m_apPlayers[ClientID]->m_isBot && Server()->m_playerNames[ClientID].compare(name) == 0) {
 		m_apPlayers[ClientID]->SetTeam(TEAM_SPECTATORS, false);
 	}
 
@@ -593,6 +607,8 @@ void CGameContext::OnClientEnter(int ClientID)
 
 void CGameContext::OnClientConnected(int ClientID)
 {
+	if (ClientID >= g_Config.m_SvMaxClients - m_pServer->m_numberBots)
+		ConRemoveBot(NULL, this); // remove bot
 	// Check which team the player should be on
 	const int StartTeam = g_Config.m_SvTournamentMode ? TEAM_SPECTATORS : m_pController->GetAutoTeam(ClientID);
 
@@ -2072,8 +2088,37 @@ void CGameContext::ConAddPickup(IConsole::IResult *pResult, void *pUserData)
 	// 		pChr->SetShields(amount);
 	// }
 }
-
 // #endif
+
+void CGameContext::ConAddBot(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int id = g_Config.m_SvMaxClients - 1 - pSelf->m_pServer->m_numberBots;
+	if (id == 0 || pSelf->IsClientReady(id)) {
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Game", "Bot cannot be added");
+		return;
+	}
+	int type = pResult->GetInteger(0);
+	if (type == 0)
+		type = 1;
+	pSelf->OnClientConnected(id);
+	pSelf->m_apPlayers[id]->m_isBot = type;
+	pSelf->OnClientEnter(id);
+	pSelf->m_pServer->m_numberBots++;
+	
+}
+
+void CGameContext::ConRemoveBot(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	if (pSelf->m_pServer->m_numberBots == 0)
+		return;
+	// int id = pResult->GetInteger(0);
+	int id = g_Config.m_SvMaxClients - pSelf->m_pServer->m_numberBots;
+	pSelf->OnClientDrop(id, "removed by bot remove command");
+	pSelf->m_pServer->m_numberBots--;
+	
+}
 
 void CGameContext::OnConsoleInit()
 {
@@ -2122,6 +2167,8 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("player_set_shields", "ii", CFGFLAG_SERVER, ConPlayerSetShields, this, "Sets the armor of a player");
 	Console()->Register("add_pickup", "iiii", CFGFLAG_SERVER, ConAddPickup, this, "Add a one-time pickup at your position (x, y, type, sub)");
 // #endif
+	Console()->Register("add_bot", "?i", CFGFLAG_SERVER, ConAddBot, this, "Add a bot with type (1=dummy,2=shoot,3=move)");
+	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
 	m_Mute.OnConsoleInit(m_pConsole);
 }
 
@@ -2141,6 +2188,8 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 
 	m_Layers.Init(Kernel());
 	m_Collision.Init(&m_Layers);
+
+	m_pServer->m_numberBots = 0; // reset bot count
 
 	// reset everything here
 	//world = new GAMEWORLD;
@@ -2250,6 +2299,13 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 				m_pController->OnEntity(Index-ENTITY_OFFSET, Pos);
 			}
 		}
+	}
+
+	if (g_Config.m_SvOnNextMap) { // execute file
+		char buffer[sizeof(g_Config.m_SvOnNextMap)];
+		str_copy(buffer, g_Config.m_SvOnNextMap, sizeof(buffer));
+		str_copy(g_Config.m_SvOnNextMap, "", sizeof(g_Config.m_SvOnNextMap));
+		Console()->ExecuteFile(buffer);;
 	}
 
 	//game.world.insert_entity(game.Controller);

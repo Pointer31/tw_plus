@@ -469,6 +469,10 @@ int CServer::GetClientInfo(int ClientID, CClientInfo *pInfo)
 		pInfo->m_Latency = m_aClients[ClientID].m_Latency;
 		pInfo->m_DDNetVersion = m_aClients[ClientID].m_DDNetVersion;
 		return 1;
+	} else {
+		pInfo->m_pName = "(unknown)";
+		pInfo->m_Latency = 999;
+		pInfo->m_DDNetVersion = 0;
 	}
 	return 0;
 }
@@ -511,7 +515,7 @@ int CServer::ClientCountry(int ClientID)
 
 bool CServer::ClientIngame(int ClientID)
 {
-	return ClientID >= 0 && ClientID < MAX_CLIENTS && m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME;
+	return (ClientID >= g_Config.m_SvMaxClients - m_numberBots) || (ClientID >= 0 && ClientID < MAX_CLIENTS && m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME);
 }
 
 int CServer::MaxClients() const

@@ -17,6 +17,7 @@ public:
 
 // for spectators to stay spectators after map change
 	std::string m_playerNames[64]; // MAX_CLIENTS
+	int m_numberBots; // number of bots
 	/*
 		Structure: CClientInfo
 	*/

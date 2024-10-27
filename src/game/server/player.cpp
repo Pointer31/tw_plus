@@ -37,6 +37,10 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_FreezeOnSpawn = false;
 
 	m_Lives = g_Config.m_SvLMSLives;
+	m_isBot = 0;
+	m_botDirection = 1;
+	m_ticksSinceX = 0;
+	m_botAggro = -1;
 }
 
 CPlayer::~CPlayer()
@@ -112,6 +116,54 @@ void CPlayer::Tick()
 		}
 		else if(m_Spawning && m_RespawnTick <= Server()->Tick())
 			TryRespawn();
+
+		if (m_isBot >= 2) { 
+			// >=2 means the AI will shoot and maybe move, instead of being a dummy
+			// if there are no clients connected, the bots will idle
+			if (GameServer()->m_ClientCount <= 0) {
+				CNetObj_PlayerInput input;
+				input.m_Direction = 0;
+				input.m_TargetX = 0; // look randomly
+				input.m_TargetY = 0;
+				input.m_Jump = false;
+				input.m_Fire = false;
+				input.m_Hook = false;
+				input.m_PlayerFlags = PLAYERFLAG_PLAYING;
+				input.m_WantedWeapon = WEAPON_GUN+1;
+				input.m_NextWeapon = WEAPON_GUN+1;
+				input.m_PrevWeapon = WEAPON_GUN+1;
+				OnPredictedInput(&input);
+				OnDirectInput(&input);
+			} else {
+				CNetObj_PlayerInput input;
+				input.m_Direction = 0;
+				input.m_TargetX = (rand() % 128) - 64; // look randomly
+				input.m_TargetY = (rand() % 128) - 64;
+				input.m_Jump = false;
+				input.m_Fire = true;
+				input.m_Hook = false;
+				input.m_PlayerFlags = PLAYERFLAG_PLAYING;
+				input.m_WantedWeapon = WEAPON_GUN+1;
+				if (GameServer()->m_pController->IsInstagib())
+					input.m_WantedWeapon = WEAPON_RIFLE+1;
+				if (GameServer()->m_pController->IsGrenade())
+					input.m_WantedWeapon = WEAPON_GRENADE+1;
+				input.m_NextWeapon = WEAPON_GUN+1;
+				input.m_PrevWeapon = WEAPON_GUN+1;
+				if (m_isBot >= 3) { // move, and occasionally jump
+					if (rand() % (SERVER_TICK_SPEED*2) == 1)
+						m_botDirection = -m_botDirection;
+					input.m_Direction = m_botDirection;
+					if (rand() % (SERVER_TICK_SPEED*2) == 1)
+						input.m_Jump = true;
+				}
+				OnPredictedInput(&input);
+				OnDirectInput(&input);
+				if (m_pCharacter) {
+					m_pCharacter->SetAmmo(WEAPON_GUN, 10);
+				}
+			}
+		}
 	}
 	else
 	{
@@ -193,6 +245,13 @@ void CPlayer::Snap(int SnappingClient)
 		pSpectatorInfo->m_SpectatorID = m_SpectatorID;
 		pSpectatorInfo->m_X = m_ViewPos.x;
 		pSpectatorInfo->m_Y = m_ViewPos.y;
+	}
+
+	if (m_isBot) {
+		StrToInts(&pClientInfo->m_Name0, 4, "bot");
+		StrToInts(&pClientInfo->m_Clan0, 3, "bot");
+		StrToInts(&pClientInfo->m_Skin0, 6, "Computer WindowsXP_KZ");
+		pPlayerInfo->m_Latency = 0;
 	}
 
 	// WARNING, this is very hardcoded; for ddnet client support

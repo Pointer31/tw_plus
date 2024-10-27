@@ -124,7 +124,11 @@ public:
 
 	bool m_FreezeOnSpawn;
 
-	int m_Lives;
+	int m_Lives; // for LMS
+	int m_isBot; // for detecting if this is a bot and what kind
+	int m_botDirection; // last moved direction
+	int m_ticksSinceX; // ticks since last x movement
+	int m_botAggro; // whether it is aggroed and on whom
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;

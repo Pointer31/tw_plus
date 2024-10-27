@@ -88,6 +88,8 @@ class CGameContext : public IGameServer
 	static void ConPlayerSetHealth(IConsole::IResult *pResult, void *pUserData);
 	static void ConPlayerSetShields(IConsole::IResult *pResult, void *pUserData);
 	static void ConAddPickup(IConsole::IResult *pResult, void *pUserData);
+	static void ConAddBot(IConsole::IResult *pResult, void *pUserData);
+	static void ConRemoveBot(IConsole::IResult *pResult, void *pUserData);
 // #endif
 
 	CGameContext(int Resetting);
@@ -139,6 +141,9 @@ public:
 	char m_aVoteReason[VOTE_REASON_LENGTH];
 	int m_NumVoteOptions;
 	int m_VoteEnforce;
+
+	int m_PlayerCount; // counts of players and clients
+	int m_ClientCount;
 	enum
 	{
 		VOTE_ENFORCE_UNKNOWN=0,

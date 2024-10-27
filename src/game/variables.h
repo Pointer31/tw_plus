@@ -212,6 +212,8 @@ MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 3, CFGFLAG_SERVER, "0 = off, 1 =
 
 MACRO_CONFIG_INT(SvTouchExplode, sv_touch_explode, 0, 0, 1, CFGFLAG_SERVER, "Whether players explode on contact with each other")
 
+MACRO_CONFIG_STR(SvOnNextMap, sv_on_next_map, 128, "", CFGFLAG_SERVER, "Config file to execute on next map load")
+
 // info shown on /info
 MACRO_CONFIG_STR(SvInfoGithub, sv_info_github, 128, "Github: https://github.com/Pointer31/tw_plus", CFGFLAG_SERVER, "Github link shown when /info is used")
 MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Contact link shown when /info is used")
