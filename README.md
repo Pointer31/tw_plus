@@ -55,6 +55,7 @@ Play a sound different from the normal hit sound when the player kills a tee, li
 new gametype: Hold the flag (HTF); (teamless) mode where you gain points by holding the flag  
 new gametype: Last man standing (LMS); (teamless) mode where you must avoid dying while killing others  
 new gametype: No Items Death Match (nDM): teamless mode where you can only use one weapon, which is randomly chosen every 15s by default.  
+Simple bots, with a few difficulty options (Thanks to +KZ for their skin, chosen as default skin for bots)  
 
 **Included Maps**  
 included extra maps to show the new features:  

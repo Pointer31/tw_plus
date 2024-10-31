@@ -140,7 +140,9 @@ void CPlayer::Tick()
 				input.m_TargetX = (rand() % 128) - 64; // look randomly
 				input.m_TargetY = (rand() % 128) - 64;
 				input.m_Jump = false;
-				input.m_Fire = true;
+				input.m_Fire = true;	
+				if (!GameServer()->m_pController->IsInstagib()) // make non-automatic weapons work, but still have ammo reload work in instagib
+					input.m_Fire = GameServer()->Server()->Tick() % (2) == 1;
 				input.m_Hook = false;
 				input.m_PlayerFlags = PLAYERFLAG_PLAYING;
 				input.m_WantedWeapon = WEAPON_GUN+1;
@@ -156,6 +158,42 @@ void CPlayer::Tick()
 					input.m_Direction = m_botDirection;
 					if (rand() % (SERVER_TICK_SPEED*2) == 1)
 						input.m_Jump = true;
+				}
+				if (m_isBot >= 4 && m_pCharacter) {
+					if (GameServer()->Server()->Tick() % (SERVER_TICK_SPEED) == 1) {
+						// get a new aggro
+						float smallestDistance = 900.0;
+						m_botAggro = -1;
+						
+						for (int i = 0; i < MAX_CLIENTS; i++) {
+							if (i != m_ClientID && GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetCharacter()) {
+								vec2 pos = GameServer()->m_apPlayers[i]->GetCharacter()->m_Pos;
+								float d = sqrt((pos.x - m_pCharacter->m_Pos.x)*(pos.x - m_pCharacter->m_Pos.x) + (pos.y - m_pCharacter->m_Pos.y)*(pos.y - m_pCharacter->m_Pos.y));
+								if (d < smallestDistance) {
+									smallestDistance = d;
+									m_botAggro = i;
+								}
+							}
+						}
+					}
+					if (m_botAggro == -1)
+						input.m_Fire = false; // do not shoot when not aggroed
+					else {
+						// aim
+						if (GameServer()->m_apPlayers[m_botAggro] && GameServer()->m_apPlayers[m_botAggro]->GetCharacter()) {
+							vec2 pos = GameServer()->m_apPlayers[m_botAggro]->GetCharacter()->m_Pos;
+							float d = sqrt((pos.x - m_pCharacter->m_Pos.x) + (pos.y - m_pCharacter->m_Pos.y));
+							input.m_TargetX = pos.x - m_pCharacter->m_Pos.x; // aim
+							input.m_TargetY = pos.y - m_pCharacter->m_Pos.y;
+							if (GameServer()->m_pController->IsGrenade()) // grenade curve correction, somewhat
+								input.m_TargetY = input.m_TargetY + (-abs(input.m_TargetX)*0.3);
+							if (m_isBot == 4)// aim worse
+							{
+								input.m_TargetX = input.m_TargetX * ((float)(rand() % 64) / 64.0 + 0.5);
+								input.m_TargetY = input.m_TargetY * ((float)(rand() % 64) / 64.0 + 0.5);
+							}
+						}
+					}
 				}
 				OnPredictedInput(&input);
 				OnDirectInput(&input);
@@ -250,7 +288,11 @@ void CPlayer::Snap(int SnappingClient)
 	if (m_isBot) {
 		StrToInts(&pClientInfo->m_Name0, 4, "bot");
 		StrToInts(&pClientInfo->m_Clan0, 3, "bot");
-		StrToInts(&pClientInfo->m_Skin0, 6, "Computer WindowsXP_KZ");
+		if (m_isBot == 4)
+			StrToInts(&pClientInfo->m_Clan0, 3, "bot4");
+		else if (m_isBot == 5)
+			StrToInts(&pClientInfo->m_Clan0, 3, "bot5");
+		StrToInts(&pClientInfo->m_Skin0, 6, g_Config.m_SvBotSkin);
 		pPlayerInfo->m_Latency = 0;
 	}
 

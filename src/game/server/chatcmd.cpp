@@ -11,7 +11,8 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 {
 	if(StrLeftComp(pMessage, "go") || StrLeftComp(pMessage, "stop") || StrLeftComp(pMessage, "restart"))
 	{/* Do nothing */}
-	else if(pMessage[0] == '/' || pMessage[0] == '!')
+	// else if(pMessage[0] == '/' || pMessage[0] == '!')
+	else if (pMessage[0] == '/')
 		pMessage++;
 	else
 		return true;
