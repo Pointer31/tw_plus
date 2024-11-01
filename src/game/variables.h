@@ -216,6 +216,8 @@ MACRO_CONFIG_STR(SvOnNextMap, sv_on_next_map, 128, "", CFGFLAG_SERVER, "Config f
 
 MACRO_CONFIG_STR(SvBotSkin, sv_bot_skin, 24, "Computer WindowsXP_KZ", CFGFLAG_SERVER, "Skin to give to bots")
 
+MACRO_CONFIG_INT(SvInmenuPause, sv_inmenu_pause, 0, 0, 1, CFGFLAG_SERVER, "(For singleplayer) pause while the client's menu is open")
+
 // info shown on /info
 MACRO_CONFIG_STR(SvInfoGithub, sv_info_github, 128, "Github: https://github.com/Pointer31/tw_plus", CFGFLAG_SERVER, "Github link shown when /info is used")
 MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Contact link shown when /info is used")

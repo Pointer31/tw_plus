@@ -129,6 +129,7 @@ public:
 	int m_botDirection; // last moved direction
 	int m_ticksSinceX; // ticks since last x movement
 	int m_botAggro; // whether it is aggroed and on whom
+	bool m_WantsPause;
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;

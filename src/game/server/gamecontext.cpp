@@ -548,16 +548,26 @@ void CGameContext::OnTick()
 
 	// count the players
 	m_PlayerCount = 0;
-	m_ClientCount = 0;
+	m_ClientCount = 0; // may be incorrect implementation to count this
+	bool pauseGameNext = false;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		if (m_apPlayers[i] && m_apPlayers[i]->m_IsReady && IsClientPlayer(i))
 		{
-			if (IsClientPlayer(i))
+			if (IsClientPlayer(i)) {
 				m_PlayerCount++;
+				if (m_apPlayers[i]->m_WantsPause)
+					pauseGameNext = true;
+			}
 
 			m_ClientCount++;
 		}
+	}
+	if (g_Config.m_SvInmenuPause) {
+		if (m_PlayerCount == 1 && pauseGameNext)
+			m_World.m_Paused = true;
+		if (m_PlayerCount > 1 || !pauseGameNext)
+			m_World.m_Paused = false;
 	}
 }
 
@@ -566,6 +576,13 @@ void CGameContext::OnClientDirectInput(int ClientID, void *pInput)
 {
 	if(!m_World.m_Paused)
 		m_apPlayers[ClientID]->OnDirectInput((CNetObj_PlayerInput *)pInput);
+	if (g_Config.m_SvInmenuPause) {
+		CNetObj_PlayerInput *NewInput = (CNetObj_PlayerInput *)pInput;
+		if (NewInput->m_PlayerFlags&PLAYERFLAG_IN_MENU)
+			m_apPlayers[ClientID]->m_WantsPause = true;
+		else
+			m_apPlayers[ClientID]->m_WantsPause = false;
+	}
 }
 
 void CGameContext::OnClientPredictedInput(int ClientID, void *pInput)

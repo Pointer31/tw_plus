@@ -41,6 +41,8 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_botDirection = 1;
 	m_ticksSinceX = 0;
 	m_botAggro = -1;
+
+	m_WantsPause = false;
 }
 
 CPlayer::~CPlayer()
