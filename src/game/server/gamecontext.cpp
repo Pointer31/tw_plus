@@ -563,7 +563,7 @@ void CGameContext::OnTick()
 			m_ClientCount++;
 		}
 	}
-	if (g_Config.m_SvInmenuPause) {
+	if (g_Config.m_SvInmenuPause && !m_pController->IsGameOver()) {
 		if (m_PlayerCount == 1 && pauseGameNext)
 			m_World.m_Paused = true;
 		if (m_PlayerCount > 1 || !pauseGameNext)

@@ -171,7 +171,7 @@ void CPlayer::Tick()
 							if (i != m_ClientID && GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetCharacter()) {
 								vec2 pos = GameServer()->m_apPlayers[i]->GetCharacter()->m_Pos;
 								float d = sqrt((pos.x - m_pCharacter->m_Pos.x)*(pos.x - m_pCharacter->m_Pos.x) + (pos.y - m_pCharacter->m_Pos.y)*(pos.y - m_pCharacter->m_Pos.y));
-								if (d < smallestDistance) {
+								if (d < smallestDistance && !(GameServer()->m_pController->IsTeamplay() && GameServer()->m_apPlayers[i]->GetTeam() == GetTeam())) {
 									smallestDistance = d;
 									m_botAggro = i;
 								}
@@ -184,15 +184,15 @@ void CPlayer::Tick()
 						// aim
 						if (GameServer()->m_apPlayers[m_botAggro] && GameServer()->m_apPlayers[m_botAggro]->GetCharacter()) {
 							vec2 pos = GameServer()->m_apPlayers[m_botAggro]->GetCharacter()->m_Pos;
-							float d = sqrt((pos.x - m_pCharacter->m_Pos.x) + (pos.y - m_pCharacter->m_Pos.y));
+							float d = sqrt((pos.x - m_pCharacter->m_Pos.x)*(pos.x - m_pCharacter->m_Pos.x) + (pos.y - m_pCharacter->m_Pos.y)*(pos.y - m_pCharacter->m_Pos.y));
 							input.m_TargetX = pos.x - m_pCharacter->m_Pos.x; // aim
 							input.m_TargetY = pos.y - m_pCharacter->m_Pos.y;
 							if (GameServer()->m_pController->IsGrenade()) // grenade curve correction, somewhat
 								input.m_TargetY = input.m_TargetY + (-abs(input.m_TargetX)*0.3);
 							if (m_isBot == 4)// aim worse
 							{
-								input.m_TargetX = input.m_TargetX * ((float)(rand() % 64) / 64.0 + 0.5);
-								input.m_TargetY = input.m_TargetY * ((float)(rand() % 64) / 64.0 + 0.5);
+								input.m_TargetX = (float)input.m_TargetX + (d * 0.3 * ((float)(rand() % 64) / 64.0 - 0.5));
+								input.m_TargetY = (float)input.m_TargetY + (d * 0.3 *  ((float)(rand() % 64) / 64.0 - 0.5));
 							}
 						}
 					}

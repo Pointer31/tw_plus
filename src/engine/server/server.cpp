@@ -1777,8 +1777,28 @@ int main(int argc, const char **argv) // ignore_convention
 	// register all console commands
 	pServer->RegisterCommands();
 
-	// execute autoexec file
-	pConsole->ExecuteFile("autoexec.cfg");
+	// execute autoexec file (try multiple files)
+	IOHANDLE File = pStorage->OpenFile("autoexec_server_twplus.cfg", IOFLAG_READ, IStorage::TYPE_ALL);
+	char aBuf[256];
+	if(File)
+	{
+		io_close(File);
+		pConsole->ExecuteFile("autoexec_server_twplus.cfg");
+	} else {
+		str_format(aBuf, sizeof(aBuf), "failed to open 'autoexec_server_twplus.cfg', trying next config file...");
+		pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+
+		IOHANDLE File2 = pStorage->OpenFile("autoexec_server.cfg", IOFLAG_READ, IStorage::TYPE_ALL);
+		if(File2)
+		{
+			pConsole->ExecuteFile("autoexec_server.cfg");
+			io_close(File2);
+		} else {
+			str_format(aBuf, sizeof(aBuf), "failed to open 'autoexec_server.cfg', trying next config file...");
+			pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+			pConsole->ExecuteFile("autoexec.cfg");
+		}
+	}
 
 	// parse the command line arguments
 	if (argc > 1)									  // ignore_convention
