@@ -2184,7 +2184,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("player_set_shields", "ii", CFGFLAG_SERVER, ConPlayerSetShields, this, "Sets the armor of a player");
 	Console()->Register("add_pickup", "iiii", CFGFLAG_SERVER, ConAddPickup, this, "Add a one-time pickup at your position (x, y, type, sub)");
 // #endif
-	Console()->Register("add_bot", "?i", CFGFLAG_SERVER, ConAddBot, this, "Add a bot with type (1=dummy,2=shoot,3=move,4=aim-,5=aim+)");
+	Console()->Register("add_bot", "?i", CFGFLAG_SERVER, ConAddBot, this, "Add a bot with type (1=dummy,2=shoot,3=move,4,5,6=aim)");
 	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
 	m_Mute.OnConsoleInit(m_pConsole);
 }

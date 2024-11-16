@@ -39,7 +39,7 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, int Team)
 	m_Lives = g_Config.m_SvLMSLives;
 	m_isBot = 0;
 	m_botDirection = 1;
-	m_ticksSinceX = 0;
+	m_ticksSinceFire = 0;
 	m_botAggro = -1;
 
 	m_WantsPause = false;
@@ -164,13 +164,16 @@ void CPlayer::Tick()
 				if (m_isBot >= 4 && m_pCharacter) {
 					if (GameServer()->Server()->Tick() % (SERVER_TICK_SPEED) == 1) {
 						// get a new aggro
-						float smallestDistance = 900.0;
+						float smallestDistance = 850.0;
+						if (m_isBot == 4)
+							smallestDistance = 750.0;
 						m_botAggro = -1;
 						
 						for (int i = 0; i < MAX_CLIENTS; i++) {
 							if (i != m_ClientID && GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetCharacter()) {
 								vec2 pos = GameServer()->m_apPlayers[i]->GetCharacter()->m_Pos;
-								float d = sqrt((pos.x - m_pCharacter->m_Pos.x)*(pos.x - m_pCharacter->m_Pos.x) + (pos.y - m_pCharacter->m_Pos.y)*(pos.y - m_pCharacter->m_Pos.y));
+								float d = sqrt((pos.x - m_pCharacter->m_Pos.x)*(pos.x - m_pCharacter->m_Pos.x) + (1.35)*(pos.y - m_pCharacter->m_Pos.y)*(pos.y - m_pCharacter->m_Pos.y));
+								// vertical distance is multiplied by a factor, since screens are larger horizontally
 								if (d < smallestDistance && !(GameServer()->m_pController->IsTeamplay() && GameServer()->m_apPlayers[i]->GetTeam() == GetTeam())) {
 									smallestDistance = d;
 									m_botAggro = i;
@@ -178,9 +181,35 @@ void CPlayer::Tick()
 							}
 						}
 					}
-					if (m_botAggro == -1)
-						input.m_Fire = false; // do not shoot when not aggroed
-					else {
+					if (m_botAggro == -1) {
+						m_ticksSinceFire = 0; // reset
+						input.m_Fire = false; // do not shoot by default
+					} else {
+						m_ticksSinceFire++;
+						if (GameServer()->m_pController->IsGrenade()) {
+							if (m_isBot >= 5 || m_ticksSinceFire > 50) {
+								m_ticksSinceFire = 0; // reset
+								input.m_Fire = true; // fire
+							} else 
+								input.m_Fire = false; // do not shoot by default
+						}
+						else if (GameServer()->m_pController->IsInstagib()) {
+							if (m_isBot >= 6 || (m_isBot == 5 && m_ticksSinceFire > 5 + g_Config.m_SvLaserReloadTime / Server()->TickSpeed()) || m_ticksSinceFire > 20+g_Config.m_SvLaserReloadTime / Server()->TickSpeed()) {
+								m_ticksSinceFire = 0; // reset
+								input.m_Fire = true; // fire
+							} else 
+								input.m_Fire = false; // do not shoot by default
+						}
+						else {
+							if (m_ticksSinceFire > 10) { // 10 = 0.2s
+								m_ticksSinceFire = 0; // reset
+								input.m_Fire = true; // fire
+							} else 
+								input.m_Fire = false; // do not shoot by default
+							if (m_isBot >= 5)
+								input.m_Fire = GameServer()->Server()->Tick() % (2) == 1;
+						}
+
 						// aim
 						if (GameServer()->m_apPlayers[m_botAggro] && GameServer()->m_apPlayers[m_botAggro]->GetCharacter()) {
 							vec2 pos = GameServer()->m_apPlayers[m_botAggro]->GetCharacter()->m_Pos;
@@ -189,7 +218,7 @@ void CPlayer::Tick()
 							input.m_TargetY = pos.y - m_pCharacter->m_Pos.y;
 							if (GameServer()->m_pController->IsGrenade()) // grenade curve correction, somewhat
 								input.m_TargetY = input.m_TargetY + (-abs(input.m_TargetX)*0.3);
-							if (m_isBot == 4)// aim worse
+							if (m_isBot <= 5) // aim worse
 							{
 								input.m_TargetX = (float)input.m_TargetX + (d * 0.3 * ((float)(rand() % 64) / 64.0 - 0.5));
 								input.m_TargetY = (float)input.m_TargetY + (d * 0.3 *  ((float)(rand() % 64) / 64.0 - 0.5));
@@ -290,10 +319,13 @@ void CPlayer::Snap(int SnappingClient)
 	if (m_isBot) {
 		StrToInts(&pClientInfo->m_Name0, 4, "bot");
 		StrToInts(&pClientInfo->m_Clan0, 3, "bot");
-		if (m_isBot == 4)
-			StrToInts(&pClientInfo->m_Clan0, 3, "bot4");
-		else if (m_isBot == 5)
-			StrToInts(&pClientInfo->m_Clan0, 3, "bot5");
+		switch (m_isBot)
+		{
+		case 4: StrToInts(&pClientInfo->m_Clan0, 3, "bot4"); break;
+		case 5: StrToInts(&pClientInfo->m_Clan0, 3, "bot5"); break;
+		case 6: StrToInts(&pClientInfo->m_Clan0, 3, "bot6"); break;
+		default: break;
+		}
 		StrToInts(&pClientInfo->m_Skin0, 6, g_Config.m_SvBotSkin);
 		pPlayerInfo->m_Latency = 0;
 	}

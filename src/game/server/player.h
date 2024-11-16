@@ -127,7 +127,7 @@ public:
 	int m_Lives; // for LMS
 	int m_isBot; // for detecting if this is a bot and what kind
 	int m_botDirection; // last moved direction
-	int m_ticksSinceX; // ticks since last x movement
+	int m_ticksSinceFire; // ticks since last fire
 	int m_botAggro; // whether it is aggroed and on whom
 	bool m_WantsPause;
 private:

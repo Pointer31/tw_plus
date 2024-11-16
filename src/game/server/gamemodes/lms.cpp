@@ -26,7 +26,7 @@ void CGameControllerLMS::DoWincheck()
 		int AliveCount = 0, AliveCountBlue = 0;
 		for (int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if (GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->m_IsReady && GameServer()->IsClientPlayer(i)) {
+			if (GameServer()->m_apPlayers[i] /*&& GameServer()->m_apPlayers[i]->m_IsReady && GameServer()->IsClientPlayer(i)*/) {
 				if (GameServer()->m_apPlayers[i]->GetTeam() == TEAM_BLUE) {
 					PlayerCountBlue++;
 					if (GameServer()->m_apPlayers[i]->m_Lives > 0)
