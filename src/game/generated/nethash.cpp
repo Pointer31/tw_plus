@@ -1,1 +1,1 @@
-#define GAME_NETVERSION_HASH "851d1afc2d3c0f8b"
+#define GAME_NETVERSION_HASH "dcd53aab2a94f3ee"

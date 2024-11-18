@@ -1467,6 +1467,8 @@ void CCharacter::Snap(int SnappingClient)
 			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_NINJA;
 		if (m_FreezeTicks > 0)
 			pDDNetCharacter->m_Flags |= CHARACTERFLAG_IN_FREEZE | CHARACTERFLAG_MOVEMENTS_DISABLED;
+		if (m_pPlayer->m_Spree >= g_Config.m_SvKillingspreeKills && g_Config.m_SvKillingspreeParticles)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_INVINCIBLE;
 		pDDNetCharacter->m_FreezeEnd = 0;
 		pDDNetCharacter->m_Jumps = 2;
 		pDDNetCharacter->m_TeleCheckpoint = -1;

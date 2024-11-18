@@ -1726,16 +1726,23 @@ static CServer *CreateServer() { return new CServer(); }
 
 int main(int argc, const char **argv) // ignore_convention
 {
-#if defined(CONF_FAMILY_WINDOWS)
+
+	char cli_rconpwd[32] = {};
 	for (int i = 1; i < argc; i++) // ignore_convention
 	{
+		#if defined(CONF_FAMILY_WINDOWS)
 		if (str_comp("-s", argv[i]) == 0 || str_comp("--silent", argv[i]) == 0) // ignore_convention
 		{
 			ShowWindow(GetConsoleWindow(), SW_HIDE);
 			break;
 		}
+		#endif
+		if (str_comp("--rconpwd", argv[i])== 0 && i < argc-1) // ignore_convention
+		{
+			str_copy(cli_rconpwd, argv[i+1], sizeof(cli_rconpwd));
+			break;
+		}
 	}
-#endif
 
 	CServer *pServer = CreateServer();
 	IKernel *pKernel = IKernel::Create();
@@ -1776,6 +1783,10 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// register all console commands
 	pServer->RegisterCommands();
+
+	// add rconpwd, if there is any given via command line arguments
+	if (cli_rconpwd)
+		str_copy(g_Config.m_SvRconPassword, cli_rconpwd, sizeof(g_Config.m_SvRconPassword));
 
 	// execute autoexec file (try multiple files)
 	IOHANDLE File = pStorage->OpenFile("autoexec_server_twplus.cfg", IOFLAG_READ, IStorage::TYPE_ALL);

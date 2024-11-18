@@ -41,6 +41,8 @@ custom weapons, of which spawns can be placed in a map: plasmagun, charge hammer
 
 **Other**  
 sv_touch_explode  
+sv_instagib  
+add_vote_if (check for certain gamemodes before adding vote)  
 shutdown message  
 slash chat commands edited/added, including /me, /w, and /help  
 Spectator stays spectator after map change  
@@ -48,9 +50,11 @@ broadcast \n (copied from DDnet)
 nicer log printing  
 more types of characters in names allowed, like in ddnet  
 end of round stats message  
+allow giving rcon password as commandline argument via --rconpwd  
 DDnet client support (whisper, HUD)  
 Experimental 64 player support (requires ddnet client)  
 Particles appearing when a pickup (shield, heart, weapon) is respawning  
+Particles for players with a killing spree (ddnet client 18.7+)  
 Play a sound different from the normal hit sound when the player kills a tee, like in some other gametypes  
 new gametype: Hold the flag (HTF); (teamless) mode where you gain points by holding the flag  
 new gametype: Last man standing (LMS); (teamless) mode where you must avoid dying while killing others  
