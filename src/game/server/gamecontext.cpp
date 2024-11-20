@@ -2107,22 +2107,26 @@ void CGameContext::ConAddPickup(IConsole::IResult *pResult, void *pUserData)
 }
 // #endif
 
+void CGameContext::AddBot(int difficulty) {
+	int id = g_Config.m_SvMaxClients - 1 - m_pServer->m_numberBots;
+	if (id == 0 || IsClientReady(id)) {
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Game", "Bot cannot be added");
+		return;
+	}
+	int type = difficulty;
+	if (type == 0)
+		type = 1;
+	OnClientConnected(id);
+	m_apPlayers[id]->m_isBot = type;
+	OnClientEnter(id);
+	m_pServer->m_numberBots++;
+}
+
 void CGameContext::ConAddBot(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
-	int id = g_Config.m_SvMaxClients - 1 - pSelf->m_pServer->m_numberBots;
-	if (id == 0 || pSelf->IsClientReady(id)) {
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Game", "Bot cannot be added");
-		return;
-	}
 	int type = pResult->GetInteger(0);
-	if (type == 0)
-		type = 1;
-	pSelf->OnClientConnected(id);
-	pSelf->m_apPlayers[id]->m_isBot = type;
-	pSelf->OnClientEnter(id);
-	pSelf->m_pServer->m_numberBots++;
-	
+	pSelf->AddBot(type);
 }
 
 void CGameContext::ConRemoveBot(IConsole::IResult *pResult, void *pUserData)
@@ -2324,6 +2328,10 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		str_copy(g_Config.m_SvOnNextMap, "", sizeof(g_Config.m_SvOnNextMap));
 		Console()->ExecuteFile(buffer);;
 	}
+
+	if (g_Config.m_SvBotsPreferredAmount > 0)
+		for (int i = 0; i < g_Config.m_SvBotsPreferredAmount; i++)
+			AddBot(g_Config.m_SvBotsPreferredLevel);
 
 	//game.world.insert_entity(game.Controller);
 

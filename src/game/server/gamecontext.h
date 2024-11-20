@@ -88,9 +88,11 @@ class CGameContext : public IGameServer
 	static void ConPlayerSetHealth(IConsole::IResult *pResult, void *pUserData);
 	static void ConPlayerSetShields(IConsole::IResult *pResult, void *pUserData);
 	static void ConAddPickup(IConsole::IResult *pResult, void *pUserData);
+// #endif
+	void AddBot(int difficulty);
 	static void ConAddBot(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemoveBot(IConsole::IResult *pResult, void *pUserData);
-// #endif
+
 
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
