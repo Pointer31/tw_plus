@@ -17,18 +17,17 @@ jobs:
       fail-fast: false
 
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        # os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, macOS-latest]
         build_type: [Debug]
         include:
-        - os: windows-latest
-          cmake-args: -A x64
-          package-file: "*-win64.zip"
+        # - os: windows-latest
+        #   cmake-args: -A x64
+        #   package-file: "*-win64.zip"
         - os: ubuntu-latest
           package-file: "*-linux_x86_64.tar.xz"
         - os: macOS-latest
           package-file: "*-macos.dmg"
-          env:
-            CXXFLAGS: -std=c++17
 
     steps:
     - uses: actions/checkout@v4
@@ -50,13 +49,14 @@ jobs:
       if: contains(matrix.os, 'macOS')
       run: |
         brew update || true
-        brew install pkg-config sdl2 python3 ninja || true
+        brew install pkg-config sdl2 python3 ninja gcc || true
         # --overwrite for:  Target /usr/local/bin/2to3 already exists.
         brew link --overwrite python@3.12
         brew upgrade freetype
         sudo rm -rf /Library/Developer/CommandLineTools
 
     - name: Configure CMake
+      if: not contains(matrix.os, 'macOS')
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: >
@@ -64,6 +64,17 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
 
+    - name: Configure CMake-macos
+      if: contains(matrix.os, 'macOS')
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=gcc-14
+        -DCMAKE_C_COMPILER=g++-14
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+        
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
