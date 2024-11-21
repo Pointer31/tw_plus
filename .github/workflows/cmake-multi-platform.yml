@@ -20,13 +20,15 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         build_type: [Debug]
         include:
-          - os: windows-latest
-            cmake-args: -A x64
-            package-file: "*-win64.zip"
-          - os: ubuntu-latest
-            package-file: "*-linux_x86_64.tar.xz"
-          - os: macOS-latest
-            package-file: "*-macos.dmg"
+        - os: windows-latest
+          cmake-args: -A x64
+          package-file: "*-win64.zip"
+        - os: ubuntu-latest
+          package-file: "*-linux_x86_64.tar.xz"
+        - os: macOS-latest
+          package-file: "*-macos.dmg"
+          env:
+            CXXFLAGS: -std=c++17
 
     steps:
     - uses: actions/checkout@v4
@@ -65,4 +67,9 @@ jobs:
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
-      
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: tw_plus_srv-${{ matrix.os }}
+        path: ${{ steps.strings.outputs.build-output-dir }}
