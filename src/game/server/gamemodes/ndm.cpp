@@ -11,7 +11,11 @@ CGameControllerNDM::CGameControllerNDM(class CGameContext *pGameServer, int Type
 {
 	m_Flags = TypeFlags | GAMETYPE_NOPICKUPS;
 	m_pGameType = "nDM+";
+#if defined(CONF_FAMILY_WINDOWS)
+	
+#else
 	srand (time(NULL));
+#endif
 	m_CurrentWeapon = WEAPON_GUN_SUPER;
 	m_NextWeapon = WEAPON_SHOTGUN;
 	m_NextSwitchTick = Server()->Tick();
