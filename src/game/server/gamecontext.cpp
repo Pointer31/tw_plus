@@ -2098,7 +2098,7 @@ void CGameContext::ConAddPickup(IConsole::IResult *pResult, void *pUserData)
 		type = POWERUP_NINJA;
 
 	CPickup *pPickup = new CPickup(&pSelf->m_World, type, sub, true);
-	pPickup->m_Pos = {x, y};
+	pPickup->m_Pos = {(float)x, (float)y};
 	// if(pSelf->IsValidCID(playerID))	{
 	// 	CCharacter* pChr = pSelf->GetPlayerChar(playerID);
 	// 	if(pChr)

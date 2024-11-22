@@ -154,8 +154,8 @@ void CGameControllerHTF::Tick()
 					int y = GameServer()->Collision()->getTeleY(0);
 					int tx = GameServer()->Collision()->getTeleX(1);
 					int ty = GameServer()->Collision()->getTeleY(1);
-					vec2 start = {x, y};
-					vec2 end = {tx, ty};
+					vec2 start = {(float)x, (float)y};
+					vec2 end = {(float)tx, (float)ty};
 					//vec2 oneTile = {ms_PhysSize * 1.5, 0};
 					F->m_Pos = F->m_Pos - start * 32 + end * 32;
 				}
@@ -171,8 +171,8 @@ void CGameControllerHTF::Tick()
 					int y = GameServer()->Collision()->getTeleY(1);
 					int tx = GameServer()->Collision()->getTeleX(0);
 					int ty = GameServer()->Collision()->getTeleY(0);
-					vec2 start = {x, y};
-					vec2 end = {tx, ty};
+					vec2 start = {(float)x, (float)y};
+					vec2 end = {(float)tx, (float)ty};
 					//vec2 oneTile = {ms_PhysSize * 1.5, 0};
 					F->m_Pos = F->m_Pos - start * 32 + end * 32;
 				}
