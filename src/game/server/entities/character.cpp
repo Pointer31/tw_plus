@@ -9,9 +9,10 @@
 #include "laser.h"
 #include "projectile.h"
 
-// this include was for testing only
-#include <iostream>
-// testing only
+// Windows cannot find M_PI, although it should be in <math.h>
+#ifndef M_PI
+# define M_PI		3.14159265358979323846	/* pi */
+#endif
 
 // input count
 struct CInputCount

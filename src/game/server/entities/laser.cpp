@@ -5,6 +5,11 @@
 #include <engine/shared/config.h>
 #include "laser.h"
 
+// Windows cannot find M_PI, although it should be in <math.h>
+#ifndef M_PI
+# define M_PI		3.14159265358979323846	/* pi */
+#endif
+
 CLaser::CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner, int clockwise)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER)
 {
