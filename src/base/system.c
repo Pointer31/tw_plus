@@ -382,7 +382,7 @@ int io_flush(IOHANDLE io)
 	return 0;
 }
 
-void *thread_create(void (*threadfunc)(void *), void *u)
+void *teethread_create(void (*threadfunc)(void *), void *u)
 {
 #if defined(CONF_FAMILY_UNIX)
 	pthread_t id;
@@ -1800,13 +1800,13 @@ void gui_messagebox(const char *title, const char *message)
 	SetFrontProcess(&psn);
 	/* END HACK */
 
-	CreateStandardAlert(kAlertStopAlert,
-			CFStringCreateWithCString(NULL, title, kCFStringEncodingASCII),
-			CFStringCreateWithCString(NULL, message, kCFStringEncodingASCII),
-			NULL,
-			&theItem);
+	//CreateStandardAlert(kAlertStopAlert,
+	//		CFStringCreateWithCString(NULL, title, kCFStringEncodingASCII),
+	//		CFStringCreateWithCString(NULL, message, kCFStringEncodingASCII),
+	//		NULL,
+	//		&theItem);
 
-	RunStandardAlert(theItem, NULL, &itemIndex);
+	//RunStandardAlert(theItem, NULL, &itemIndex);
 #elif defined(CONF_FAMILY_UNIX)
 	static char cmd[1024];
 	int err;

@@ -364,7 +364,7 @@ IOHANDLE io_stderr();
 void thread_sleep(int milliseconds);
 
 /*
-	Function: thread_create
+	Function: teethread_create
 		Creates a new thread.
 
 	Parameters:
@@ -372,7 +372,7 @@ void thread_sleep(int milliseconds);
 		user - Pointer to pass to the thread.
 
 */
-void *thread_create(void (*threadfunc)(void *), void *user);
+void *teethread_create(void (*threadfunc)(void *), void *user);
 
 /*
 	Function: thread_wait

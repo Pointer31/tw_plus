@@ -910,8 +910,8 @@ void CCharacter::Tick()
 			int y = GameServer()->Collision()->getTeleY(0);
 			int tx = GameServer()->Collision()->getTeleX(1);
 			int ty = GameServer()->Collision()->getTeleY(1);
-			vec2 start = {x, y};
-			vec2 end = {tx, ty};
+			vec2 start = {(float)x, (float)y};
+			vec2 end = {(float)tx, (float)ty};
 			m_Pos = m_Pos - start * 32 + end * 32;
 			m_Core.m_Pos = m_Pos;
 		}
@@ -927,8 +927,8 @@ void CCharacter::Tick()
 			int y = GameServer()->Collision()->getTeleY(1);
 			int tx = GameServer()->Collision()->getTeleX(0);
 			int ty = GameServer()->Collision()->getTeleY(0);
-			vec2 start = {x, y};
-			vec2 end = {tx, ty};
+			vec2 start = {(float)x, (float)y};
+			vec2 end = {(float)tx, (float)ty};
 			m_Pos = m_Pos - start * 32 + end * 32;
 			m_Core.m_Pos = m_Pos;
 		}
@@ -944,8 +944,8 @@ void CCharacter::Tick()
 			int y = GameServer()->Collision()->getTeleY(2);
 			int tx = GameServer()->Collision()->getTeleX(3);
 			int ty = GameServer()->Collision()->getTeleY(3);
-			vec2 start = {x, y};
-			vec2 end = {tx, ty};
+			vec2 start = {(float)x, (float)y};
+			vec2 end = {(float)tx, (float)ty};
 			m_Pos = m_Pos - start * 32 + end * 32;
 			m_Core.m_Pos = m_Pos;
 		}
@@ -961,8 +961,8 @@ void CCharacter::Tick()
 			int y = GameServer()->Collision()->getTeleY(3);
 			int tx = GameServer()->Collision()->getTeleX(2);
 			int ty = GameServer()->Collision()->getTeleY(2);
-			vec2 start = {x, y};
-			vec2 end = {tx, ty};
+			vec2 start = {(float)x, (float)y};
+			vec2 end = {(float)tx, (float)ty};
 			m_Pos = m_Pos - start * 32 + end * 32;
 			m_Core.m_Pos = m_Pos;
 		}

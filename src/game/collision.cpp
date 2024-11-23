@@ -18,8 +18,12 @@ CCollision::CCollision()
 	m_Width = 0;
 	m_Height = 0;
 	m_pLayers = 0;
-	for (int i = 0; i < 4; i++) 
-		m_telePositions[i] = {0,0,false};
+	for (int i = 0; i < 4; i++)
+	{
+		m_telePositions[i].x = 0;
+		m_telePositions[i].y = 0;
+		m_telePositions[i].exists = false;
+	}
 }
 
 void CCollision::Init(class CLayers *pLayers)
@@ -33,7 +37,7 @@ void CCollision::Init(class CLayers *pLayers)
 	{
 		int Index = m_pTiles[i].m_Index;
 		int x = i % m_Width;
-		int y = std::floor(i/m_Width);
+		int y = floor(i/m_Width);
 
 		if(Index > 128)
 			continue;
@@ -51,22 +55,38 @@ void CCollision::Init(class CLayers *pLayers)
 			break;
 		case TILE_TELEONE:
 			if (m_telePositions[0].exists == false)
-				m_telePositions[0] = {x, y, true};
+			{
+				m_telePositions[0].x = x;
+				m_telePositions[0].y = y;
+				m_telePositions[0].exists = true;
+			}
 			// m_pTiles[i].m_Index = COLFLAG_TELEONE;
 			break;
 		case TILE_TELETWO:
 			if (m_telePositions[1].exists == false)
-				m_telePositions[1] = {x, y, true};
+			{
+				m_telePositions[1].x = x;
+				m_telePositions[1].y = y;
+				m_telePositions[1].exists = true;
+			}
 			// m_pTiles[i].m_Index = COLFLAG_TELETWO;
 			break;
 		case TILE_TELETHREE:
 			if (m_telePositions[2].exists == false)
-				m_telePositions[2] = {x, y, true};
+			{
+				m_telePositions[2].x = x;
+				m_telePositions[2].y = y;
+				m_telePositions[2].exists = true;
+			}
 			// m_pTiles[i].m_Index = COLFLAG_TELETHREE;
 			break;
 		case TILE_TELEFOUR:
 			if (m_telePositions[3].exists == false)
-				m_telePositions[3] = {x, y, true};
+			{
+				m_telePositions[3].x = x;
+				m_telePositions[3].y = y;
+				m_telePositions[3].exists = true;
+			}
 			// m_pTiles[i].m_Index = COLFLAG_TELEFOUR;
 			break;
 		case TILE_SLOWDEATH:

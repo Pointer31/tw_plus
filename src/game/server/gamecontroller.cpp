@@ -203,7 +203,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 		CStructure *pProj = new CStructure(g, WEAPON_GRENADE,
 				-1,
 				Pos,
-				{0,d});
+				{0.0f,(float)d});
 	}
 	else if(Index == ENTITY_GRENADE_FOUNTAIN_HORIZONTAL)
 	{
@@ -215,7 +215,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 		CStructure *pProj = new CStructure(g, WEAPON_GRENADE,
 				-1,
 				Pos,
-				{d,0});
+				{(float)d,0.0f});
 	}
 
 	if(Type != -1)

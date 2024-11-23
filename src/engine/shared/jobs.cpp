@@ -49,7 +49,7 @@ int CJobPool::Init(int NumThreads)
 {
 	// start threads
 	for(int i = 0; i < NumThreads; i++)
-		thread_create(WorkerThread, this);
+		teethread_create(WorkerThread, this);
 	return 0;
 }
 
