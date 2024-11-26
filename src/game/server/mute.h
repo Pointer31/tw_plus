@@ -67,6 +67,9 @@ public:
 	 */
 	CMuteEntry *GetMute(int Num);
 
+
+	bool CheckSpam(int ClientID, const char* msg);
+
 private:
 	/**
 	 * List where our mutes are saved in

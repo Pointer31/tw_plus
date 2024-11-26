@@ -196,3 +196,40 @@ void CMute::ConUnmuteIP(IConsole::IResult *pResult, void *pUserData)
 	else
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "Mutes", "mute not found");
 }
+
+bool CMute::CheckSpam(int ClientID, const char* msg)
+{
+	int count = 0; // amount of flagged strings (some strings may count more than others)
+
+	// fancy alphabet detection
+	int fancy_count = 0;
+	const char* alphabet_fancy[] = {
+		"𝕢", "𝕨", "𝕖", "𝕣", "𝕥", "𝕪", "𝕦", "𝕚", "𝕠", "𝕡", "𝕒", "𝕤", "𝕕", "𝕗", "𝕘", "𝕙", "𝕛", "𝕜", "𝕝", "𝕫", "𝕩", "	", "𝕧", "𝕓", "𝕟", "𝕞",
+		"ｑ", "ｗ", "ｅ", "ｒ", "ｔ", "ｙ", "ｕ", "ｉ", "ｏ", "ｐ", "ａ", "ｓ", "ｄ", "ｆ", "ｇ", "ｈ", "ｊ", "ｋ", "ｌ", "ｚ", "ｘ", "ｃ", "ｖ", "ｂ", "ｎ", "ｍ",
+		"🆀", "🆆", "🅴", "🆁", "🆃", "🆈", "🆄", "🅸", "🅾", "🅿", "🅰", "🆂", "🅳", "🅵", "🅶", "🅷", "🅹", "🅺", "🅻", "🆉", "🆇", "🅲", "🆅", "🅱", "🅽", "🅼",
+		"🅀", "🅆", "🄴", "🅁", "🅃", "🅈", "🅄", "🄸", "🄾", "🄿", "🄰", "🅂", "🄳", "🄵", "🄶", "🄷", "🄹", "🄺", "🄻", "🅉", "🅇", "🄲", "🅅", "🄱", "🄽", "🄼",
+		"ⓠ", "ⓦ", "ⓔ", "ⓡ", "ⓣ", "ⓨ", "ⓤ", "ⓘ", "ⓞ", "ⓟ", "ⓐ", "ⓢ", "ⓓ", "ⓕ", "ⓖ", "ⓗ", "ⓙ", "ⓚ", "ⓛ", "ⓩ", "ⓧ", "ⓒ", "ⓥ", "ⓑ", "ⓝ", "ⓜ",
+	};
+	for (int i = 0; i < 130; i++) {
+		if (str_find_nocase(msg, alphabet_fancy[i]))
+			fancy_count++;
+	}
+	if (fancy_count > 3)
+		count += 2;
+
+	// general needles to disallow
+	const char* disallowedStrings[] = {"krx", "discord.gg", "http", "free", "bot client", "cheat client"};
+	for (int i = 0; i < 6; i++) {
+		if (str_find_nocase(msg, disallowedStrings[i]))
+			count++;
+	}
+	
+	// anti whisper ad bot
+	if ((str_find_nocase(msg, "/whisper") || str_find_nocase(msg, "/w")) && str_find_nocase(msg, "bro, check out this client"))
+		count += 2;
+
+	if (count >= 2) {
+		return true;
+	} else
+		return false;
+}

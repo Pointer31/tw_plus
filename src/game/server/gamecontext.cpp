@@ -740,6 +740,15 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			pPlayer->m_LastChat = Server()->Tick();
 
+			// anti adbot
+			if (g_Config.m_SvAntiAdbot && m_client_msgcount[ClientID] < g_Config.m_SvAntiAdbot && m_Mute.CheckSpam(ClientID, pMsg->m_pMessage) && !Server()->IsAuthed(ClientID)) {
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), "ban %i 15 \"anti-adbot; Please use the ddnet client. https://ddnet.org/\"", ClientID);
+				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, Team!=CHAT_ALL?"teamchat/blocked":"chat/blocked", pMsg->m_pMessage);
+				Console()->ExecuteLine(aBuf);
+				return;
+			}
+
 			//Check if the player is muted
 			CMute::CMuteEntry *pMute = m_Mute.Muted(ClientID);
 			if(pMute)
@@ -772,6 +781,8 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					*pMessage = ' ';
 				pMessage++;
 			}
+
+			m_client_msgcount[ClientID]++;
 
 			if(ShowCommand(ClientID, pPlayer, pMsg->m_pMessage, &Team))
 			{

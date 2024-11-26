@@ -223,6 +223,8 @@ MACRO_CONFIG_INT(SvKillingspreeParticles, sv_killingspree_particles, 1, 0, 1, CF
 MACRO_CONFIG_INT(SvBotsPreferredAmount, sv_bots_preferred_amount, 0, 0, MAX_CLIENTS-1, CFGFLAG_SERVER, "Preferred amount of bots (takes effect on reload)")
 MACRO_CONFIG_INT(SvBotsPreferredLevel, sv_bots_preferred_level, 4, 1, 6, CFGFLAG_SERVER, "Preferred level of bots (max:6) (takes effect on reload)")
 
+MACRO_CONFIG_INT(SvAntiAdbot, sv_antiadbot, 1, 0, 3, CFGFLAG_SERVER, "whether antiadbot should be on")
+
 // info shown on /info
 MACRO_CONFIG_STR(SvInfoGithub, sv_info_github, 128, "Github: https://github.com/Pointer31/tw_plus", CFGFLAG_SERVER, "Github link shown when /info is used")
 MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Contact link shown when /info is used")
