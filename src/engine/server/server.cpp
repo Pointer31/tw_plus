@@ -746,8 +746,16 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	return 0;
 }
 
+static int lastsent[MAX_CLIENTS];
+static int lastask[MAX_CLIENTS];
+static int lastasktick[MAX_CLIENTS];
+
 void CServer::SendMap(int ClientID)
 {
+	lastsent[ClientID] = 0;
+	lastask[ClientID] = 0;
+	lastasktick[ClientID] = Tick();
+
 	CMsgPacker Msg(NETMSG_MAP_CHANGE);
 	Msg.AddString(GetMapName(), 0);
 	Msg.AddInt(m_CurrentMapCrc);
@@ -871,6 +879,13 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			unsigned int Offset = Chunk * ChunkSize;
 			int Last = 0;
 
+			lastask[ClientID] = Chunk;
+			lastasktick[ClientID] = Tick();
+			if (Chunk == 0)
+			{
+				lastsent[ClientID] = 0;
+			}
+
 			// drop faulty map data requests
 			if (Chunk < 0 || Offset > m_CurrentMapSize)
 				return;
@@ -882,6 +897,9 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					ChunkSize = 0;
 				Last = 1;
 			}
+
+			if (lastsent[ClientID] < Chunk+g_Config.m_SvMapWindow && g_Config.m_SvFastDownload)
+				return;
 
 			CMsgPacker Msg(NETMSG_MAP_DATA);
 			Msg.AddInt(Last);
@@ -1221,6 +1239,47 @@ void CServer::PumpNetwork()
 		}
 		else
 			ProcessClientPacket(&Packet);
+	}
+
+	if(g_Config.m_SvFastDownload)
+	{
+		for (int i=0;i<MAX_CLIENTS;i++)
+		{
+			if (m_aClients[i].m_State != CClient::STATE_CONNECTING)
+				continue;
+			if (lastasktick[i] < Tick()-TickSpeed())
+			{
+				lastsent[i] = lastask[i];
+				lastasktick[i] = Tick();
+			}
+			if (lastask[i]<lastsent[i]-g_Config.m_SvMapWindow)
+				continue;
+			int Chunk = lastsent[i]++;
+			unsigned int ChunkSize = 1024-128;
+			unsigned int Offset = Chunk * ChunkSize;
+			int Last = 0;
+			// drop faulty map data requests
+			if(Chunk < 0 || Offset > m_CurrentMapSize)
+				continue;
+			if(Offset+ChunkSize >= m_CurrentMapSize)
+			{
+				ChunkSize = m_CurrentMapSize-Offset;
+				Last = 1;
+			}
+			CMsgPacker Msg(NETMSG_MAP_DATA);
+			Msg.AddInt(Last);
+			Msg.AddInt(m_CurrentMapCrc);
+			Msg.AddInt(Chunk);
+			Msg.AddInt(ChunkSize);
+			Msg.AddRaw(&m_pCurrentMapData[Offset], ChunkSize);
+			SendMsgEx(&Msg, MSGFLAG_FLUSH, i, true);
+			if(g_Config.m_Debug)
+			{
+				char aBuf[256];
+				str_format(aBuf, sizeof(aBuf), "sending chunk %d with size %d", Chunk, ChunkSize);
+				Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
+			}
+		}
 	}
 
 	m_ServerBan.Update();

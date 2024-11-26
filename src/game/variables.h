@@ -235,4 +235,8 @@ MACRO_CONFIG_INT(SvDDInstagibHideHealth, sv_dd_instagib_hide_health, 0, 0, 1, CF
 MACRO_CONFIG_INT(SvDDShowHud, sv_dd_show_hud, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to enable the ddrace HUD")
 MACRO_CONFIG_INT(SvDDExposeAuthed, sv_dd_expose_authed, 1, 0, 1, CFGFLAG_SERVER, "Whether or not to color client's names if they are authenticated in rcon")
 
+// fast download
+MACRO_CONFIG_INT(SvMapWindow, sv_map_window, 15, 0, 100, CFGFLAG_SERVER, "Map downloading send-ahead window")
+MACRO_CONFIG_INT(SvFastDownload, sv_fast_download, 1, 0, 1, CFGFLAG_SERVER, "Enables fast download of maps")
+
 #endif
