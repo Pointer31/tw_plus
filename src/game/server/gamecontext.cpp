@@ -47,6 +47,11 @@ void CGameContext::Construct(int Resetting)
 		m_pVoteOptionHeap = new CHeap();
 
 	m_SpecMuted = false;
+
+	m_apPlayers;
+	for(int i = 0; i < MAX_CLIENTS; i++) {
+		m_apPlayers[i] = NULL;
+	}
 }
 
 CGameContext::CGameContext(int Resetting)
