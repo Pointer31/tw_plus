@@ -7,6 +7,7 @@
 
 #include "character.h"
 #include "laser.h"
+#include "lasertrap.h"
 #include "projectile.h"
 
 // Windows cannot find M_PI, although it should be in <math.h>
@@ -1231,6 +1232,10 @@ void CCharacter::Die(int Killer, int Weapon)
 	GameServer()->m_World.RemoveEntity(this);
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
 	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
+
+	if (g_Config.m_SvLaserDeath)
+		for (int i = 0; i < g_Config.m_SvLaserDeathAmount; i++)
+			new CLaserTrap(GameWorld(), m_Pos, GetDirection((int)(((float)i)*100.0f*16.0f/((float)g_Config.m_SvLaserDeathAmount))), GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
 }
 
 bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
