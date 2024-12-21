@@ -11,6 +11,7 @@
 
 #include "character.h"
 #include "laser.h"
+#include "lasertrap.h"
 #include "projectile.h"
 
 //input count
@@ -796,6 +797,10 @@ void CCharacter::Die(int Killer, int Weapon)
 	GameWorld()->RemoveEntity(this);
 	GameWorld()->m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
 	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
+
+	if (Config()->m_SvLaserDeath)
+		for (int i = 0; i < Config()->m_SvLaserDeathAmount; i++)
+			new CLaserTrap(GameWorld(), m_Pos, direction((((float)i)*2*pi/((float)Config()->m_SvLaserDeathAmount))), GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
 }
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
