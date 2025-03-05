@@ -601,7 +601,8 @@ void CCharacter::FireWeapon()
 		} else if (m_ActiveWeapon == WEAPON_SHOTGUN && g_Config.m_SvShotgunRepeater) 
 		{
 			FireDelay = g_Config.m_SvShotgunRepeaterFireDelay;
-		}
+		} else if (m_ActiveWeapon == WEAPON_NINJA)
+			FireDelay = GameServer()->Tuning()->m_NinjaFireDelay;
 
 		if (m_pPlayer->m_GotAward)
 			FireDelay = g_Config.m_SvKillingspreeAwardFiredelay;

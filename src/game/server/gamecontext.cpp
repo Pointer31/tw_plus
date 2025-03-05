@@ -158,7 +158,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 			l = 1-clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
 			float Dmg = 6 * l;
 			if((int)Dmg) {
-				vec2 force = ForceDir*Dmg*2;
+				vec2 force = ForceDir*l*Tuning()->m_ExplosionStrength*2;
 				if (Owner < 0 && !g_Config.m_SvGrenadeFountainHarm) // if the source is a grenade fountain, maybe do not do harm
 					Dmg = 0;
 				apEnts[i]->TakeDamage(force, (int)Dmg, Owner, Weapon);

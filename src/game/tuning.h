@@ -45,4 +45,19 @@ MACRO_TUNING_PARAM(LaserDamage, laser_damage, 5)
 
 MACRO_TUNING_PARAM(PlayerCollision, player_collision, 1)
 MACRO_TUNING_PARAM(PlayerHooking, player_hooking, 1)
+
+// ddnet tunes (not all are implemented, but they need to exist so the 
+// format of the tuning message is the same for the server and client)
+MACRO_TUNING_PARAM(JetpackStrengthNOTUSED, NOTUSEDjetpack_strength, 400.0f)
+MACRO_TUNING_PARAM(ShotgunStrengthNOTUSED, NOTUSEDshotgun_strength, 10.0f)
+MACRO_TUNING_PARAM(ExplosionStrength, explosion_strength, 6.0f)
+MACRO_TUNING_PARAM(HammerStrengthNOTUSED, NOTUSEDhammer_strength, 1.0f)
+MACRO_TUNING_PARAM(HookDurationNOTUSED, NOTUSEDhook_duration, 1.25f)
+
+MACRO_TUNING_PARAM(HammerFireDelayNOTUSED, NOTUSEDhammer_fire_delay, 125)
+MACRO_TUNING_PARAM(GunFireDelayNOTUSED, NOTUSEDgun_fire_delay, 125)
+MACRO_TUNING_PARAM(ShotgunFireDelayNOTUSED, NOTUSEDshotgun_fire_delay, 500)
+MACRO_TUNING_PARAM(GrenadeFireDelayNOTUSED, NOTUSEDgrenade_fire_delay, 500)
+MACRO_TUNING_PARAM(LaserFireDelayNOTUSED, NOTUSEDlaser_fire_delay, 800)
+MACRO_TUNING_PARAM(NinjaFireDelay, ninja_fire_delay, 800.0f)
 #endif
