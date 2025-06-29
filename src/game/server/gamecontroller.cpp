@@ -550,11 +550,19 @@ void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 	// default health
 	pChr->IncreaseHealth(10);
 
-	if (IsInstagib() && IsGrenade())
-		pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmo);
-	else if(IsInstagib())
-		pChr->GiveWeapon(WEAPON_RIFLE, -1);
-	else
+	if (IsInstagib() && IsGrenade()) {
+		if (g_Config.m_SvInstagibFiniteAmmo) {
+			pChr->GiveWeapon(WEAPON_GRENADE, 10);
+		} else {
+			pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmo);
+		}
+	} else if(IsInstagib()) {
+		if (g_Config.m_SvInstagibFiniteAmmo) {
+			pChr->GiveWeapon(WEAPON_RIFLE, 10);
+		} else {
+			pChr->GiveWeapon(WEAPON_RIFLE, -1);
+		}
+	} else
 	{
 		// give default weapons
 		pChr->GiveWeapon(WEAPON_HAMMER, -1);

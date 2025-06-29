@@ -9,6 +9,7 @@
 #include "laser.h"
 #include "lasertrap.h"
 #include "projectile.h"
+#include "pickup.h"
 
 // Windows cannot find M_PI, although it should be in <math.h>
 #ifndef M_PI
@@ -629,7 +630,7 @@ void CCharacter::HandleWeapons()
 	// ammo regen
 	int AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
 	bool gCTF = GameServer()->m_pController->m_Flags & IGameController::GAMETYPE_GCTF;
-	if (gCTF && m_aWeapons[m_ActiveWeapon].m_Ammo > -1)
+	if (gCTF && m_aWeapons[m_ActiveWeapon].m_Ammo > -1 && !g_Config.m_SvInstagibFiniteAmmo)
 		AmmoRegenTime = g_Config.m_SvGrenadeAmmoRegen;
 
 	if (AmmoRegenTime)
@@ -684,6 +685,9 @@ bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 		} else 
 			Weapon = WEAPON_SHOTGUN;
 	}
+
+	// reset health in instagib finite ammo mode
+	if (GameServer()->m_pController->IsInstagib() && g_Config.m_SvInstagibFiniteAmmo) m_Health = 10;
 
 	if (m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got || (g_Config.m_SvShotgunRepeater && m_aWeapons[Weapon].m_Ammo < g_Config.m_SvShotgunRepeaterAmmo))
 	{
@@ -1038,7 +1042,21 @@ void CCharacter::Tick()
 			m_healthArmorZoneTick = g_Config.m_SvHealthArmorZoneTicks;
 		}
 	}
-if ((GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST ||
+
+	// death on no ammo if applicable
+	if (GameServer()->m_pController->IsInstagib() && g_Config.m_SvInstagibFiniteAmmo && m_aWeapons[m_ActiveWeapon].m_Ammo == 0 && Server()->Tick() % SERVER_TICK_SPEED == 0) {
+		m_Health = m_Health - 1;
+		if (m_Health < 1) {
+			Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+		}
+			
+		GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
+		m_EmoteType = EMOTE_PAIN;
+		m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+		GameServer()->CreateDamageInd(m_Pos, 0, 1);
+	} 
+	// speedup
+	if ((GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST ||
 			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x + m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST ||
 			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y - m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST ||
 			 GameServer()->Collision()->GetCollisionAtNew(m_Pos.x - m_ProximityRadius / 3.f, m_Pos.y + m_ProximityRadius / 3.f) == TILE_SPEEDUPFAST))
@@ -1233,6 +1251,17 @@ void CCharacter::Die(int Killer, int Weapon)
 	GameServer()->m_World.RemoveEntity(this);
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
 	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());
+
+	// in the instagib finite ammo gamemode, place a one time pickup on death
+	if (GameServer()->m_pController->IsInstagib() && g_Config.m_SvInstagibFiniteAmmo) {
+		if (GameServer()->m_pController->IsGrenade()) {
+			CPickup *pPickup = new CPickup(&GameServer()->m_World, POWERUP_WEAPON, WEAPON_GRENADE, true);
+			pPickup->m_Pos = m_Pos;
+		} else {
+			CPickup *pPickup = new CPickup(&GameServer()->m_World, POWERUP_WEAPON, WEAPON_RIFLE, true);
+			pPickup->m_Pos = m_Pos;
+		}
+	}
 
 	if (g_Config.m_SvLaserDeath)
 		for (int i = 0; i < g_Config.m_SvLaserDeathAmount; i++)

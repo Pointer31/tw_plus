@@ -228,6 +228,8 @@ MACRO_CONFIG_INT(SvAntiAdbot, sv_antiadbot, 1, 0, 3, CFGFLAG_SERVER, "whether an
 MACRO_CONFIG_INT(SvLaserDeath, sv_laser_death, 0, 0, 1, CFGFLAG_SERVER, "spawn sv_laser_death_amount lasers on death")
 MACRO_CONFIG_INT(SvLaserDeathAmount, sv_laser_death_amount, 16, 0, 64, CFGFLAG_SERVER, "amount of lasers to spawn on death (if sv_laser_death is 1)")
 
+MACRO_CONFIG_INT(SvInstagibFiniteAmmo, sv_instagib_finite_ammo, 0, 0, 1, CFGFLAG_SERVER, "whether to have finite ammo in instagib")
+
 // info shown on /info
 MACRO_CONFIG_STR(SvInfoGithub, sv_info_github, 128, "Github: https://github.com/Pointer31/tw_plus", CFGFLAG_SERVER, "Github link shown when /info is used")
 MACRO_CONFIG_STR(SvInfoContact, sv_info_contact, 128, "", CFGFLAG_SERVER, "Contact link shown when /info is used")

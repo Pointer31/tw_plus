@@ -39,7 +39,11 @@ CGameControllerGDM::CGameControllerGDM(class CGameContext *pGameServer, int Type
 void CGameControllerGDM::OnCharacterSpawn(CCharacter* pChr)
 {
 	pChr->IncreaseHealth(10);
-	pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmo);
+	if (g_Config.m_SvInstagibFiniteAmmo) {
+		pChr->GiveWeapon(WEAPON_GRENADE, 10);
+	} else {
+		pChr->GiveWeapon(WEAPON_GRENADE, g_Config.m_SvGrenadeAmmo);
+	}
 }
 
 void CGameControllerGDM::Tick()
