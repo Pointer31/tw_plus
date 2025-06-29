@@ -218,8 +218,8 @@ bool CMute::CheckSpam(int ClientID, const char* msg)
 		count += 2;
 
 	// general needles to disallow
-	const char* disallowedStrings[] = {"krx", "discord.gg", "http", "free", "bot client", "cheat client"};
-	for (int i = 0; i < 6; i++) {
+	const char* disallowedStrings[] = {"krx", "discord.gg", "http", "free", "bot client", "cheat client", "cheat", "hack", "@goodservers", "ultimate", "@ddneting", "tasnet", "Подписывайся", "tg:", "@LogXylos", "@", "л"};
+	for (int i = 0; i < 17; i++) {
 		if (str_find_nocase(msg, disallowedStrings[i]))
 			count++;
 	}
