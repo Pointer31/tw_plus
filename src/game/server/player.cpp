@@ -3,6 +3,8 @@
 #include <new>
 #include <engine/shared/config.h>
 #include "player.h"
+#include <game/server/entities/flag.h>
+#include <game/server/gamemodes/ctf.h>
 
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
@@ -154,12 +156,32 @@ void CPlayer::Tick()
 					input.m_WantedWeapon = WEAPON_GRENADE+1;
 				input.m_NextWeapon = WEAPON_GUN+1;
 				input.m_PrevWeapon = WEAPON_GUN+1;
-				if (m_isBot >= 3) { // move, and occasionally jump
+				if (m_isBot >= 3 && m_pCharacter) { // move, and occasionally jump
 					if (rand() % (SERVER_TICK_SPEED*2) == 1)
 						m_botDirection = -m_botDirection;
 					input.m_Direction = m_botDirection;
 					if (rand() % (SERVER_TICK_SPEED*2) == 1)
 						input.m_Jump = true;
+					if (str_comp_nocase(GameServer()->m_pController->m_pGameType, "CTF+") == 0
+					|| str_comp_nocase(GameServer()->m_pController->m_pGameType, "iCTF+") == 0
+					|| str_comp_nocase(GameServer()->m_pController->m_pGameType, "gCTF+") == 0) {
+						int team = m_Team;
+						int teamEnemy = 1-m_Team;
+						if (GameServer()->m_pController->m_apFlags[team]
+						&& GameServer()->m_pController->m_apFlags[teamEnemy]) {
+							if (GameServer()->m_pController->m_apFlags[teamEnemy]->m_pCarryingCharacter == m_pCharacter) {
+								if (GameServer()->m_pController->m_apFlags[team]->m_Pos.x > m_pCharacter->m_Pos.x)
+									m_botDirection = 1;
+								else
+									m_botDirection = -1;
+							} else {
+								if (GameServer()->m_pController->m_apFlags[teamEnemy]->m_Pos.x > m_pCharacter->m_Pos.x)
+									m_botDirection = 1;
+								else
+									m_botDirection = -1;
+							}
+						}
+					}
 				}
 				if (m_isBot >= 4 && m_pCharacter) {
 					if (GameServer()->Server()->Tick() % (SERVER_TICK_SPEED) == 1) {

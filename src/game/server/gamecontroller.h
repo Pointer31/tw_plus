@@ -158,6 +158,7 @@ public:
 	};
 	int m_Flags;
 
+	class CFlag *m_apFlags[2];
 	virtual bool IsInstagib() { return m_Flags&GAMETYPE_INSTAGIB; }
 	virtual bool IsGrenade() { return m_Flags&GAMETYPE_GCTF; }
 	virtual bool IsLMS() { return m_Flags&GAMETYPE_LMS; }

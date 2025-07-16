@@ -40,6 +40,9 @@ IGameController::IGameController(class CGameContext *pGameServer)
 	m_aNumSpawnPoints[2] = 0;
 
 	m_FakeWarmup = 0;
+
+	m_apFlags[0] = 0;
+	m_apFlags[1] = 0;
 }
 
 IGameController::~IGameController()
