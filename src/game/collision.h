@@ -52,6 +52,9 @@ public:
 	bool TestBox(vec2 Pos, vec2 Size);
 	int getTeleX(int index);
 	int getTeleY(int index);
+
+	int UnIntersectLineKZ(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision);
+	int FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision);
 };
 
 #endif

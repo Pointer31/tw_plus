@@ -207,6 +207,7 @@ public:
 	void Quantize();
 
 	bool m_WillExplode; // whether or not to explode next tick
+	int m_Colliding;
 };
 
 #endif

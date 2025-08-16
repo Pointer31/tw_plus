@@ -141,6 +141,22 @@ private:
 	bool m_Spawning;
 	int m_ClientID;
 	int m_Team;
+
+	void HandleInputKZ(CNetObj_PlayerInput &Input);
+	int m_TryingDirectionSmart = 0;
+	bool m_TryingOppositeSmart = false;
+	bool m_StopUntilTouchGround = false;
+	int m_DontDoSmartTargetChase = 0;
+	bool m_DoGrenadeJump = false;
+
+	CGameWorld *GameWorld() { return m_pCharacter->GameWorld(); }
+	//CTuningParams *Tuning() { return GameWorld()->Tuning(); }
+	//CTuningParams *TuningList() { return GameWorld()->TuningList(); }
+	//CTuningParams *GetTuning(int i) { return GameWorld()->GetTuning(i); }
+	//class CConfig *Config() { return m_pCharacter->GameWorld()->Config(); }
+	//class CGameContext *GameServer() { return m_pCharacter->GameServer(); }
+	//class IServer *Server() { return m_pCharacter->Server(); }
+	CCollision *Collision();
 };
 
 #endif
