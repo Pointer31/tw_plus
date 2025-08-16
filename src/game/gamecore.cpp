@@ -384,10 +384,20 @@ void CCharacterCore::Move()
 
 	m_Vel.x = m_Vel.x*RampValue;
 
+	vec2 OldVel = m_Vel;
 	vec2 NewPos = m_Pos;
 	m_pCollision->MoveBox(&NewPos, &m_Vel, vec2(28.0f, 28.0f), 0);
 
 	m_Vel.x = m_Vel.x*(1.0f/RampValue);
+
+	m_Colliding = 0;
+	if(m_Vel.x < 0.001f && m_Vel.x > -0.001f)
+	{
+		if(OldVel.x > 0)
+			m_Colliding = 1;
+		else if(OldVel.x < 0)
+			m_Colliding = 2;
+	}
 
 	if(m_pWorld && m_pWorld->m_Tuning.m_PlayerCollision)
 	{

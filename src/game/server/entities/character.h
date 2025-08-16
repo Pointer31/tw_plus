@@ -84,15 +84,9 @@ public:
 	int m_CampTick;
 	vec2 m_CampPos;
 
-private:
-	// player controlling this character
-	class CPlayer *m_pPlayer;
-
-	bool m_Alive;
-
-	// weapon info
-	CEntity *m_apHitObjects[10];
-	int m_NumObjectsHit;
+	int GetHealth() {return m_Health;}
+	int GetArmor() {return m_Armor;}
+	bool IsDeepFrozen() {return m_DeepFreeze;}
 
 	struct WeaponStat
 	{
@@ -104,6 +98,23 @@ private:
 	} m_aWeapons[NUM_WEAPONS];
 
 	int m_ActiveWeapon;
+
+	CNetObj_PlayerInput &GetLatestInput() { return m_LatestInput; }
+	bool GetWeaponGot(int Type) { return m_aWeapons[Type].m_Got; }
+	bool GetWeaponAmmo(int Type) { return m_aWeapons[Type].m_Ammo; }
+	void SetActiveWeapon(int ActiveWeap) { m_ActiveWeapon = ActiveWeap; }
+	int m_Jumped;
+
+private:
+	// player controlling this character
+	class CPlayer *m_pPlayer;
+
+	bool m_Alive;
+
+	// weapon info
+	CEntity *m_apHitObjects[10];
+	int m_NumObjectsHit;
+
 	int m_LastWeapon;
 	int m_QueuedWeapon;
 
@@ -127,7 +138,6 @@ private:
 	CNetObj_PlayerInput m_PrevInput;
 	CNetObj_PlayerInput m_Input;
 	int m_NumInputs;
-	int m_Jumped;
 
 	int m_DamageTakenTick;
 
