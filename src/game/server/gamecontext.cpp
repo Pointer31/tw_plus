@@ -2,7 +2,10 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <new>
 #include <base/math.h>
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include <engine/external/httplib.h>
 #include <engine/shared/config.h>
+#include <engine/shared/json.h>
 #include <engine/map.h>
 #include <engine/console.h>
 #include "gamecontext.h"
@@ -614,6 +617,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "'%s' entered and joined the %s", Server()->ClientName(ClientID), m_pController->GetTeamName(m_apPlayers[ClientID]->GetTeam()));
 	SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+	SendDiscordChatMessage(-1, aBuf);
 
 	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), m_apPlayers[ClientID]->GetTeam());
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
@@ -826,6 +830,8 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 				else
 					SendChat(ClientID, Team, pMsg->m_pMessage);
+				
+				SendDiscordChatMessage(ClientID, pMsg->m_pMessage);
 			}
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
@@ -1874,6 +1880,41 @@ bool CGameContext::CheckForCapslock(const char *pStr)
 		return true;
 
 	return false;
+}
+
+void CGameContext::SendDiscordChatMessage(int ClientID, const char *msg)
+{
+	char aPayload[4048];
+	char aStatsStr[4000];
+	char aStr[275];
+	aStr[0] = '\0';
+	if(ClientID >= 0 && ClientID < MAX_CLIENTS)
+		str_format(aStr, sizeof(aStr),"%s: %s",Server()->ClientName(ClientID),msg);
+	else
+		str_format(aStr, sizeof(aStr),"%s: %s","Server",msg);
+
+	str_format(
+		aPayload,
+		sizeof(aPayload),
+		"{\"allowed_mentions\": {\"parse\": []}, \"content\": \"%s\"}",
+		EscapeJson(aStatsStr, sizeof(aStatsStr), aStr));
+	const int PayloadSize = str_length(aPayload);
+
+	httplib::Client cli("https://discord.com");
+
+	cli.set_connection_timeout(5); // 5 seconds
+	cli.set_read_timeout(10); // 10 seconds
+
+	auto res = cli.Post(g_Config.m_SvChatDiscordWebhook, aPayload, "application/json");
+
+	if(res)
+	{
+		std::cout << "Response Status: " << res->status << std::endl;
+	}
+	else
+	{
+		std::cout << res.error() << std::endl;
+	}
 }
 
 void CGameContext::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)

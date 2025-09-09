@@ -260,7 +260,11 @@ find_package(PythonInterp)
 find_package(SDL)
 find_package(Threads)
 find_package(Wavpack)
+find_package(OpenSSL REQUIRED)
 
+if(NOT(OpenSSL_FOUND))
+  message(SEND_ERROR "You must install OpenSSL to compile the Teeworlds server")
+endif()
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   find_program(DMG dmg)
@@ -305,6 +309,7 @@ show_dependency_status("PythonInterp" PYTHONINTERP)
 show_dependency_status("SDL" SDL)
 show_dependency_status("Wavpack" WAVPACK)
 show_dependency_status("Zlib" ZLIB)
+show_dependency_status("OpenSSL" OpenSSL)
 
 if(NOT(PYTHONINTERP_FOUND))
   message(SEND_ERROR "You must install Python to compile Teeworlds")
@@ -466,6 +471,9 @@ set_glob(ENGINE_INTERFACE GLOB src/engine
   sound.h
   storage.h
   textrender.h
+  external/httplib.h
+  external/json-parser/json.c
+  external/json-parser/json.h
 )
 set_glob(ENGINE_SHARED GLOB src/engine/shared
   compression.cpp
@@ -488,6 +496,8 @@ set_glob(ENGINE_SHARED GLOB src/engine/shared
   huffman.h
   jobs.cpp
   jobs.h
+  json.cpp
+  json.h
   kernel.cpp
   linereader.cpp
   linereader.h
@@ -807,7 +817,7 @@ add_executable(${TARGET_SERVER}
   $<TARGET_OBJECTS:engine-shared>
   $<TARGET_OBJECTS:game-shared>
 )
-target_link_libraries(${TARGET_SERVER} ${LIBS_SERVER})
+target_link_libraries(${TARGET_SERVER} ${LIBS_SERVER} OpenSSL::SSL)
 list(APPEND TARGETS_OWN ${TARGET_SERVER})
 list(APPEND TARGETS_LINK ${TARGET_SERVER})
 

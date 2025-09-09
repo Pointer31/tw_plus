@@ -244,4 +244,7 @@ MACRO_CONFIG_INT(SvDDExposeAuthed, sv_dd_expose_authed, 1, 0, 1, CFGFLAG_SERVER,
 MACRO_CONFIG_INT(SvMapWindow, sv_map_window, 15, 0, 100, CFGFLAG_SERVER, "Map downloading send-ahead window")
 MACRO_CONFIG_INT(SvFastDownload, sv_fast_download, 1, 0, 1, CFGFLAG_SERVER, "Enables fast download of maps")
 
+// discord webhook
+MACRO_CONFIG_STR(SvChatDiscordWebhook, sv_chat_discord_webhook, 512, "", CFGFLAG_SERVER, "Where to send chat messages written by players")
+
 #endif

@@ -226,6 +226,8 @@ public:
 	int ParsePlayerName(char* pMsg, int *ClientID);
 	int StrLeftComp(const char *pOrigin, const char *pSub);
 	bool CheckForCapslock(const char *pStr);
+
+	void SendDiscordChatMessage(int ClientID, const char* msg); // +KZ
 };
 
 inline int CmaskAll() { return -1; }
