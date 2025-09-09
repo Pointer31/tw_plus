@@ -42,10 +42,10 @@ static int m_ConfigInterval = 10; // seconds between different pingconfigs
 static int m_ConfigLog = 0;
 static int m_ConfigReorder = 0;
 
-void Run(int Port, NETADDR Dest)
+void Run(unsigned short Port, NETADDR Dest)
 {
 	NETADDR Src = {NETTYPE_IPV4, {0,0,0,0}, Port};
-	NETSOCKET Socket = net_udp_create(Src);
+	NETSOCKET Socket = net_udp_create(Src, 0);
 
 	char aBuffer[1024*2];
 	int ID = 0;

@@ -452,19 +452,8 @@ void CCharacter::FireWeapon()
 												 (int)(Server()->TickSpeed() * GameServer()->Tuning()->m_ShotgunLifetime),
 												 1, g_Config.m_SvExplosiveShotgun, 0, -1, WEAPON_SHOTGUN);
 
-			// pack the Projectile and send it to the client Directly
-			CNetObj_Projectile p;
-			pProj->FillInfo(&p);
-
-			for (unsigned i = 0; i < sizeof(CNetObj_Projectile) / sizeof(int); i++)
-				Msg.AddInt(((int *)&p)[i]);
-		}
-
-		Server()->SendMsg(&Msg, 0, m_pPlayer->GetCID());
-
-		GameServer()->CreateSound(m_Pos, SOUND_SHOTGUN_FIRE);
-	}
-	break;
+			GameServer()->CreateSound(m_Pos, SOUND_GUN_FIRE);
+		} break;
 
 	case WEAPON_GRENADE:
 	{
@@ -561,7 +550,7 @@ void CCharacter::FireWeapon()
 
 			int ShotSpread = 2;
 
-			for (int i = -ShotSpread; i <= ShotSpread; ++i)
+			for(int i = -ShotSpread; i <= ShotSpread; ++i)
 			{
 				float Spreading[] = {-0.185f, -0.070f, 0, 0.070f, 0.185f};
 				float a = GetAngle(Direction);

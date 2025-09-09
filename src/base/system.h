@@ -364,7 +364,7 @@ IOHANDLE io_stderr();
 void thread_sleep(int milliseconds);
 
 /*
-	Function: teethread_create
+	Function: thread_init
 		Creates a new thread.
 
 	Parameters:
@@ -372,7 +372,7 @@ void thread_sleep(int milliseconds);
 		user - Pointer to pass to the thread.
 
 */
-void *teethread_create(void (*threadfunc)(void *), void *user);
+void *thread_init(void (*threadfunc)(void *), void *user);
 
 /*
 	Function: thread_wait
@@ -415,9 +415,9 @@ typedef void* LOCK;
 LOCK lock_create();
 void lock_destroy(LOCK lock);
 
-int lock_try(LOCK lock);
+int lock_trylock(LOCK lock);
 void lock_wait(LOCK lock);
-void lock_release(LOCK lock);
+void lock_unlock(LOCK lock);
 
 
 /* Group: Semaphores */
@@ -578,12 +578,13 @@ int net_addr_from_str(NETADDR *addr, const char *string);
 
 	Parameters:
 		bindaddr - Address to bind the socket to.
+		use_random_port - use a random port
 
 	Returns:
 		On success it returns an handle to the socket. On failure it
 		returns NETSOCKET_INVALID.
 */
-NETSOCKET net_udp_create(NETADDR bindaddr);
+NETSOCKET net_udp_create(NETADDR bindaddr, int use_random_port);
 
 /*
 	Function: net_udp_send
