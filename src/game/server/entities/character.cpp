@@ -454,6 +454,7 @@ void CCharacter::FireWeapon()
 
 			GameServer()->CreateSound(m_Pos, SOUND_GUN_FIRE);
 		} break;
+	}
 
 	case WEAPON_GRENADE:
 	{
