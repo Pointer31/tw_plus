@@ -9,6 +9,8 @@
 
 #include <game/gamecore.h>
 
+#include <game/server/rollback.h>
+
 enum
 {
 	WEAPON_GAME = -3, // team switching etc
@@ -83,6 +85,8 @@ public:
 	bool m_SentCampMsg;
 	int m_CampTick;
 	vec2 m_CampPos;
+
+	CRollbackPositionHistory m_Positions[ROLLBACK_POSITION_HISTORY];
 
 private:
 	// player controlling this character

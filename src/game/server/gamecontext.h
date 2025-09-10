@@ -17,6 +17,8 @@
 #include "player.h"
 #include "mute.h"
 
+#include <game/server/rollback.h> // ddnet-insta rollback
+
 
 /*
 	Tick
@@ -92,6 +94,9 @@ class CGameContext : public IGameServer
 	void AddBot(int difficulty);
 	static void ConAddBot(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemoveBot(IConsole::IResult *pResult, void *pUserData);
+
+	void DoRollback(int ClientId);
+	static void ConchainRollback(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 
 	CGameContext(int Resetting);
@@ -226,6 +231,9 @@ public:
 	int ParsePlayerName(char* pMsg, int *ClientID);
 	int StrLeftComp(const char *pOrigin, const char *pSub);
 	bool CheckForCapslock(const char *pStr);
+
+	CRollback m_Rollback; //ddnet-insta rollback
+	virtual void SetPlayerLastAckedSnapshot(int ClientId, int Tick) override; //ddnet-insta rollback
 };
 
 inline int CmaskAll() { return -1; }

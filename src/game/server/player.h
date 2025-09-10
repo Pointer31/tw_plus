@@ -130,6 +130,11 @@ public:
 	int m_ticksSinceFire; // ticks since last fire
 	int m_botAggro; // whether it is aggroed and on whom
 	bool m_WantsPause;
+
+	// Enabled rollback for this player
+	bool m_RollbackEnabled = false;
+	// Rollback LastAckedSnapshot
+	int m_LastAckedSnapshot = -1;
 private:
 	CCharacter *m_pCharacter;
 	CGameContext *m_pGameServer;

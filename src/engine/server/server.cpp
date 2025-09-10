@@ -951,6 +951,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			int64 TagTime;
 
 			m_aClients[ClientID].m_LastAckedSnapshot = Unpacker.GetInt();
+			const int LastAckedSnapshot = m_aClients[ClientID].m_LastAckedSnapshot;
 			int IntendedTick = Unpacker.GetInt();
 			int Size = Unpacker.GetInt();
 
@@ -984,6 +985,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				IntendedTick = Tick() + 1;
 
 			pInput->m_GameTick = IntendedTick;
+			pInput->m_AckedTick = LastAckedSnapshot; //ddnet-insta rollback
 
 			for (int i = 0; i < Size / 4; i++)
 				pInput->m_aData[i] = Unpacker.GetInt();
@@ -1467,6 +1469,7 @@ int CServer::Run()
 					{
 						if (m_aClients[c].m_aInputs[i].m_GameTick == Tick())
 						{
+							GameServer()->SetPlayerLastAckedSnapshot(c, m_aClients[c].m_aInputs[i].m_AckedTick); //ddnet-insta rollback
 							if (m_aClients[c].m_State == CClient::STATE_INGAME)
 								GameServer()->OnClientPredictedInput(c, m_aClients[c].m_aInputs[i].m_aData);
 							break;

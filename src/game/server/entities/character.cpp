@@ -362,8 +362,8 @@ void CCharacter::FireWeapon()
 
 		CCharacter *apEnts[MAX_CLIENTS];
 		int Hits = 0;
-		int Num = GameServer()->m_World.FindEntities(ProjStartPos, m_ProximityRadius * 0.5f, (CEntity **)apEnts,
-													 MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+		int Num = GameServer()->m_Rollback.FindCharactersOnTick(ProjStartPos, m_ProximityRadius * 0.5f, (CEntity **)apEnts,
+													 MAX_CLIENTS, m_pPlayer->m_RollbackEnabled ? m_pPlayer->m_LastAckedSnapshot : -1);
 
 		for (int i = 0; i < Num; ++i)
 		{
@@ -1099,6 +1099,8 @@ void CCharacter::TickDefered()
 	m_Core.Quantize();
 	bool StuckAfterQuant = GameServer()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
 	m_Pos = m_Core.m_Pos;
+	m_Positions[Server()->Tick() % ROLLBACK_POSITION_HISTORY].m_Position = m_Pos; //ddnet-insta rollback
+	m_Positions[Server()->Tick() % ROLLBACK_POSITION_HISTORY].m_Valid = true; //ddnet-insta rollback
 
 	if (!StuckBefore && (StuckAfterMove || StuckAfterQuant))
 	{

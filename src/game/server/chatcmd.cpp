@@ -595,6 +595,11 @@ bool CGameContext::ShowCommand(int ClientID, CPlayer* pPlayer, const char* pMess
 		else	
 			SendBroadcast("Please wait until the end of the round", ClientID);
 	}
+	else if(StrLeftComp(pMessage, "rollback") || StrLeftComp(pMessage, "antilag"))
+	{
+		DoRollback(ClientID);
+		return false; //true;
+	}
 	else
 		SendChatTarget(ClientID, "No such command. Type \"/cmdlist\" to get a list of available commands");
 

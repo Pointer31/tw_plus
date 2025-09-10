@@ -2157,6 +2157,63 @@ void CGameContext::ConRemoveBot(IConsole::IResult *pResult, void *pUserData)
 	
 }
 
+void CGameContext::DoRollback(int ClientId)
+{
+	if(ClientId < 0 || ClientId >= MAX_CLIENTS)
+		return;
+
+	if(!m_pController)
+		return;
+
+	if(!g_Config.m_SvRollback)
+	{
+		SendChatTarget(ClientId, "Rollback is not allowed on this server.");
+		return;
+	}
+
+	if(!m_apPlayers[ClientId])
+		return;
+
+	if(!m_apPlayers[ClientId]->m_RollbackEnabled)
+	{
+		m_apPlayers[ClientId]->m_RollbackEnabled = true;
+		SendChatTarget(ClientId, "Rollback enabled.");
+
+		//if(GetClientVersion(ClientId) >= VERSION_DDNET_ANTIPING_PROJECTILE)
+		//{
+			SendChatTarget(ClientId, "For correct rollback experience on DDNet Client please set the following Antiping settings:");
+			SendChatTarget(ClientId, "* Antiping: ON");
+			SendChatTarget(ClientId, "* Antiping: predict other players: OFF");
+			SendChatTarget(ClientId, "* Antiping: predict weapons: ON");
+			SendChatTarget(ClientId, "* Antiping: predict grenade paths: ON");
+		//}
+	}
+	else
+	{
+		m_apPlayers[ClientId]->m_RollbackEnabled = false;
+		SendChatTarget(ClientId, "Rollback disabled.");
+	}
+}
+
+void CGameContext::ConchainRollback(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pfnCallback(pResult, pCallbackUserData);
+
+	//Dont keep rollback enabled if server does not allow it
+
+	if(!g_Config.m_SvRollback)
+	{
+		for(CPlayer *pPlayer : pSelf->m_apPlayers)
+		{
+			if(!pPlayer)
+				continue;
+
+			pPlayer->m_RollbackEnabled = false;
+		}
+	}
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -2206,6 +2263,9 @@ void CGameContext::OnConsoleInit()
 // #endif
 	Console()->Register("add_bot", "?i", CFGFLAG_SERVER, ConAddBot, this, "Add a bot with type (1=dummy,2=shoot,3=move,4,5,6=aim)");
 	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
+
+	Console()->Chain("sv_rollback", ConchainRollback, this);
+
 	m_Mute.OnConsoleInit(m_pConsole);
 }
 
@@ -2360,6 +2420,8 @@ void CGameContext::OnInit(/*class IKernel *pKernel*/)
 		}
 	}
 #endif
+
+	m_Rollback.Init(this);
 }
 
 void CGameContext::OnShutdown()
@@ -2454,3 +2516,14 @@ const char *CGameContext::Version() { return GAME_VERSION; }
 const char *CGameContext::NetVersion() { return GAME_NETVERSION; }
 
 IGameServer *CreateGameServer() { return new CGameContext; }
+
+void CGameContext::SetPlayerLastAckedSnapshot(int ClientId, int Tick)
+{
+	if(ClientId < 0 || ClientId >= MAX_CLIENTS)
+		return;
+
+	if(!m_apPlayers[ClientId])
+		return;
+
+	m_apPlayers[ClientId]->m_LastAckedSnapshot = Tick;
+}

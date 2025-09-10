@@ -783,6 +783,8 @@ set_glob(GAME_SERVER GLOB_RECURSE src/game/server
   gameworld.h
   player.cpp
   player.h
+  rollback.cpp
+  rollback.h
 )
 set(GAME_GENERATED_SERVER
   "src/game/generated/server_data.cpp"

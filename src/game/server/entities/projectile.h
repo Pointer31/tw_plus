@@ -9,6 +9,8 @@ public:
 	CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, vec2 Dir, int Span,
 		int Damage, bool Explosive, float Force, int SoundImpact, int Weapon);
 
+	~CProjectile();
+
 	vec2 GetPos(float Time);
 	void FillInfo(CNetObj_Projectile *pProj);
 
@@ -16,6 +18,16 @@ public:
 	virtual void Tick();
 	virtual void TickPaused();
 	virtual void Snap(int SnappingClient);
+
+	// Kaizo-Insta projectile rollback
+	// for rollback players the projectile will be forwarded
+	// to match the tick they sent the fire input
+	//
+	// Can not detect antiping clients D:
+	bool m_FirstTick;
+	int m_OrigStartTick;
+	bool m_FirstSnap;
+	int m_aParticleIds[3]; // particles to let know others a projectile got fired, in case it was forwarded too much
 
 private:
 	vec2 m_Direction;

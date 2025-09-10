@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <game/generated/protocol.h>
 #include <game/server/gamecontext.h>
+#include <game/server/rollback.h>
 #include <engine/shared/config.h>
 #include "laser.h"
 
@@ -29,6 +30,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	vec2 At;
 	CCharacter *pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
 	CCharacter *pHit = GameServer()->m_World.IntersectCharacter(m_Pos, To, 0.f, At, pOwnerChar);
+	GameServer()->m_Rollback.IntersectCharacterOnTick(m_Pos, To, 0.f, At, pOwnerChar, nullptr, nullptr, m_FireAckedTick);
 	if(!pHit)
 		return false;
 
@@ -41,6 +43,18 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 
 void CLaser::DoBounce()
 {
+	if(GameServer()->m_apPlayers[m_Owner] && GameServer()->m_apPlayers[m_Owner]->m_RollbackEnabled)
+	{
+		if(m_FireAckedTick == -1)
+		{
+			m_FireAckedTick = GameServer()->m_apPlayers[m_Owner]->m_LastAckedSnapshot;
+		}
+		else
+		{
+			m_FireAckedTick += Server()->Tick() - m_EvalTick; //rollback (ddnet-insta specific): increment acked tick each bounce
+		}
+	}
+
 	m_EvalTick = Server()->Tick();
 
 	if(m_Energy < 0)
