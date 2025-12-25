@@ -9,7 +9,7 @@
 
 CGameControllerLMS::CGameControllerLMS(CGameContext *pGameServer) : IGameController(pGameServer)
 {
-	m_pGameType = "LMS+";
+	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gLMS+" : "iLMS+") : "LMS+";
 	m_GameFlags = GAMEFLAG_SURVIVAL;
 }
 

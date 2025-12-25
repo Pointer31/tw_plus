@@ -114,6 +114,7 @@ protected:
 	// info
 	int m_GameFlags;
 	const char *m_pGameType;
+	int m_Instagib;
 	struct CGameInfo
 	{
 		int m_MatchCurrent;
@@ -209,6 +210,9 @@ public:
 	bool IsTeamChangeAllowed() const;
 	bool IsTeamplay() const { return m_GameFlags&GAMEFLAG_TEAMS; }
 	bool IsSurvival() const { return m_GameFlags&GAMEFLAG_SURVIVAL; }
+	bool IsInstagib() const { return m_Instagib; }
+	bool IsInstagibLaser() const { return m_Instagib == 1; }
+	bool IsInstagibGrenade() const { return m_Instagib == 2; }
 
 	const char *GetGameType() const { return m_pGameType; }
 

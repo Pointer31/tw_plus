@@ -6,5 +6,5 @@
 CGameControllerDM::CGameControllerDM(CGameContext *pGameServer)
 : IGameController(pGameServer)
 {
-	m_pGameType = "DM+";
+	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gDM+" : "iDM+") : "DM+";
 }

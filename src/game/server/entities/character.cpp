@@ -59,8 +59,21 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_EmoteStop = -1;
 	m_LastAction = -1;
 	m_LastNoAmmoSound = -1;
-	m_ActiveWeapon = WEAPON_GUN;
-	m_LastWeapon = WEAPON_HAMMER;
+	if (GameServer()->m_pController->IsInstagibLaser())
+	{
+		m_ActiveWeapon = WEAPON_LASER;
+		m_LastWeapon = WEAPON_LASER;
+	}
+	else if (GameServer()->m_pController->IsInstagibGrenade())
+	{
+		m_ActiveWeapon = WEAPON_GRENADE;
+		m_LastWeapon = WEAPON_GRENADE;
+	}
+	else
+	{
+		m_ActiveWeapon = WEAPON_GUN;
+		m_LastWeapon = WEAPON_HAMMER;
+	}
 	m_QueuedWeapon = -1;
 
 	m_pPlayer = pPlayer;
@@ -732,6 +745,18 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	// m_pPlayer only inflicts half damage on self
 	if(From == m_pPlayer->GetCID())
 		Dmg = maximum(1, Dmg/2);
+
+	if(From == m_pPlayer->GetCID() && GameServer()->m_pController->IsInstagib())
+		Dmg = 0;
+
+	if(GameServer()->m_pController->IsInstagib())
+	{
+		if (Dmg >= 4)
+			Dmg = 20;
+		else
+			return true;
+	}
+
 
 	int OldHealth = m_Health, OldArmor = m_Armor;
 	if(Dmg)

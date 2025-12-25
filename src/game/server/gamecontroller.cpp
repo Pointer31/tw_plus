@@ -39,6 +39,7 @@ IGameController::IGameController(CGameContext *pGameServer)
 	// info
 	m_GameFlags = 0;
 	m_pGameType = "unknown";
+	m_Instagib = Config()->m_SvInstagib;
 	m_GameInfo.m_MatchCurrent = m_MatchCount+1;
 	m_GameInfo.m_MatchNum = (str_length(Config()->m_SvMaprotation) && Config()->m_SvMatchesPerMap) ? Config()->m_SvMatchesPerMap : 0;
 	m_GameInfo.m_ScoreLimit = Config()->m_SvScorelimit;
@@ -250,8 +251,19 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	pChr->IncreaseHealth(10);
 
 	// give default weapons
-	pChr->GiveWeapon(WEAPON_HAMMER, -1);
-	pChr->GiveWeapon(WEAPON_GUN, 10);
+	if (m_Instagib == 1)
+	{
+		pChr->GiveWeapon(WEAPON_LASER, -1);
+	}
+	else if (m_Instagib == 2)
+	{
+		pChr->GiveWeapon(WEAPON_GRENADE, -1);
+	}
+	else
+	{
+		pChr->GiveWeapon(WEAPON_HAMMER, -1);
+		pChr->GiveWeapon(WEAPON_GUN, 10);
+	}
 }
 
 void IGameController::OnFlagReturn(CFlag *pFlag)
@@ -261,7 +273,7 @@ void IGameController::OnFlagReturn(CFlag *pFlag)
 bool IGameController::OnEntity(int Index, vec2 Pos)
 {
 	// don't add pickups in survival
-	if(m_GameFlags&GAMEFLAG_SURVIVAL)
+	if(m_GameFlags&GAMEFLAG_SURVIVAL || m_Instagib != 0)
 	{
 		if(Index < ENTITY_SPAWN || Index > ENTITY_SPAWN_BLUE)
 			return false;
