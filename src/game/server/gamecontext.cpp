@@ -888,8 +888,37 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					Mode = CHAT_NONE;
 			}
 
-			if(Mode != CHAT_NONE)
-				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);
+			if(pMsg->m_pMessage[0] != '/')
+			{
+				if(Mode != CHAT_NONE)
+					SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);
+			}
+			else
+			{
+				char aBuf[256];
+				str_copy(aBuf, pMsg->m_pMessage+1, sizeof(aBuf));
+				char bBuf[256] = "";
+				char* split = str_skip_to_whitespace(aBuf);
+				
+				if (*split != NULL)
+					str_copy(bBuf, split+1, sizeof(bBuf));
+
+				*split = '\0';
+
+				if (m_CommandManager.GetCommand(aBuf))
+				{
+					m_CommandManager.OnCommand(aBuf, bBuf, ClientID);
+				}
+				else
+				{
+					CNetMsg_Sv_Chat Msg;
+					Msg.m_Mode = CHAT_ALL;
+					Msg.m_ClientID = -1;
+					Msg.m_pMessage = "Invalid command";
+					Msg.m_TargetID = ClientID;
+					Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+				}
+			}
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
