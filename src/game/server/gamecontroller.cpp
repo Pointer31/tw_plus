@@ -1220,6 +1220,31 @@ int IGameController::GetStartTeam()
 	return TEAM_SPECTATORS;
 }
 
+void IGameController::Com_DefaultEmote(IConsole::IResult *pResult, void *pContext)
+{
+	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
+	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
+
+	if (!pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID])
+		return;
+
+	char emote[16];
+	str_copy(emote, pResult->GetString(0), sizeof(emote));
+
+	if(str_startswith_nocase(emote, "surprise"))
+		pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID]->m_DefaultEmote = EMOTE_SURPRISE;
+	else if(str_startswith_nocase(emote, "blink"))
+		pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID]->m_DefaultEmote = EMOTE_BLINK;
+	else if(str_startswith_nocase(emote, "happy"))
+		pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID]->m_DefaultEmote = EMOTE_HAPPY;
+	else if(str_startswith_nocase(emote, "pain"))
+		pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID]->m_DefaultEmote = EMOTE_PAIN;
+	else if(str_startswith_nocase(emote, "angry"))
+		pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID]->m_DefaultEmote = EMOTE_ANGRY;
+	else
+		pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID]->m_DefaultEmote = EMOTE_NORMAL;
+}
+
 /*void IGameController::Com_Example(IConsole::IResult *pResult, void *pContext)
 {
 	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
@@ -1230,5 +1255,6 @@ int IGameController::GetStartTeam()
 
 void IGameController::RegisterChatCommands(CCommandManager *pManager)
 {
+	pManager->AddCommand("emote", "set your default eye emote", "r", Com_DefaultEmote, this);
 	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }

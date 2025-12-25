@@ -854,7 +854,7 @@ void CCharacter::Snap(int SnappingClient)
 	// set emote
 	if(m_EmoteStop < Server()->Tick())
 	{
-		SetEmote(EMOTE_NORMAL, -1);
+		SetEmote(GetPlayer()->m_DefaultEmote, -1);
 	}
 
 	pCharacter->m_Emote = m_EmoteType;
