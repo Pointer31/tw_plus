@@ -153,3 +153,5 @@ MACRO_CONFIG_INT(DbgTuning, dbg_tuning, 0, 0, 1, CFGFLAG_CLIENT, "")
 #endif
 
 MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib (0=off, 1=laser, 2=grenade)")
+MACRO_CONFIG_INT(SvBetweenMatchTime, sv_between_match_time, 10, 0, 30, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many seconds to wait before starting the next match")
+MACRO_CONFIG_INT(SvBetweenRoundTime, sv_between_round_time, 5, 0, 30, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many seconds to wait before starting the next round")

@@ -624,9 +624,46 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 		}
 		break;
 	case IGS_END_ROUND:
+		Timer = Config()->m_SvBetweenRoundTime;
 	case IGS_END_MATCH:
 		if(GameState == IGS_END_ROUND && DoWincheckMatch())
 			break;
+
+		if (GameState == IGS_END_MATCH)
+		{
+			Timer = Config()->m_SvBetweenMatchTime;
+			if(IsTeamplay())
+			{
+				char aBuf[1024] = "No message (this should not appear)";
+				int scoreRed = m_aTeamscore[TEAM_RED];
+				int scoreBlue = m_aTeamscore[TEAM_BLUE];
+				if (scoreRed > scoreBlue)
+					str_format(aBuf, sizeof(aBuf), "★ Red team has won the match!");
+				else if (scoreRed < scoreBlue)
+					str_format(aBuf, sizeof(aBuf), "★ Blue team has won the match!");
+				else
+					str_format(aBuf, sizeof(aBuf), "★ Match is a draw!");
+				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			} else { // Non-team gamemode
+				char aBuf[1024] = "No message (this should not appear)";
+				int highestScore = -99;
+				for(int i = 0; i < MAX_CLIENTS; i++) {
+					if(!GameServer()->m_apPlayers[i] || GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
+						continue;
+					CPlayer* pP = GameServer()->m_apPlayers[i];
+
+					if (pP->m_Score > highestScore) {
+						highestScore = pP->m_Score;
+						str_format(aBuf, sizeof(aBuf), "★ '%s' has won the match!", Server()->ClientName(i));
+					} else if (pP->m_Score == highestScore) {
+						highestScore = pP->m_Score;
+						str_format(aBuf, sizeof(aBuf), "★ Match is a draw!");
+					}
+				}
+				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			}
+		}
+		
 		// only possible when game is running or over
 		if(m_GameState == IGS_GAME_RUNNING || m_GameState == IGS_END_MATCH || m_GameState == IGS_END_ROUND || m_GameState == IGS_GAME_PAUSED)
 		{
@@ -710,7 +747,7 @@ void IGameController::Snap(int SnappingClient)
 			pGameData->m_GameStateEndTick = Server()->Tick()+m_GameStateTimer;
 		break;
 	case IGS_END_ROUND:
-		pGameData->m_GameStateFlags |= GAMESTATEFLAG_ROUNDOVER;
+		pGameData->m_GameStateFlags |= GAMESTATEFLAG_ROUNDOVER | GAMESTATEFLAG_GAMEOVER;
 		pGameData->m_GameStateEndTick = Server()->Tick()-m_GameStartTick-TIMER_END/2*Server()->TickSpeed()+m_GameStateTimer;
 		break;
 	case IGS_END_MATCH:
