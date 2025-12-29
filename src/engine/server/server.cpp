@@ -273,15 +273,55 @@ CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
 	Init();
 }
 
+int CServer::TrySetClientName(int ClientID, const char *pName)
+{
+	const char *aTrimmedName = str_utf8_skip_whitespaces(pName);
+
+	// check for empty names
+	if (!aTrimmedName[0])
+		return -1;
+
+	// check if new and old name are the same (commented; 0.7 cannot do this anyway)
+	// if (m_aClients[ClientID].m_aName[0] && str_comp(m_aClients[ClientID].m_aName, aTrimmedName) == 0)
+	// 	return 0;
+
+	char aBuf[256];
+	str_format(aBuf, sizeof(aBuf), "'%s' -> '%s'", pName, aTrimmedName);
+	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
+	pName = aTrimmedName;
+
+	// make sure that two clients doesn't have the same name
+	for (int i = 0; i < MAX_CLIENTS; i++)
+		if (i != ClientID && m_aClients[i].m_State >= CClient::STATE_READY)
+		{
+			if (str_comp(pName, m_aClients[i].m_aName) == 0)
+				return -1;
+		}
+
+	// set the client name
+	str_copy(m_aClients[ClientID].m_aName, pName, MAX_NAME_LENGTH);
+	return 0;
+}
 
 void CServer::SetClientName(int ClientID, const char *pName)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY || !pName)
 		return;
 
-	const char *pDefaultName = "(1)";
-	pName = str_utf8_skip_whitespaces(pName);
-	str_utf8_copy_num(m_aClients[ClientID].m_aName, *pName ? pName : pDefaultName, sizeof(m_aClients[ClientID].m_aName), MAX_NAME_LENGTH);
+	char aCleanName[MAX_NAME_LENGTH];
+	str_copy(aCleanName, pName, sizeof(aCleanName));
+
+	if (TrySetClientName(ClientID, aCleanName))
+	{
+		// auto rename
+		for (int i = 1;; i++)
+		{
+			char aNameTry[MAX_NAME_LENGTH];
+			str_format(aNameTry, sizeof(aCleanName), "(%d)%s", i, aCleanName);
+			if (TrySetClientName(ClientID, aNameTry) == 0)
+				break;
+		}
+	}
 }
 
 void CServer::SetClientClan(int ClientID, const char *pClan)
