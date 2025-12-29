@@ -251,7 +251,7 @@ void CGameControllerHTF::Tick()
 					continue;
 
 				// player can't take 2 flags
-				if (m_apFlags[fi^1]->GetCarrier() && m_apFlags[fi^1]->GetCarrier() == apCloseCCharacters[i])
+				if (m_apFlags[fi^1] && m_apFlags[fi^1]->GetCarrier() && m_apFlags[fi^1]->GetCarrier() == apCloseCCharacters[i])
 					continue;
 
 				{
