@@ -629,7 +629,7 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 		if(GameState == IGS_END_ROUND && DoWincheckMatch())
 			break;
 
-		if (GameState == IGS_END_MATCH)
+		if (GameState == IGS_END_MATCH && HasEnoughPlayers())
 		{
 			Timer = Config()->m_SvBetweenMatchTime;
 			if(IsTeamplay())
