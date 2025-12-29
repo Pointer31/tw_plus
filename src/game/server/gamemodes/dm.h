@@ -8,6 +8,7 @@ class CGameControllerDM : public IGameController
 {
 public:
 	CGameControllerDM(class CGameContext *pGameServer);
+	virtual const char *GetGameHelpText();
 };
 
 #endif

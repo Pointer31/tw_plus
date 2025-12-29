@@ -13,6 +13,11 @@ CGameControllerTDM::CGameControllerTDM(class CGameContext *pGameServer) : IGameC
 	m_GameFlags = GAMEFLAG_TEAMS;
 }
 
+const char* CGameControllerTDM::GetGameHelpText()
+{
+	return "Gametype: Team Death Match. Kill the other team for points!";
+}
+
 // event
 int CGameControllerTDM::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
 {

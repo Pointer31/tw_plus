@@ -17,6 +17,7 @@ class CGameControllerHTF : public IGameController
 
 public:
 	CGameControllerHTF(class CGameContext *pGameServer);
+	virtual const char *GetGameHelpText();
 	
 	// event
 	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);

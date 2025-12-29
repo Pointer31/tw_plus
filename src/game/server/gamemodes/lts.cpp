@@ -13,6 +13,11 @@ CGameControllerLTS::CGameControllerLTS(CGameContext *pGameServer) : IGameControl
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_SURVIVAL;
 }
 
+const char* CGameControllerLTS::GetGameHelpText()
+{
+	return "Gametype: Last Team Standing. Kill the other team but avoid dying yourself!";
+}
+
 // event
 void CGameControllerLTS::OnCharacterSpawn(class CCharacter *pChr)
 {

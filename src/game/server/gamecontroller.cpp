@@ -1282,6 +1282,47 @@ void IGameController::Com_DefaultEmote(IConsole::IResult *pResult, void *pContex
 		pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID]->m_DefaultEmote = EMOTE_NORMAL;
 }
 
+void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
+{
+	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
+	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
+
+	int ClientID = pComContext->m_ClientID;
+
+	if (pSelf->IsInstagibLaser()) 
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Mode = CHAT_ALL;
+		Msg.m_ClientID = -1;
+		Msg.m_pMessage = "Instagib is enabled. Your rifle instakills others.";
+		Msg.m_TargetID = ClientID;
+		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
+	else if (pSelf->IsInstagibGrenade()) 
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Mode = CHAT_ALL;
+		Msg.m_ClientID = -1;
+		Msg.m_pMessage = "Instagib is enabled. Your grenade launcher instakills others.";
+		Msg.m_TargetID = ClientID;
+		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
+
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Mode = CHAT_ALL;
+		Msg.m_ClientID = -1;
+		Msg.m_pMessage = pSelf->GetGameHelpText();
+		Msg.m_TargetID = ClientID;
+		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
+}
+
+const char* IGameController::GetGameHelpText()
+{
+	return "Help text is unknown for this gamemode.";
+}
+
 /*void IGameController::Com_Example(IConsole::IResult *pResult, void *pContext)
 {
 	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
@@ -1293,5 +1334,6 @@ void IGameController::Com_DefaultEmote(IConsole::IResult *pResult, void *pContex
 void IGameController::RegisterChatCommands(CCommandManager *pManager)
 {
 	pManager->AddCommand("emote", "set your default eye emote", "r", Com_DefaultEmote, this);
+	pManager->AddCommand("help", "get info about the current gametype", "", Com_GameHelp, this);
 	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }

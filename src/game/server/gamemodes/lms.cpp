@@ -13,6 +13,11 @@ CGameControllerLMS::CGameControllerLMS(CGameContext *pGameServer) : IGameControl
 	m_GameFlags = GAMEFLAG_SURVIVAL;
 }
 
+const char* CGameControllerLMS::GetGameHelpText()
+{
+	return "Gametype: Last Man Standing. Kill others but avoid dying yourself!";
+}
+
 // event
 void CGameControllerLMS::OnCharacterSpawn(CCharacter *pChr)
 {

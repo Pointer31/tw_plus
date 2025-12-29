@@ -20,6 +20,11 @@ CGameControllerCTF::CGameControllerCTF(CGameContext *pGameServer)
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_FLAGS;
 }
 
+const char* CGameControllerCTF::GetGameHelpText()
+{
+	return "Gametype: Capture The Flag. Bring the other team's flag to your own to get points!";
+}
+
 // balancing
 bool CGameControllerCTF::CanBeMovedOnBalance(int ClientID) const
 {

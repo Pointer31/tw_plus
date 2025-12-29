@@ -20,6 +20,11 @@ CGameControllerHTF::CGameControllerHTF(CGameContext *pGameServer)
 	m_GameFlags = GAMEFLAG_FLAGS;
 }
 
+const char* CGameControllerHTF::GetGameHelpText()
+{
+	return "Gametype: Hold The Flag. Hold the flag to continually get points!";
+}
+
 // balancing
 bool CGameControllerHTF::CanBeMovedOnBalance(int ClientID) const
 {

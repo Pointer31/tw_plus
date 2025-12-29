@@ -8,6 +8,7 @@ class CGameControllerTDM : public IGameController
 {
 public:
 	CGameControllerTDM(class CGameContext *pGameServer);
+	virtual const char *GetGameHelpText();
 
 	// event
 	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);

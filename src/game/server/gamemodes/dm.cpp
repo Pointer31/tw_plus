@@ -8,3 +8,8 @@ CGameControllerDM::CGameControllerDM(CGameContext *pGameServer)
 {
 	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gDM+" : "iDM+") : "DM+";
 }
+
+const char* CGameControllerDM::GetGameHelpText()
+{
+	return "Gametype: Death Match. Kill others to get points!";
+}
