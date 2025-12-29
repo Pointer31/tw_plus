@@ -200,6 +200,8 @@ public:
 	virtual const char *NetVersion() const;
 	virtual const char *NetVersionHashUsed() const;
 	virtual const char *NetVersionHashReal() const;
+
+	void PreInputClients(int ClientId, bool *pClients) override;
 };
 
 inline int64 CmaskAll() { return -1; }

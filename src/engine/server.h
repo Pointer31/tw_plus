@@ -104,6 +104,7 @@ public:
 	virtual const char *NetVersionHashReal() const = 0;
 
 	virtual bool TimeScore() const { return false; }
+	virtual void PreInputClients(int ClientId, bool *pClients) = 0;
 };
 
 extern IGameServer *CreateGameServer();

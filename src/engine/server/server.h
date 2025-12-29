@@ -7,6 +7,7 @@
 
 #include <engine/server.h>
 #include <engine/shared/memheap.h>
+#include <generated/protocol.h>
 
 class CSnapIDPool
 {
@@ -121,6 +122,7 @@ public:
 		int m_LastInputTick;
 		CSnapshotStorage m_Snapshots;
 
+		CNetMsg_Sv_PreInput m_LastPreInput = {};
 		CInput m_LatestInput;
 		CInput m_aInputs[200]; // TODO: handle input better
 		int m_CurrentInput;
