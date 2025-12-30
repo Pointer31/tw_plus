@@ -1323,6 +1323,16 @@ const char* IGameController::GetGameHelpText()
 	return "Help text is unknown for this gamemode.";
 }
 
+void IGameController::Com_Restart(IConsole::IResult *pResult, void *pContext)
+{
+	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
+	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
+
+	int ClientID = pComContext->m_ClientID;
+
+	pSelf->GameServer()->StartVote("Restart round", "restart", "/restart");
+}
+
 /*void IGameController::Com_Example(IConsole::IResult *pResult, void *pContext)
 {
 	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
@@ -1335,5 +1345,6 @@ void IGameController::RegisterChatCommands(CCommandManager *pManager)
 {
 	pManager->AddCommand("emote", "set your default eye emote", "r", Com_DefaultEmote, this);
 	pManager->AddCommand("help", "get info about the current gametype", "", Com_GameHelp, this);
+	pManager->AddCommand("restart", "vote for restarting the round", "", Com_Restart, this);
 	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }

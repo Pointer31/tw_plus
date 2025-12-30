@@ -235,6 +235,7 @@ public:
 
 	static void Com_DefaultEmote(IConsole::IResult *pResult, void *pContext);
 	static void Com_GameHelp(IConsole::IResult *pResult, void *pContext);
+	static void Com_Restart(IConsole::IResult *pResult, void *pContext);
 	virtual const char *GetGameHelpText();
 	//static void Com_Example(IConsole::IResult *pResult, void *pContext);
 	virtual void RegisterChatCommands(CCommandManager *pManager);
