@@ -91,6 +91,32 @@ void CProjectile::Tick()
 
 		GameWorld()->DestroyEntity(this);
 	}
+	else
+	{
+		// teleports
+		int TeleId = -1;
+		if (GameServer()->Collision()->GetCollisionAtId(CurPos.x, CurPos.y) >= TILE_TELE_START && GameServer()->Collision()->GetCollisionAtId(CurPos.x, CurPos.y) < TILE_TELE_START+NUM_TILE_TELE)
+			TeleId = GameServer()->Collision()->GetCollisionAtId(CurPos.x, CurPos.y) - TILE_TELE_START;
+
+		if (TeleId >= 0)
+		{
+			if (!m_inTele) {
+				m_inTele = true;
+				int TeleIdEnd = TeleId % 2 == 0 ? TeleId+1  : TeleId-1;
+				int x = GameServer()->Collision()->getTeleX(TeleId);
+				int y = GameServer()->Collision()->getTeleY(TeleId);
+				int tx = GameServer()->Collision()->getTeleX(TeleIdEnd);
+				int ty = GameServer()->Collision()->getTeleY(TeleIdEnd);
+				vec2 start = {(float)x, (float)y};
+				vec2 end = {(float)tx, (float)ty};
+				m_Pos = m_Pos - start * 32 + end * 32;
+			}
+		}
+		else
+		{
+			m_inTele = false;
+		}
+	}
 }
 
 void CProjectile::TickPaused()

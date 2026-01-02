@@ -18,6 +18,13 @@ CCollision::CCollision()
 	m_Width = 0;
 	m_Height = 0;
 	m_pLayers = 0;
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_telePositions[i].x = 0;
+		m_telePositions[i].y = 0;
+		m_telePositions[i].exists = false;
+	}
 }
 
 void CCollision::Init(class CLayers *pLayers)
@@ -30,33 +37,50 @@ void CCollision::Init(class CLayers *pLayers)
 	for(int i = 0; i < m_Width*m_Height; i++)
 	{
 		int Index = m_pTiles[i].m_Index;
+		int x = i % m_Width;
+		int y = floor(i/m_Width);
 
-		if(Index > 128)
-			continue;
-
-		switch(Index)
+		if (Index >= TILE_TELE_START && Index < TILE_TELE_START+NUM_TILE_TELE)
 		{
-		case TILE_DEATH:
-			m_pTiles[i].m_Index = COLFLAG_DEATH;
-			break;
-		case TILE_SOLID:
-			m_pTiles[i].m_Index = COLFLAG_SOLID;
-			break;
-		case TILE_NOHOOK:
-			m_pTiles[i].m_Index = COLFLAG_SOLID|COLFLAG_NOHOOK;
-			break;
-		default:
-			m_pTiles[i].m_Index = 0;
+			int TeleId = Index - TILE_TELE_START;
+			if (m_telePositions[TeleId].exists == false)
+			{
+				m_telePositions[TeleId].x = x;
+				m_telePositions[TeleId].y = y;
+				m_telePositions[TeleId].exists = true;
+			}
 		}
 	}
 }
 
-int CCollision::GetTile(int x, int y) const
+int CCollision::GetTile(int x, int y, bool id) const
 {
 	int Nx = clamp(x/32, 0, m_Width-1);
 	int Ny = clamp(y/32, 0, m_Height-1);
 
-	return m_pTiles[Ny*m_Width+Nx].m_Index > 128 ? 0 : m_pTiles[Ny*m_Width+Nx].m_Index;
+	if (!id)
+	{
+		int Index = m_pTiles[Ny*m_Width+Nx].m_Index;
+
+		switch(Index)
+		{
+		case TILE_DEATH:
+			return COLFLAG_DEATH;
+			break;
+		case TILE_SOLID:
+			return COLFLAG_SOLID;
+			break;
+		case TILE_NOHOOK:
+			return COLFLAG_SOLID|COLFLAG_NOHOOK;
+			break;
+		default:
+			return 0;
+		}
+	}
+	else
+	{
+		return m_pTiles[Ny*m_Width+Nx].m_Index;
+	}
 }
 
 bool CCollision::IsTile(int x, int y, int Flag) const
@@ -205,4 +229,14 @@ void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elas
 
 	*pInoutPos = Pos;
 	*pInoutVel = Vel;
+}
+
+// gets X of a teleport position
+int CCollision::getTeleX(int index) {
+	return m_telePositions[index].x;
+}
+
+// gets Y of a teleport position
+int CCollision::getTeleY(int index) {
+	return m_telePositions[index].y;
 }

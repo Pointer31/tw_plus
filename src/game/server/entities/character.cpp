@@ -47,6 +47,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Health = 0;
 	m_Armor = 0;
 	m_TriggeredEvents = 0;
+	m_inTele = false;
 }
 
 void CCharacter::Reset()
@@ -544,6 +545,31 @@ void CCharacter::Tick()
 	if(GameLayerClipped(m_Pos))
 	{
 		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+	}
+
+	// teleports
+	int TeleId = -1;
+	if (GameServer()->Collision()->GetCollisionAtId(m_Pos.x, m_Pos.y) >= TILE_TELE_START && GameServer()->Collision()->GetCollisionAtId(m_Pos.x, m_Pos.y) < TILE_TELE_START+NUM_TILE_TELE)
+		TeleId = GameServer()->Collision()->GetCollisionAtId(m_Pos.x, m_Pos.y) - TILE_TELE_START;
+		
+	if (TeleId >= 0)
+	{
+		if (!m_inTele) {
+			m_inTele = true;
+			int TeleIdEnd = TeleId % 2 == 0 ? TeleId+1  : TeleId-1;
+			int x = GameServer()->Collision()->getTeleX(TeleId);
+			int y = GameServer()->Collision()->getTeleY(TeleId);
+			int tx = GameServer()->Collision()->getTeleX(TeleIdEnd);
+			int ty = GameServer()->Collision()->getTeleY(TeleIdEnd);
+			vec2 start = {(float)x, (float)y};
+			vec2 end = {(float)tx, (float)ty};
+			m_Pos = m_Pos - start * 32 + end * 32;
+			m_Core.m_Pos = m_Pos;
+		}
+	}
+	else
+	{
+		m_inTele = false;
 	}
 
 	// handle Weapons
