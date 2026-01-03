@@ -52,7 +52,7 @@ void CGameControllerHidNSek::Tick()
 
 	if(!IsGamePaused() && HasEnoughPlayers())
 	{
-		if(Seekers() < Config()->m_SvHidNSekSeekers && Seekers() <= GetRealPlayerNum()/2)
+		if(Seekers() < Config()->m_SvHidNSekSeekers && Seekers() < GetRealPlayerNum()/2)
 		{
 			for(auto *pPlayer : GameServer()->m_apPlayers)
 			{
@@ -80,7 +80,7 @@ void CGameControllerHidNSek::Tick()
 					m_HidNSekPlayers[pPlayer->GetCID()].m_FrozenTick = Server()->Tick() + (Server()->TickSpeed() * Config()->m_SvHidNSekFreezeStart - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit);
 				}
 
-				if(Seekers() >= Config()->m_SvHidNSekSeekers || Seekers() > GetRealPlayerNum()/2)
+				if(Seekers() >= Config()->m_SvHidNSekSeekers || Seekers() >= GetRealPlayerNum()/2)
 					break;
 			}
 		}
