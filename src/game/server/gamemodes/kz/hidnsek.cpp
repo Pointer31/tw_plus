@@ -204,6 +204,12 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 	if(From < 0 || From >= MAX_CLIENTS)
 		return false;
 
+	if(Character.GetPlayer()->GetCID() == From) //no self damage
+	{
+		Character.GetCore().m_Vel += Force;
+		return true;
+	}
+
 	if(m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
 	{
 		Character.GetCore().m_Vel += Force;
