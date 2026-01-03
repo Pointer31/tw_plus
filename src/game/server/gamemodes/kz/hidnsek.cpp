@@ -166,7 +166,8 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 	// prevent respawn
 	pChr->GetPlayer()->m_RespawnDisabled = GetStartRespawnState();
 
-	pChr->RemoveWeapon(WEAPON_GUN);
+	for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
+		pChr->RemoveWeapon(i);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	pChr->SetWeapon(WEAPON_HAMMER);
 
