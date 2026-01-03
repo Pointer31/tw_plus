@@ -115,6 +115,18 @@ void CGameControllerHidNSek::Tick()
 			m_ToldSeekers = true;
 		}
 	}
+
+	if(Server()->Tick() % Server()->TickSpeed() == 0)
+	{
+		for(auto *pPlayer : GameServer()->m_apPlayers)
+		{
+			if(!pPlayer)
+				continue;
+
+			if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
+				SendSkinChangeHNS(pPlayer->GetCID(), -1, 65408);
+		}
+	}
 }
 
 void CGameControllerHidNSek::CHidNSekPlayer::Reset()
