@@ -54,22 +54,27 @@ void CGameControllerHidNSek::Tick()
 	{
 		if(Seekers() < Config()->m_SvHidNSekSeekers && Seekers() < GetRealPlayerNum()/2)
 		{
-			for(auto *pPlayer : GameServer()->m_apPlayers)
+			bool Found = false;
+			bool ResetWasSeekers = false;
+			while(!Found)
 			{
-				if(!pPlayer)
-					continue;
-
-				if(pPlayer->GetTeam() == TEAM_SPECTATORS)
-					continue;
-
-				if(m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker)
-					continue;
-
-				if(rand() % 10)
+				for(auto *pPlayer : GameServer()->m_apPlayers)
 				{
+					if(!pPlayer)
+						continue;
+
+					if(ResetWasSeekers)
+						m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker = false;
+
+					if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+						continue;
+
+					if(m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker)
+						continue;
+
 					m_HidNSekPlayers[pPlayer->GetCID()].SetSeeker(true);
 					SendSkinChangeHNS(pPlayer->GetCID(), -1, 65408);
-					if(CCharacter *pChr = pPlayer->GetCharacter())
+					if (CCharacter *pChr = pPlayer->GetCharacter())
 					{
 						pChr->RemoveWeapon(WEAPON_GUN);
 						pChr->RemoveWeapon(WEAPON_HAMMER);
@@ -78,10 +83,14 @@ void CGameControllerHidNSek::Tick()
 					}
 					pPlayer->m_RespawnDisabled = false;
 					m_HidNSekPlayers[pPlayer->GetCID()].m_FrozenTick = Server()->Tick() + (Server()->TickSpeed() * Config()->m_SvHidNSekFreezeStart - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit);
-				}
 
-				if(Seekers() >= Config()->m_SvHidNSekSeekers || Seekers() >= GetRealPlayerNum()/2)
-					break;
+					Found = true;
+
+					if(Seekers() >= Config()->m_SvHidNSekSeekers || Seekers() >= GetRealPlayerNum()/2)
+						break;
+				}
+				if(!Found)
+					ResetWasSeekers = true;
 			}
 		}
 		else if(!m_ToldSeekers)
@@ -115,7 +124,6 @@ void CGameControllerHidNSek::CHidNSekPlayer::Reset()
 
 void CGameControllerHidNSek::CHidNSekPlayer::SetSeeker(bool set)
 {
-	m_WasSeeker = false;
 	if(set)
 	{
 		m_IsSeeker = true;
