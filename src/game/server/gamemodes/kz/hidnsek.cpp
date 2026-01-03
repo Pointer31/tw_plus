@@ -28,6 +28,11 @@ CGameControllerHidNSek::~CGameControllerHidNSek()
 	}
 }
 
+const char* CGameControllerHidNSek::GetGameHelpText()
+{
+	return "Gametype: Hide & Seek, Seekers will try to kill the Hiders, Hiders need to run!";
+}
+
 void CGameControllerHidNSek::Tick()
 {
 	if(!Config()->m_SvTimelimit)

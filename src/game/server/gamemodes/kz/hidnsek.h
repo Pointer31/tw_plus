@@ -9,7 +9,8 @@ class CGameControllerHidNSek : public IGameController
 public:
 	CGameControllerHidNSek(class CGameContext *pGameServer);
     ~CGameControllerHidNSek();
-	virtual void Tick();
+    const char *GetGameHelpText();
+    virtual void Tick();
 
     virtual void OnCharacterSpawn(class CCharacter *pChr);
     virtual bool OnCharacterSnap(CCharacter *pChar, int SnappingClient) override;
