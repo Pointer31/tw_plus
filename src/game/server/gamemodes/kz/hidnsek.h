@@ -20,6 +20,8 @@ public:
     virtual bool CanFireWeapon(class CCharacter &Char) override;
 	virtual void DoWincheckRound();
 
+    virtual void OnPlayerConnect(class CPlayer *pPlayer) override;
+
     int Seekers();
     void ResetSeekers();
 

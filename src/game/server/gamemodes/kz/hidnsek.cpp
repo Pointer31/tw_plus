@@ -341,6 +341,29 @@ void CGameControllerHidNSek::DoWincheckRound()
 	}
 }
 
+void CGameControllerHidNSek::OnPlayerConnect(CPlayer *pPlayer)
+{
+	IGameController::OnPlayerConnect(pPlayer);
+
+	for(auto *pEachPlayer : GameServer()->m_apPlayers)
+	{
+		if(!pEachPlayer)
+			continue;
+
+		if(pEachPlayer->GetTeam() == TEAM_SPECTATORS)
+			continue;
+
+		if(m_HidNSekPlayers[pEachPlayer->GetCID()].m_IsSeeker)
+		{
+			SendSkinChangeHNS(pEachPlayer->GetCID(), pPlayer->GetCID(), 65408);
+		}
+		else
+		{
+			SendSkinChangeHNS(pEachPlayer->GetCID(), pPlayer->GetCID(), 0);
+		}
+	}
+}
+
 int CGameControllerHidNSek::Seekers()
 {
 	int a = 0;
