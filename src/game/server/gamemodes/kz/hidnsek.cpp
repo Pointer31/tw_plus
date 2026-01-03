@@ -159,6 +159,7 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 	pChr->GetPlayer()->m_RespawnDisabled = GetStartRespawnState();
 
 	pChr->RemoveWeapon(WEAPON_GUN);
+	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	pChr->SetWeapon(WEAPON_HAMMER);
 
 	if(m_HidNSekPlayers[pChr->GetPlayer()->GetCID()].m_IsSeeker)
