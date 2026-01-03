@@ -59,6 +59,9 @@ void CGameControllerHidNSek::Tick()
 				if(!pPlayer)
 					continue;
 
+				if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+					continue;
+
 				if(m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker)
 					continue;
 
@@ -88,13 +91,16 @@ void CGameControllerHidNSek::Tick()
 				if(!pPlayer)
 					continue;
 
+				if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+					continue;
+
 				if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
 				{
-					GameServer()->SendChat(pPlayer->GetCID(), CHAT_TEAM, pPlayer->GetCID(), "You are a Seeker now! Kill the Hiders!");
+					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, "You are a Seeker now! Kill the Hiders!");
 				}
 				else
 				{
-					GameServer()->SendChat(pPlayer->GetCID(), CHAT_TEAM, pPlayer->GetCID(), "You are a Hider now! Run away from the Seekers!");
+					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, "You are a Hider now! Run away from the Seekers!");
 				}
 			}
 			m_ToldSeekers = true;
@@ -395,4 +401,15 @@ void CGameControllerHidNSek::HandleCharacterSnap(CCharacter &Char, CNetObj_Chara
 	{
 		pCharObj->m_Weapon = WEAPON_NINJA;
 	}
+}
+
+void CGameControllerHidNSek::SendChatMsg(int From, int To, int Mode, const char *pText)
+{
+	CNetMsg_Sv_Chat Msg;
+	Msg.m_Mode = Mode;
+	Msg.m_ClientID = From;
+	Msg.m_pMessage = pText;
+	Msg.m_TargetID = To;
+
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
 }
