@@ -397,10 +397,14 @@ void CGameControllerHidNSek::HandleCharacterInput(class CCharacter &Char, CNetOb
 
 void CGameControllerHidNSek::HandleCharacterSnap(CCharacter &Char, CNetObj_Character *pCharObj, int SnappingClient)
 {
+	if(m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_IsSeeker)
+		pCharObj->m_Emote = EMOTE_ANGRY;
+
 	if(m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenTick != -1 &&
 		m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenTick > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
 	{
 		pCharObj->m_Weapon = WEAPON_NINJA;
+		pCharObj->m_Emote = EMOTE_PAIN;
 	}
 }
 
