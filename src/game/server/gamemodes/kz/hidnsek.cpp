@@ -1,3 +1,4 @@
+// Gamemode by +KZ
 #include "hidnsek.h"
 #include <game/server/entities/character.h>
 #include <game/server/player.h>
