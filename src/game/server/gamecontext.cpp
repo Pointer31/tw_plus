@@ -21,6 +21,7 @@
 #include "gamemodes/lts.h"
 #include "gamemodes/mod.h"
 #include "gamemodes/tdm.h"
+#include "gamemodes/kz/hidnsek.h"
 #include "gamecontext.h"
 #include "player.h"
 
@@ -1138,6 +1139,9 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if(MsgID == NETMSGTYPE_CL_SKINCHANGE)
 		{
+			if(!m_pController->CanChangeSkin(ClientID))
+				return;
+
 			if(pPlayer->m_LastChangeInfoTick && pPlayer->m_LastChangeInfoTick+Server()->TickSpeed()*5 > Server()->Tick())
 				return;
 
@@ -1658,6 +1662,8 @@ void CGameContext::OnInit()
 		m_pController = new CGameControllerLTS(this);
 	else if(str_comp_nocase(Config()->m_SvGametype, "tdm") == 0)
 		m_pController = new CGameControllerTDM(this);
+	else if(str_comp_nocase(Config()->m_SvGametype, "hidnsek") == 0 || str_comp_nocase(Config()->m_SvGametype, "hns") == 0)
+		m_pController = new CGameControllerHidNSek(this);
 	else
 		m_pController = new CGameControllerDM(this);
 

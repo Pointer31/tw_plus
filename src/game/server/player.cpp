@@ -282,9 +282,12 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 					}
 					else
 					{
-						m_SpecMode = SPEC_PLAYER;
-						m_pSpecFlag = 0;
-						m_SpectatorID = pChar->GetPlayer()->GetCID();
+						if(GameServer()->m_pController->CanSpecID(pChar->GetPlayer()->GetCID()))
+						{
+							m_SpecMode = SPEC_PLAYER;
+							m_pSpecFlag = 0;
+							m_SpectatorID = pChar->GetPlayer()->GetCID();
+						}
 					}
 				}
 			}
@@ -350,6 +353,11 @@ bool CPlayer::SetSpectatorID(int SpecMode, int SpectatorID)
 {
 	if((SpecMode == m_SpecMode && SpecMode != SPEC_PLAYER) ||
 		(m_SpecMode == SPEC_PLAYER && SpecMode == SPEC_PLAYER && (SpectatorID == -1 || m_SpectatorID == SpectatorID || m_ClientID == SpectatorID)))
+	{
+		return false;
+	}
+
+	if(!GameServer()->m_pController->CanSpecID(SpectatorID))
 	{
 		return false;
 	}
