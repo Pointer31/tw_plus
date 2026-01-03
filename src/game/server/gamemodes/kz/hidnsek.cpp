@@ -269,6 +269,9 @@ bool CGameControllerHidNSek::CanChangeSkin(int ClientID)
 
 bool CGameControllerHidNSek::CanSpecID(int ClientID)
 {
+	if(ClientID == -1)
+		return true;
+
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS)
 		return false;
 
