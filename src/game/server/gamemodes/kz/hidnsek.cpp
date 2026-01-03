@@ -55,16 +55,12 @@ void CGameControllerHidNSek::Tick()
 		if(Seekers() < Config()->m_SvHidNSekSeekers && Seekers() < GetRealPlayerNum()/2)
 		{
 			bool Found = false;
-			bool ResetWasSeekers = false;
 			while(!Found)
 			{
 				for(auto *pPlayer : GameServer()->m_apPlayers)
 				{
 					if(!pPlayer)
 						continue;
-
-					if(ResetWasSeekers)
-						m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker = false;
 
 					if(pPlayer->GetTeam() == TEAM_SPECTATORS)
 						continue;
@@ -90,7 +86,15 @@ void CGameControllerHidNSek::Tick()
 						break;
 				}
 				if(!Found)
-					ResetWasSeekers = true;
+				{
+					for(auto *pPlayer : GameServer()->m_apPlayers)
+					{
+						if(!pPlayer)
+							continue;
+						
+						m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker = false;
+					}
+				}
 			}
 		}
 		else if(!m_ToldSeekers)
