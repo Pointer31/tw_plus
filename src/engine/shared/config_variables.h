@@ -101,6 +101,7 @@ MACRO_CONFIG_STR(SvMaplist, sv_maplist, 32, "all", CFGFLAG_SAVE|CFGFLAG_SERVER, 
 MACRO_CONFIG_INT(SvPreInput, sv_preinput, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Send PreInputs")
 MACRO_CONFIG_INT(SvHidNSekSeekers, sv_hns_seekers, 1, 0, MAX_CLIENTS, CFGFLAG_SAVE|CFGFLAG_SERVER, "HidNSek Seekers")
 MACRO_CONFIG_INT(SvHidNSekFreezeHit, sv_hns_freeze_hit, 2, 0, 60, CFGFLAG_SAVE|CFGFLAG_SERVER, "How much time to freeze Seekers on hit")
+MACRO_CONFIG_INT(SvHidNSekFreezeHitProtection, sv_hns_freeze_hit_protection, 3, 0, 60, CFGFLAG_SAVE|CFGFLAG_SERVER, "Protection for hit after unfreeze")
 MACRO_CONFIG_INT(SvHidNSekFreezeStart, sv_hns_freeze_start, 10, 0, 60, CFGFLAG_SAVE|CFGFLAG_SERVER, "How much time to freeze Seekers on round start")
 MACRO_CONFIG_INT(SvHidNSekSeekerWeapon, sv_hns_seeker_weapon, 0, 0, 4, CFGFLAG_SAVE|CFGFLAG_SERVER, "Seekers weapon")
 

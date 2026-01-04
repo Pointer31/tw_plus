@@ -205,9 +205,6 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 	if(!pPlayer)
 		return false;
 
-	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
-		return false;
-
 	CCharacter *pOther = GameServer()->GetPlayerChar(SnappingClient);
 	if(!pOther)
 		return true;
@@ -233,6 +230,22 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 			pProj->m_Y = round_to_int(postemp.y);
 		}
 	}
+	else if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
+		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
+	{
+		CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Pickup)));
+
+		if(pPickup)
+		{
+			vec2 postemp;
+			postemp.x = pChar->GetPos().x + 32*sin((float)Server()->Tick() / 25.0);
+			postemp.y = pChar->GetPos().y + 32*cos((float)Server()->Tick() / 25.0);
+
+			pPickup->m_Type = PICKUP_ARMOR;
+			pPickup->m_X = round_to_int(postemp.x);
+			pPickup->m_Y = round_to_int(postemp.y);
+		}
+	}
 
     return false;
 }
@@ -252,7 +265,7 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 	{
 		Character.GetCore().m_Vel += Force;
 		if(m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_FrozenTick == -1 ||
-			m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
+			m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * (Config()->m_SvHidNSekFreezeHit + Config()->m_SvHidNSekFreezeHitProtection))
 		{
 			m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_FrozenTick = Server()->Tick();
 		}

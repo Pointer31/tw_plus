@@ -411,6 +411,9 @@ bool CPlayer::SetSpectatorID(int SpecMode, int SpectatorID)
 
 bool CPlayer::DeadCanFollow(CPlayer *pPlayer) const
 {
+	if(!GameServer()->m_pController->CanSpecID(pPlayer->GetCID()))
+		return false;
+
 	// check if wanted player is in the same team and alive
 	return (!pPlayer->m_RespawnDisabled || (pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())) && pPlayer->GetTeam() == m_Team;
 }
