@@ -434,8 +434,11 @@ int CServer::GetClientVersion(int ClientID) const
 	return 0;
 }
 
-const char *CServer::ClientName(int ClientID) const
+const char *CServer::ClientName(int ClientID)
 {
+	if(GameServer()->IsClientBot(ClientID))
+		return GameServer()->GetBotName(ClientID);
+
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State == CServer::CClient::STATE_EMPTY)
 		return "(invalid)";
 	if(m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME)

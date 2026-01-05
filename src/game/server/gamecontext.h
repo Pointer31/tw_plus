@@ -66,6 +66,8 @@ class CGameContext : public IGameServer
 	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainSettingUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
+	static void ConAddBot(IConsole::IResult *pResult, void *pUserData);
+	static void ConRemoveBot(IConsole::IResult *pResult, void *pUserData);
 
 	static void NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);
 	static void RemoveCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);
@@ -202,6 +204,8 @@ public:
 	virtual const char *NetVersionHashReal() const;
 
 	void PreInputClients(int ClientId, bool *pClients) override;
+
+	virtual const char *GetBotName(int ClientID) override;
 };
 
 inline int64 CmaskAll() { return -1; }

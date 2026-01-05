@@ -25,7 +25,7 @@ public:
 	int Tick() const { return m_CurrentGameTick; }
 	int TickSpeed() const { return m_TickSpeed; }
 
-	virtual const char *ClientName(int ClientID) const = 0;
+	virtual const char *ClientName(int ClientID) = 0;
 	virtual const char *ClientClan(int ClientID) const = 0;
 	virtual int ClientCountry(int ClientID) const = 0;
 	virtual bool ClientIngame(int ClientID) const = 0;
@@ -107,6 +107,8 @@ public:
 
 	virtual bool TimeScore() const { return false; }
 	virtual void PreInputClients(int ClientId, bool *pClients) = 0;
+
+	virtual const char *GetBotName(int ClientID) = 0;
 };
 
 extern IGameServer *CreateGameServer();

@@ -182,6 +182,8 @@ public:
 	void Read(const CNetObj_CharacterCore *pObjCore);
 	void Write(CNetObj_CharacterCore *pObjCore) const;
 	void Quantize();
+
+	int m_Colliding = 0;
 };
 
 #endif

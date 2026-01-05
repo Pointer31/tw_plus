@@ -6,7 +6,7 @@
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
-
+#include "bots/base_ai.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
@@ -41,6 +41,12 @@ CPlayer::~CPlayer()
 {
 	delete m_pCharacter;
 	m_pCharacter = 0;
+
+	if(m_pBotAI)
+	{
+		delete m_pBotAI;
+		m_pBotAI = nullptr;
+	}
 }
 
 void CPlayer::Tick()

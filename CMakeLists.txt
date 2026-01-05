@@ -1596,6 +1596,12 @@ set_src(ENGINE_SERVER GLOB src/engine/server
 )
 set_src(GAME_SERVER GLOB_RECURSE src/game/server
   alloc.h
+  bots/base_ai.cpp
+  bots/base_ai.h
+  bots/kz_ai.cpp
+  bots/kz_ai.h
+  bots/pointer_ai.cpp
+  bots/pointer_ai.h
   entities/character.cpp
   entities/character.h
   entities/flag.cpp
