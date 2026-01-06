@@ -79,7 +79,8 @@ void CGameControllerHidNSek::Tick()
 						pChr->SetWeapon(Config()->m_SvHidNSekSeekerWeapon);
 					}
 					pPlayer->m_RespawnDisabled = false;
-					m_HidNSekPlayers[pPlayer->GetCID()].m_FrozenTick = Server()->Tick() + (Server()->TickSpeed() * Config()->m_SvHidNSekFreezeStart - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit);
+					if(Server()->Tick() - Server()->TickSpeed() * 5 < m_GameStartTick)
+						m_HidNSekPlayers[pPlayer->GetCID()].m_FrozenTick = Server()->Tick() + (Server()->TickSpeed() * Config()->m_SvHidNSekFreezeStart - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit);
 
 					Found = true;
 
