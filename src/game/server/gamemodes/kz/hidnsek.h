@@ -9,16 +9,16 @@ class CGameControllerHidNSek : public IGameController
 public:
 	CGameControllerHidNSek(class CGameContext *pGameServer);
     ~CGameControllerHidNSek();
-    const char *GetGameHelpText();
-    virtual void Tick();
+    virtual const char *GetGameHelpText() override;
+    virtual void Tick() override;
 
-    virtual void OnCharacterSpawn(class CCharacter *pChr);
+    virtual void OnCharacterSpawn(class CCharacter *pChr) override;
     virtual bool OnCharacterSnap(CCharacter *pChar, int SnappingClient) override;
     virtual bool OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From, int &Weapon, CCharacter &Character) override;
     virtual bool CanChangeSkin(int ClientID) override;
     virtual bool CanSpecID(int ClientID) override;
     virtual bool CanFireWeapon(class CCharacter &Char) override;
-	virtual void DoWincheckRound();
+	virtual void DoWincheckRound() override;
 
     virtual void OnPlayerConnect(class CPlayer *pPlayer) override;
 

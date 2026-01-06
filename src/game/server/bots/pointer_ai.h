@@ -15,7 +15,7 @@ class CPointerBotAI : public CBotAI
     CPointerBotAI(CGameContext *pContext, CPlayer *pPlayer, int Difficulty);
     virtual void HandleInput(CNetObj_PlayerInput &Input) override;
     virtual void GetSkin(STeeInfos &TeeInfos) override;
-    virtual const char * GetName() { return "Bot"; };
-    virtual EBotAIType GetAIType() { return BOT_AI_POINTER; }
+    virtual const char * GetName() override { return "Bot"; };
+    virtual EBotAIType GetAIType() override { return BOT_AI_POINTER; }
 };
 #endif

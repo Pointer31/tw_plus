@@ -18,7 +18,7 @@ class CKZBotAI : public CBotAI
     CKZBotAI(CGameContext *pContext, CPlayer *pPlayer);
     virtual void HandleInput(CNetObj_PlayerInput &Input) override;
     virtual void GetSkin(STeeInfos &TeeInfos) override;
-    virtual const char * GetName() { return "Aimbot"; };
-    virtual EBotAIType GetAIType() { return BOT_AI_KZ; }
+    virtual const char * GetName() override { return "Aimbot"; };
+    virtual EBotAIType GetAIType() override { return BOT_AI_KZ; }
 };
 #endif
