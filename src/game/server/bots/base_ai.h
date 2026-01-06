@@ -44,6 +44,7 @@ class CBotAI
     };
 
     CBotAI(CGameContext *pContext, CPlayer *pPlayer);
+    virtual ~CBotAI() {};
     virtual void HandleInput(CNetObj_PlayerInput &Input) {};
     virtual void GetSkin(STeeInfos &TeeInfos) {};
     virtual const char * GetName() { return "Dummy"; };
