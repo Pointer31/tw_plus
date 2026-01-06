@@ -471,6 +471,8 @@ void CGameControllerHidNSek::HandleCharacterSnap(CCharacter &Char, CNetObj_Chara
 	{
 		pCharObj->m_Weapon = WEAPON_NINJA;
 		pCharObj->m_Emote = EMOTE_PAIN;
+		pCharObj->m_Jumped = 3;
+		pCharObj->m_Direction = 0;
 	}
 }
 
