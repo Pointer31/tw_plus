@@ -256,6 +256,12 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 	if(From < 0 || From >= MAX_CLIENTS)
 		return false;
 
+	if(Weapon == WEAPON_GRENADE && Dmg < 3) //fix for grenade
+	{
+		Character.GetCore().m_Vel += Force;
+		return true;
+	}
+
 	if(Character.GetPlayer()->GetCID() == From) //no self damage
 	{
 		Character.GetCore().m_Vel += Force;
@@ -470,6 +476,7 @@ void CGameControllerHidNSek::HandleCharacterSnap(CCharacter &Char, CNetObj_Chara
 		m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenTick > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
 	{
 		pCharObj->m_Weapon = WEAPON_NINJA;
+		pCharObj->m_AmmoCount = m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit;
 		pCharObj->m_Emote = EMOTE_PAIN;
 		pCharObj->m_Jumped = 3;
 		pCharObj->m_Direction = 0;
