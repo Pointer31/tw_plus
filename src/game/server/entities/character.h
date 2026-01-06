@@ -56,12 +56,28 @@ public:
 	bool IncreaseArmor(int Amount);
 
 	bool GiveWeapon(int Weapon, int Ammo);
+	void RemoveWeapon(int Weapon);
 	void GiveNinja();
 
 	void SetEmote(int Emote, int Tick);
 
 	bool IsAlive() const { return m_Alive; }
 	class CPlayer *GetPlayer() { return m_pPlayer; }
+	class CCharacterCore &GetCore() { return m_Core; }
+	int &GetHealth() { return m_Health; }
+	int &GetArmor() { return m_Armor; }
+	CNetObj_PlayerInput &GetLatestInput() { return m_LatestInput; }
+	int GetActiveWeapon() { return m_ActiveWeapon; }
+	bool GetWeaponGot(int Weapon) { return m_aWeapons[Weapon].m_Got; }
+	int GetWeaponAmmo(int Weapon) { return m_aWeapons[Weapon].m_Ammo; }
+
+	struct WeaponStat
+	{
+		int m_AmmoRegenStart;
+		int m_Ammo;
+		bool m_Got;
+
+	} m_aWeapons[NUM_WEAPONS];
 
 private:
 	// player controlling this character
@@ -72,14 +88,6 @@ private:
 	// weapon info
 	CEntity *m_apHitObjects[MAX_PLAYERS];
 	int m_NumObjectsHit;
-
-	struct WeaponStat
-	{
-		int m_AmmoRegenStart;
-		int m_Ammo;
-		bool m_Got;
-
-	} m_aWeapons[NUM_WEAPONS];
 
 	int m_ActiveWeapon;
 	int m_LastWeapon;

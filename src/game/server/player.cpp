@@ -6,7 +6,7 @@
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
-
+#include "bots/base_ai.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
@@ -41,6 +41,12 @@ CPlayer::~CPlayer()
 {
 	delete m_pCharacter;
 	m_pCharacter = 0;
+
+	if(m_pBotAI)
+	{
+		delete m_pBotAI;
+		m_pBotAI = nullptr;
+	}
 }
 
 void CPlayer::Tick()
@@ -154,6 +160,8 @@ void CPlayer::Snap(int SnappingClient)
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_DEAD;
 	if(SnappingClient != -1 && (m_Team == TEAM_SPECTATORS || m_DeadSpecMode) && (SnappingClient == m_SpectatorID))
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_WATCHING;
+	if(m_pBotAI)
+		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_BOT;
 
 	pPlayerInfo->m_Latency = SnappingClient == -1 ? m_Latency.m_Min : GameServer()->m_apPlayers[SnappingClient]->m_aActLatency[m_ClientID];
 	pPlayerInfo->m_Score = m_Score;
@@ -282,9 +290,12 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 					}
 					else
 					{
-						m_SpecMode = SPEC_PLAYER;
-						m_pSpecFlag = 0;
-						m_SpectatorID = pChar->GetPlayer()->GetCID();
+						if(GameServer()->m_pController->CanSpecID(pChar->GetPlayer()->GetCID()))
+						{
+							m_SpecMode = SPEC_PLAYER;
+							m_pSpecFlag = 0;
+							m_SpectatorID = pChar->GetPlayer()->GetCID();
+						}
 					}
 				}
 			}
@@ -354,6 +365,11 @@ bool CPlayer::SetSpectatorID(int SpecMode, int SpectatorID)
 		return false;
 	}
 
+	if(!GameServer()->m_pController->CanSpecID(SpectatorID))
+	{
+		return false;
+	}
+
 	if(m_Team == TEAM_SPECTATORS)
 	{
 		// check for freeview or if wanted player is playing
@@ -403,6 +419,9 @@ bool CPlayer::SetSpectatorID(int SpecMode, int SpectatorID)
 
 bool CPlayer::DeadCanFollow(CPlayer *pPlayer) const
 {
+	if(!GameServer()->m_pController->CanSpecID(pPlayer->GetCID()))
+		return false;
+
 	// check if wanted player is in the same team and alive
 	return (!pPlayer->m_RespawnDisabled || (pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())) && pPlayer->GetTeam() == m_Team;
 }

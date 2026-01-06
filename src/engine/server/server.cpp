@@ -434,8 +434,11 @@ int CServer::GetClientVersion(int ClientID) const
 	return 0;
 }
 
-const char *CServer::ClientName(int ClientID) const
+const char *CServer::ClientName(int ClientID)
 {
+	if(GameServer()->IsClientBot(ClientID))
+		return GameServer()->GetBotName(ClientID);
+
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State == CServer::CClient::STATE_EMPTY)
 		return "(invalid)";
 	if(m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME)
@@ -705,6 +708,8 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 	pThis->m_aClients[ClientID].m_Quitting = false;
 	pThis->m_aClients[ClientID].m_Latency = 0;
 	pThis->m_aClients[ClientID].Reset();
+	pThis->m_aClients[ClientID].m_InfclassVersion = 0;
+	pThis->m_aClients[ClientID].m_DDNetVersion = 0;
 
 	return 0;
 }
@@ -869,7 +874,33 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 	if(Sys)
 	{
 		// system message
-		if(Msg == NETMSG_INFO)
+		if(Msg == NETMSG_CLIENTVER)
+		{
+			if((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0)
+			{
+				CUuid *pConnectionId = (CUuid *)Unpacker.GetRaw(sizeof(*pConnectionId));
+				int DDNetVersion = Unpacker.GetInt();
+				if(Unpacker.Error() || DDNetVersion < 0)
+				{
+					return;
+				}
+				//m_aClients[ClientID].m_ConnectionId = *pConnectionId;
+				m_aClients[ClientID].m_DDNetVersion = DDNetVersion;
+			}
+		}
+		else if(Msg == NETMSG_CLIENTVER_INFCLASS)
+		{
+			if((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0) // Ignore STATE_AUTH for now, see ddnet#4445 // && m_aClients[ClientId].m_State == CClient::STATE_AUTH)
+			{ //+KZ identify infclass client
+				int InfClassVersion = Unpacker.GetInt();
+				if(Unpacker.Error() || InfClassVersion < 0)
+				{
+					return;
+				}
+				m_aClients[ClientID].m_InfclassVersion = InfClassVersion;
+			}
+		}
+		else if(Msg == NETMSG_INFO)
 		{
 			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State == CClient::STATE_AUTH)
 			{
@@ -1650,8 +1681,8 @@ void CServer::ConStatus(IConsole::IResult *pResult, void *pUser)
 			{
 				const char *pAuthStr = pThis->m_aClients[i].m_Authed == CServer::AUTHED_ADMIN ? "(Admin)" :
 										pThis->m_aClients[i].m_Authed == CServer::AUTHED_MOD ? "(Mod)" : "";
-				str_format(aBuf, sizeof(aBuf), "id=%d addr=%s client=%x name='%s' score=%d %s", i, aAddrStr,
-					pThis->m_aClients[i].m_Version, pThis->m_aClients[i].m_aName, pThis->m_aClients[i].m_Score, pAuthStr);
+				str_format(aBuf, sizeof(aBuf), "id=%d addr=%s client=%x name='%s' score=%d ddnet=%d infclass=%d %s", i, aAddrStr,
+					pThis->m_aClients[i].m_Version, pThis->m_aClients[i].m_aName, pThis->m_aClients[i].m_Score, pThis->m_aClients[i].m_DDNetVersion, pThis->m_aClients[i].m_InfclassVersion, pAuthStr);
 			}
 			else
 				str_format(aBuf, sizeof(aBuf), "id=%d addr=%s connecting", i, aAddrStr);

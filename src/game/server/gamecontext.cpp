@@ -21,8 +21,11 @@
 #include "gamemodes/lts.h"
 #include "gamemodes/mod.h"
 #include "gamemodes/tdm.h"
+#include "gamemodes/kz/hidnsek.h"
 #include "gamecontext.h"
 #include "player.h"
+#include "bots/base_ai.h"
+#include <cstdio>
 
 enum
 {
@@ -636,6 +639,17 @@ void CGameContext::OnTick()
 		}
 	}
 #endif
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(m_apPlayers[i] && m_apPlayers[i]->m_pBotAI)
+		{
+			CNetObj_PlayerInput Input = {0};
+			m_apPlayers[i]->m_pBotAI->HandleInput(Input);
+			m_apPlayers[i]->OnPredictedInput(&Input);
+			m_apPlayers[i]->OnDirectInput(&Input);
+		}
+	}
 }
 
 // Server hooks
@@ -1138,6 +1152,9 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if(MsgID == NETMSGTYPE_CL_SKINCHANGE)
 		{
+			if(!m_pController->CanChangeSkin(ClientID))
+				return;
+
 			if(pPlayer->m_LastChangeInfoTick && pPlayer->m_LastChangeInfoTick+Server()->TickSpeed()*5 > Server()->Tick())
 				return;
 
@@ -1585,6 +1602,50 @@ void CGameContext::ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUse
 	}
 }
 
+void CGameContext::ConAddBot(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	if(!pResult->NumArguments())
+		return;
+
+	int Type = pResult->GetInteger(0);
+	if(Type < 0)
+		Type = 0;
+
+	int Difficulty = pResult->GetInteger(1);
+	if(Difficulty < 0)
+		Difficulty = 0;
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(pSelf->m_apPlayers[i])
+			continue;
+
+		pSelf->OnClientConnected(i, false, false);
+		if(pSelf->m_apPlayers[i])
+		{
+			pSelf->m_apPlayers[i]->m_pBotAI = CBotAI::CreateBot(pSelf, pSelf->m_apPlayers[i], Type, Difficulty);
+			pSelf->OnClientEnter(i);
+			break;
+		}
+	}
+}
+
+void CGameContext::ConRemoveBot(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->m_pBotAI)
+		{
+			pSelf->OnClientDrop(i, "removing bot");
+			break;
+		}
+	}
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1611,6 +1672,9 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("remove_vote", "s[option]", CFGFLAG_SERVER, ConRemoveVote, this, "remove a voting option");
 	Console()->Register("clear_votes", "", CFGFLAG_SERVER, ConClearVotes, this, "Clears the voting options");
 	Console()->Register("vote", "r['yes'|'no']", CFGFLAG_SERVER, ConVote, this, "Force a vote to yes/no");
+
+	Console()->Register("add_bot", "i[AI] ?i[Difficulty]", CFGFLAG_SERVER, ConAddBot, this, "Add a bot");
+	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
 }
 
 void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
@@ -1658,6 +1722,8 @@ void CGameContext::OnInit()
 		m_pController = new CGameControllerLTS(this);
 	else if(str_comp_nocase(Config()->m_SvGametype, "tdm") == 0)
 		m_pController = new CGameControllerTDM(this);
+	else if(str_comp_nocase(Config()->m_SvGametype, "hidnsek") == 0 || str_comp_nocase(Config()->m_SvGametype, "hns") == 0)
+		m_pController = new CGameControllerHidNSek(this);
 	else
 		m_pController = new CGameControllerDM(this);
 
@@ -1803,4 +1869,11 @@ void CGameContext::PreInputClients(int ClientId, bool *pClients)
 
 		pClients[Id] = true;
 	}
+}
+
+const char *CGameContext::GetBotName(int ClientID)
+{
+	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_pBotAI)
+		return m_apPlayers[ClientID]->m_pBotAI->GetName();
+    return "Debug Dummy";
 }

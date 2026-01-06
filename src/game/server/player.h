@@ -5,12 +5,20 @@
 
 #include "alloc.h"
 
+class CBotAI;
 
 enum
 {
 	WEAPON_GAME = -3, // team switching etc
 	WEAPON_SELF = -2, // console kill command
 	WEAPON_WORLD = -1, // death tiles etc
+};
+
+struct STeeInfos
+{
+	char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_ARRAY_SIZE];
+	int m_aUseCustomColors[NUM_SKINPARTS];
+	int m_aSkinPartColors[NUM_SKINPARTS];
 };
 
 // player object
@@ -22,14 +30,12 @@ public:
 	CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, bool AsSpec = false);
 	~CPlayer();
 
-	void Init(int CID);
-
 	void TryRespawn();
 	void Respawn();
 	void SetTeam(int Team, bool DoChatMsg=true);
 	int GetTeam() const { return m_Team; }
 	int GetCID() const { return m_ClientID; }
-	bool IsDummy() const { return m_Dummy; }
+	bool IsDummy() const { return m_Dummy || m_pBotAI; }
 
 	void Tick();
 	void PostTick();
@@ -79,12 +85,7 @@ public:
 	int m_LastReadyChangeTick;
 
 	// TODO: clean this up
-	struct
-	{
-		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_ARRAY_SIZE];
-		int m_aUseCustomColors[NUM_SKINPARTS];
-		int m_aSkinPartColors[NUM_SKINPARTS];
-	} m_TeeInfos;
+	STeeInfos m_TeeInfos;
 
 	int m_RespawnTick;
 	int m_DieTick;
@@ -113,6 +114,8 @@ public:
 	} m_Latency;
 
 	int m_DefaultEmote;
+
+	CBotAI* m_pBotAI = nullptr;
 
 private:
 	CCharacter *m_pCharacter;

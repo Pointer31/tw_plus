@@ -41,28 +41,11 @@ class IGameController
 	void DoTeamBalance();
 
 	// game
-	enum EGameState
-	{
-		// internal game states
-		IGS_WARMUP_GAME,		// warmup started by game because there're not enough players (infinite)
-		IGS_WARMUP_USER,		// warmup started by user action via rcon or new match (infinite or timer)
-
-		IGS_START_COUNTDOWN,	// start countown to unpause the game or start match/round (tick timer)
-
-		IGS_GAME_PAUSED,		// game paused (infinite or tick timer)
-		IGS_GAME_RUNNING,		// game running (infinite)
-
-		IGS_END_MATCH,			// match is over (tick timer)
-		IGS_END_ROUND,			// round is over (tick timer)
- 	};
-	EGameState m_GameState;
 	int m_GameStateTimer;
 
 	virtual bool DoWincheckMatch();		// returns true when the match is over
 	virtual void DoWincheckRound() {}
-	bool HasEnoughPlayers() const { return (IsTeamplay() && m_aTeamSize[TEAM_RED] > 0 && m_aTeamSize[TEAM_BLUE] > 0) || (!IsTeamplay() && m_aTeamSize[TEAM_RED] > 1); }
 	void ResetGame();
-	void SetGameState(EGameState GameState, int Timer=0);
 	void StartMatch();
 	void StartRound();
 
@@ -124,10 +107,35 @@ protected:
 	} m_GameInfo;
 
 	void SendGameInfo(int ClientID);
+	bool HasEnoughPlayers() const { return (IsTeamplay() && m_aTeamSize[TEAM_RED] > 0 && m_aTeamSize[TEAM_BLUE] > 0) || (!IsTeamplay() && m_aTeamSize[TEAM_RED] > 1); }
 
 public:
 	IGameController(class CGameContext *pGameServer);
 	virtual ~IGameController() {}
+
+	enum EGameState
+	{
+		// internal game states
+		IGS_WARMUP_GAME,		// warmup started by game because there're not enough players (infinite)
+		IGS_WARMUP_USER,		// warmup started by user action via rcon or new match (infinite or timer)
+
+		IGS_START_COUNTDOWN,	// start countown to unpause the game or start match/round (tick timer)
+
+		IGS_GAME_PAUSED,		// game paused (infinite or tick timer)
+		IGS_GAME_RUNNING,		// game running (infinite)
+
+		IGS_END_MATCH,			// match is over (tick timer)
+		IGS_END_ROUND,			// round is over (tick timer)
+ 	};
+	void SetGameState(EGameState GameState, int Timer=0);
+
+	virtual bool OnCharacterSnap(class CCharacter *pChar, int SnappingClient) { return false; }
+	virtual bool OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From, int &Weapon, CCharacter &Character) { return false; }
+	virtual bool CanChangeSkin(int ClientID) { return true; };
+	virtual bool CanSpecID(int ClientID) { return true; }
+	virtual bool CanFireWeapon(class CCharacter &Char) { return true; }
+	virtual void HandleCharacterInput(class CCharacter &Char, CNetObj_PlayerInput *pInput, bool Predicted) {}
+	virtual void HandleCharacterSnap(class CCharacter &Char, CNetObj_Character *pCharObj, int SnappingClient) {}
 
 	// event
 	/*
@@ -239,6 +247,9 @@ public:
 	virtual const char *GetGameHelpText();
 	//static void Com_Example(IConsole::IResult *pResult, void *pContext);
 	virtual void RegisterChatCommands(CCommandManager *pManager);
+
+	private:
+	EGameState m_GameState;
 };
 
 #endif

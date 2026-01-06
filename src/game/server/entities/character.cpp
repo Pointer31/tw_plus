@@ -261,6 +261,9 @@ void CCharacter::HandleWeaponSwitch()
 
 void CCharacter::FireWeapon()
 {
+	if(!GameServer()->m_pController->CanFireWeapon(*this))
+		return;
+
 	if(m_ReloadTimer != 0)
 		return;
 
@@ -473,6 +476,11 @@ bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 	return false;
 }
 
+void CCharacter::RemoveWeapon(int Weapon)
+{
+	m_aWeapons[Weapon].m_Got = false;
+}
+
 void CCharacter::GiveNinja()
 {
 	m_Ninja.m_ActivationTick = Server()->Tick();
@@ -504,6 +512,8 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 	// it is not allowed to aim in the center
 	if(m_Input.m_TargetX == 0 && m_Input.m_TargetY == 0)
 		m_Input.m_TargetY = -1;
+
+	GameServer()->m_pController->HandleCharacterInput(*this, &m_Input, true);
 }
 
 void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
@@ -514,6 +524,8 @@ void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
 	// it is not allowed to aim in the center
 	if(m_LatestInput.m_TargetX == 0 && m_LatestInput.m_TargetY == 0)
 		m_LatestInput.m_TargetY = -1;
+
+	GameServer()->m_pController->HandleCharacterInput(*this, &m_LatestInput, false);
 
 	if(m_NumInputs > 2 && m_pPlayer->GetTeam() != TEAM_SPECTATORS)
 	{
@@ -752,6 +764,9 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
+	if(GameServer()->m_pController->OnCharacterTakeDamage(Force, Dmg, From, Weapon, *this))
+		return true;
+
 	m_Core.m_Vel += Force;
 
 	if(From >= 0)
@@ -859,6 +874,9 @@ void CCharacter::Snap(int SnappingClient)
 	if(NetworkClipped(SnappingClient))
 		return;
 
+	if(GameServer()->m_pController->OnCharacterSnap(this, SnappingClient))
+		return;
+
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, m_pPlayer->GetCID(), sizeof(CNetObj_Character)));
 	if(!pCharacter)
 		return;
@@ -911,6 +929,7 @@ void CCharacter::Snap(int SnappingClient)
 		if(5 * Server()->TickSpeed() - ((Server()->Tick() - m_LastAction) % (5 * Server()->TickSpeed())) < 5)
 			pCharacter->m_Emote = EMOTE_BLINK;
 	}
+	GameServer()->m_pController->HandleCharacterSnap(*this, pCharacter, SnappingClient);
 }
 
 void CCharacter::PostSnap()
