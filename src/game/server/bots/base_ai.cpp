@@ -15,6 +15,7 @@ CBotAI::CBotAI(CGameContext *pContext, CPlayer *pPlayer)
     m_pConfig = m_pGameServer->Config();
 
     m_pPlayer = pPlayer;
+    m_pPlayer->m_Latency.m_Avg = 0;
 }
 
 CBotAI *CBotAI::CreateBot(CGameContext *pContext, CPlayer *pPlayer, int AI, int Difficulty)

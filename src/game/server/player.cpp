@@ -57,6 +57,7 @@ void CPlayer::Tick()
 	Server()->SetClientScore(m_ClientID, m_Score);
 
 	// do latency stuff
+	if (m_pBotAI == NULL)
 	{
 		IServer::CClientInfo Info;
 		if(Server()->GetClientInfo(m_ClientID, &Info))
