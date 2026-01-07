@@ -1763,6 +1763,15 @@ void CGameContext::OnInit()
 	if(Config()->m_SvMaxClients < Config()->m_SvPlayerSlots)
 		Config()->m_SvPlayerSlots = Config()->m_SvMaxClients;
 
+	if (Config()->m_SvMotdHelpMenu)
+	{
+		str_format(Config()->m_SvMotd, sizeof(Config()->m_SvMotd), "%s\n\n%s\n\n%s",
+			"Welcome to TWplus!",
+		 	m_pController->GetGameHelpText(),
+			m_pController->IsInstagib() == 0 ? "" : (m_pController->IsInstagibLaser() == 1 ? "Instagib is enabled. Your rifle instakills others." : "Instagib is enabled. Your grenade launcher instakills others.")
+		);
+	}
+
 #ifdef CONF_DEBUG
 	// clamp dbg_dummies to 0..MAX_CLIENTS-1
 	if(MAX_CLIENTS <= Config()->m_DbgDummies)
