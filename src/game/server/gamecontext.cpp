@@ -1886,3 +1886,10 @@ const char *CGameContext::GetBotName(int ClientID)
 		return m_apPlayers[ClientID]->m_pBotAI->GetName();
     return "Debug Dummy";
 }
+
+const char *CGameContext::GetBotClan(int ClientID)
+{
+	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_pBotAI)
+		return m_apPlayers[ClientID]->m_pBotAI->GetClan();
+    return "";
+}

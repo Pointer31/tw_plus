@@ -206,6 +206,7 @@ public:
 	void PreInputClients(int ClientId, bool *pClients) override;
 
 	virtual const char *GetBotName(int ClientID) override;
+	virtual const char *GetBotClan(int ClientID) override;
 };
 
 inline int64 CmaskAll() { return -1; }

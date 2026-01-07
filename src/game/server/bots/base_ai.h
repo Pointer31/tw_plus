@@ -48,6 +48,7 @@ class CBotAI
     virtual void HandleInput(CNetObj_PlayerInput &Input) {};
     virtual void GetSkin(STeeInfos &TeeInfos) {};
     virtual const char * GetName() { return "Dummy"; };
+    virtual const char * GetClan() { return ""; };
     virtual EBotAIType GetAIType() { return BOT_AI_NONE; }
 
     static CBotAI *CreateBot(CGameContext *pContext, CPlayer *pPlayer, int AI, int Difficulty);
