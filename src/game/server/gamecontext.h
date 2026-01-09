@@ -68,6 +68,7 @@ class CGameContext : public IGameServer
 	static void ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConAddBot(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemoveBot(IConsole::IResult *pResult, void *pUserData);
+	static void ConGiveWeapon(IConsole::IResult *pResult, void *pUserData);
 
 	static void NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);
 	static void RemoveCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);

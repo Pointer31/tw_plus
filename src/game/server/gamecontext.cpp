@@ -1646,6 +1646,19 @@ void CGameContext::ConRemoveBot(IConsole::IResult *pResult, void *pUserData)
 	}
 }
 
+void CGameContext::ConGiveWeapon(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	int ClientID = pResult->GetInteger(0);
+
+	if(pSelf->m_apPlayers[ClientID] && pSelf->m_apPlayers[ClientID]->GetCharacter())
+	{
+		int Weapon = clamp(pResult->GetInteger(0), 0, NUM_WEAPONS-1);
+		pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveWeapon(Weapon, -1);
+	}
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1675,6 +1688,7 @@ void CGameContext::OnConsoleInit()
 
 	Console()->Register("add_bot", "i[AI] ?i[Difficulty]", CFGFLAG_SERVER, ConAddBot, this, "Add a bot");
 	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
+	Console()->Register("give", "i[id] i[weapon]", CFGFLAG_SERVER, ConGiveWeapon, this, "Give a player a weapon");
 }
 
 void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
