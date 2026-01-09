@@ -582,6 +582,9 @@ void CGameContext::OnTick()
 					if(!m_apPlayers[i] || m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS || aVoteChecked[i])	// don't count in votes by spectators
 						continue;
 
+					if(m_apPlayers[i]->m_pBotAI) // dont count bots
+						continue;
+
 					int ActVote = m_apPlayers[i]->m_Vote;
 					int ActVotePos = m_apPlayers[i]->m_VotePos;
 
