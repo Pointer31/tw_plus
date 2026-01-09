@@ -493,7 +493,7 @@ void CGameControllerHidNSek::ResetSeekers()
 {
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		m_HidNSekPlayers[i].m_IsSeeker = false;
+		SetPlayerSeeker(i, false);
 		if(!GameServer()->m_apPlayers[i])
 			m_HidNSekPlayers[i].m_WasSeeker = false;
 		m_HidNSekPlayers[i].m_FrozenTick = -1;
