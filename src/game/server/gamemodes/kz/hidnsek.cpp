@@ -359,7 +359,9 @@ void CGameControllerHidNSek::DoWincheckRound()
 	{
 		for(int i = 0; i < MAX_CLIENTS; ++i)
 		{
-			if(GameServer()->m_apPlayers[i] && !m_HidNSekPlayers[i].m_IsSeeker && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
+			if(GameServer()->m_apPlayers[i] && !m_HidNSekPlayers[i].m_IsSeeker && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS &&
+				(!GameServer()->m_apPlayers[i]->m_RespawnDisabled ||
+				(GameServer()->m_apPlayers[i]->GetCharacter() && GameServer()->m_apPlayers[i]->GetCharacter()->IsAlive())))
 				GameServer()->m_apPlayers[i]->m_Score++;
 		}
 		m_GameStartTick = Server()->Tick(); // hack to not end match
