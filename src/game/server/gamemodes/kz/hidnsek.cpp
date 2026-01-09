@@ -24,14 +24,14 @@ CGameControllerHidNSek::CGameControllerHidNSek(CGameContext *pGameServer)
 		m_HidNSekPlayers[i].m_SentSpecialModeBroadcast = false;
 	}
 
-	if(Config()->m_SvHidNSekSpecialModes)
+	if(Config()->m_SvHidNSekSpecialModes == -1)
 	{
 		m_SpecialMode++;
 		m_SpecialMode %= (MAX_SPECIAL_MODES);
 	}
 	else
 	{
-		m_SpecialMode = 0;
+		m_SpecialMode = Config()->m_SvHidNSekSpecialModes;
 	}
 }
 

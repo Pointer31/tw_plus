@@ -104,7 +104,7 @@ MACRO_CONFIG_INT(SvHidNSekFreezeHit, sv_hns_freeze_hit, 2, 0, 60, CFGFLAG_SAVE|C
 MACRO_CONFIG_INT(SvHidNSekFreezeHitProtection, sv_hns_freeze_hit_protection, 3, 0, 60, CFGFLAG_SAVE|CFGFLAG_SERVER, "Protection for hit after unfreeze")
 MACRO_CONFIG_INT(SvHidNSekFreezeStart, sv_hns_freeze_start, 10, 0, 60, CFGFLAG_SAVE|CFGFLAG_SERVER, "How much time to freeze Seekers on round start")
 MACRO_CONFIG_INT(SvHidNSekSeekerWeapon, sv_hns_seeker_weapon, 0, 0, 4, CFGFLAG_SAVE|CFGFLAG_SERVER, "Seekers weapon")
-MACRO_CONFIG_INT(SvHidNSekSpecialModes, sv_hns_special_modes, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Allow Special Modes")
+MACRO_CONFIG_INT(SvHidNSekSpecialModes, sv_hns_special_modes, -1, -1, 2, CFGFLAG_SAVE|CFGFLAG_SERVER, "Special Modes")
 
 MACRO_CONFIG_STR(EcBindaddr, ec_bindaddr, 128, "localhost", CFGFLAG_SAVE|CFGFLAG_ECON, "Address to bind the external console to. Anything but 'localhost' is dangerous")
 MACRO_CONFIG_INT(EcPort, ec_port, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_ECON, "Port to use for the external console")
