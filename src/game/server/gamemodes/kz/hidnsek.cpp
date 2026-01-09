@@ -206,17 +206,14 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 	if(!pPlayer)
 		return false;
 
-	if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+	CCharacter *pOther = GameServer()->GetPlayerChar(SnappingClient);
+	if(!pOther)
 	{
 		if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
 			return false;
 		else
 			return true;
 	}
-
-	CCharacter *pOther = GameServer()->GetPlayerChar(SnappingClient);
-	if(!pOther)
-		return true;
 
 	if(m_HidNSekPlayers[SnappingClient].m_IsSeeker && GameServer()->Collision()->FastIntersectLine(pChar->GetPos(), pOther->GetPos(), nullptr, nullptr))
 		return true;
