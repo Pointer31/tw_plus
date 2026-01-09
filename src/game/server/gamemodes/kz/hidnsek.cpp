@@ -206,6 +206,14 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 	if(!pPlayer)
 		return false;
 
+	if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+	{
+		if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
+			return false;
+		else
+			return true;
+	}
+
 	CCharacter *pOther = GameServer()->GetPlayerChar(SnappingClient);
 	if(!pOther)
 		return true;
