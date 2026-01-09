@@ -4,6 +4,13 @@
 #include <generated/protocol.h>
 #include <engine/shared/protocol.h>
 
+enum {
+    SPECIAL_MODE_NONE = 0,
+    SPECIAL_MODE_INFECTION,
+    SPECIAL_MODE_FREEZE,
+    MAX_SPECIAL_MODES,
+};
+
 class CGameControllerHidNSek : public IGameController
 {
 public:
@@ -32,22 +39,24 @@ public:
 
     class CHidNSekPlayer
     {
-        private:
-        int m_SelfID = -1;
         public:
         bool m_WasSeeker = false;
         bool m_IsSeeker = false;
+        bool m_Infected = false;
         int m_Ball = -1;
         int m_FrozenTick = -1;
-        void Reset();
-        void SetSeeker(bool set);
-        void SetID(int id);
+        bool m_FrozenSpecial = false;
+        bool m_SentSpecialModeBroadcast = false;
     } m_HidNSekPlayers[MAX_CLIENTS];
 
     bool m_DoResetSeekers = false;
     bool m_ToldSeekers = false;
 
+    static int m_SpecialMode;
+
     private:
+    void SetPlayerSeeker(int ClientID, bool set, bool infected = false);
     void SendSkinChangeHNS(int ClientID, int TargetID, int ColorBody);
+    void UpdateSkins();
 };
 #endif
