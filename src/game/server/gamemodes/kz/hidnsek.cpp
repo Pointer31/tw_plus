@@ -53,9 +53,6 @@ void CGameControllerHidNSek::Tick()
 	if(!Config()->m_SvTimelimit)
 		Config()->m_SvTimelimit = 1;
 
-	if(!HasEnoughPlayers())
-		SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
-
 	IGameController::Tick();
 
 	if(!GameServer()->m_World.m_Paused && m_DoResetSeekers)
@@ -78,6 +75,9 @@ void CGameControllerHidNSek::Tick()
 						continue;
 
 					if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+						continue;
+
+					if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
 						continue;
 
 					if(m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker)
@@ -399,7 +399,32 @@ bool CGameControllerHidNSek::CanFireWeapon(CCharacter &Char)
     return true;
 }
 
-// game
+bool CGameControllerHidNSek::DoWincheckMatch()
+{
+	// gather some stats
+	int Topscore = 0;
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if (GameServer()->m_apPlayers[i])
+		{
+			if (GameServer()->m_apPlayers[i]->m_Score > Topscore)
+			{
+				Topscore = GameServer()->m_apPlayers[i]->m_Score;
+			}
+		}
+	}
+
+	// check score win condition
+	if ((m_GameInfo.m_ScoreLimit > 0 && Topscore >= m_GameInfo.m_ScoreLimit) ||
+		(m_GameInfo.m_TimeLimit > 0 && (Server()->Tick() - m_GameStartTick) >= m_GameInfo.m_TimeLimit * Server()->TickSpeed() * 60))
+	{
+		EndMatch();
+		return true;
+	}
+
+	return false;
+}
+
 void CGameControllerHidNSek::DoWincheckRound()
 {
 	if(!Seekers())
