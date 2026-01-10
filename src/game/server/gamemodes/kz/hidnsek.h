@@ -57,6 +57,6 @@ public:
     private:
     void SetPlayerSeeker(int ClientID, bool set, bool infected = false);
     void SendSkinChangeHNS(int ClientID, int TargetID, int ColorBody);
-    void UpdateSkins();
+    void UpdatePlayerSkin(int ClientID);
 };
 #endif

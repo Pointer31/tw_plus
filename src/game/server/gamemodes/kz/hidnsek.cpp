@@ -137,7 +137,8 @@ void CGameControllerHidNSek::Tick()
 
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{
-		UpdateSkins();
+		for(int i = 0; i < MAX_CLIENTS; i++)
+			UpdatePlayerSkin(i);
 	}
 }
 
@@ -160,7 +161,7 @@ void CGameControllerHidNSek::SetPlayerSeeker(int ClientID, bool set, bool infect
 	if(infected)
 		m_HidNSekPlayers[ClientID].m_Infected = infected;
 
-	UpdateSkins();
+	UpdatePlayerSkin(ClientID);
 }
 
 void CGameControllerHidNSek::SendSkinChangeHNS(int ClientID, int TargetID, int ColorBody)
@@ -178,23 +179,21 @@ void CGameControllerHidNSek::SendSkinChangeHNS(int ClientID, int TargetID, int C
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
 }
 
-void CGameControllerHidNSek::UpdateSkins()
+void CGameControllerHidNSek::UpdatePlayerSkin(int ClientID)
 {
-	for(auto *pPlayer : GameServer()->m_apPlayers)
-	{
-		if(!pPlayer)
-			continue;
+	CPlayer * pPlayer = GameServer()->m_apPlayers[ClientID];
+	if(!pPlayer)
+		return;
 
-		if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
-		{
-			if(m_HidNSekPlayers[pPlayer->GetCID()].m_Infected)
-				SendSkinChangeHNS(pPlayer->GetCID(), -1, 0xFF08);
-			else
-				SendSkinChangeHNS(pPlayer->GetCID(), -1, 65408);
-		}
+	if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
+	{
+		if(m_HidNSekPlayers[pPlayer->GetCID()].m_Infected)
+			SendSkinChangeHNS(pPlayer->GetCID(), -1, 0xFF08);
 		else
-			SendSkinChangeHNS(pPlayer->GetCID(), -1, 0);
+			SendSkinChangeHNS(pPlayer->GetCID(), -1, 65408);
 	}
+	else
+		SendSkinChangeHNS(pPlayer->GetCID(), -1, 0);
 }
 
 void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
@@ -470,8 +469,6 @@ void CGameControllerHidNSek::OnPlayerConnect(CPlayer *pPlayer)
 	}
 
 	m_HidNSekPlayers[pPlayer->GetCID()].m_SentSpecialModeBroadcast = false;
-
-	UpdateSkins();
 }
 
 int CGameControllerHidNSek::Seekers()
@@ -499,9 +496,8 @@ void CGameControllerHidNSek::ResetSeekers()
 		m_HidNSekPlayers[i].m_FrozenTick = -1;
 		m_HidNSekPlayers[i].m_FrozenSpecial = false;
 		m_HidNSekPlayers[i].m_Infected = false;
+		UpdatePlayerSkin(i);
 	}
-
-	UpdateSkins();
 }
 
 int CGameControllerHidNSek::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon)
