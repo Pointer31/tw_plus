@@ -316,6 +316,12 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 		return true;
 	}
 
+	if(m_HidNSekPlayers[From].m_IsSeeker == m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker) //do nothing for same team
+	{
+		Character.GetCore().m_Vel += Force;
+		return true;
+	}
+
 	if(m_SpecialMode == SPECIAL_MODE_FREEZE && !m_HidNSekPlayers[From].m_IsSeeker)
 	{
 		Character.GetCore().m_Vel += Force;
@@ -331,12 +337,6 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 		{
 			m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_FrozenTick = Server()->Tick();
 		}
-		return true;
-	}
-
-	if(m_HidNSekPlayers[From].m_IsSeeker == m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
-	{
-		Character.GetCore().m_Vel += Force;
 		return true;
 	}
 
