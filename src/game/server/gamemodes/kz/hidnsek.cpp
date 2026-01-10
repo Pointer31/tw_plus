@@ -14,6 +14,7 @@ CGameControllerHidNSek::CGameControllerHidNSek(CGameContext *pGameServer)
 {
     m_pGameType = "HidNSek";
     m_GameFlags = GAMEFLAG_SURVIVAL;
+	m_Instagib = 0;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -238,6 +239,9 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 
 bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClient)
 {
+	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker) //always snap seekers
+		return false;
+
 	if(SnappingClient < 0 || SnappingClient >= MAX_CLIENTS)
 		return false;
 
