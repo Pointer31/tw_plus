@@ -1657,9 +1657,17 @@ void CGameContext::ConGiveWeapon(IConsole::IResult *pResult, void *pUserData)
 
 	if(pSelf->m_apPlayers[ClientID] && pSelf->m_apPlayers[ClientID]->GetCharacter())
 	{
-		int Weapon = clamp(pResult->GetInteger(0), 0, NUM_WEAPONS-1);
-		pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveWeapon(Weapon, -1);
+		int Weapon = clamp(pResult->GetInteger(1), 0, NUM_WEAPONS-1);
+
+		if (Weapon == WEAPON_NINJA)
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveNinja();
+		else
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveWeapon(Weapon, -1);
+
+		return;
 	}
+	if (!pSelf->m_apPlayers[ClientID])
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "no player found");
 }
 
 void CGameContext::OnConsoleInit()
