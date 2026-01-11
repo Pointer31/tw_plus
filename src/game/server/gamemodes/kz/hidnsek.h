@@ -52,6 +52,7 @@ public:
 
     bool m_DoResetSeekers = false;
     bool m_ToldSeekers = false;
+    bool m_AlreadySetSeekers = false;
 
     static int m_SpecialMode;
 

@@ -34,6 +34,8 @@ CGameControllerHidNSek::CGameControllerHidNSek(CGameContext *pGameServer)
 	{
 		m_SpecialMode = Config()->m_SvHidNSekSpecialModes;
 	}
+
+	m_AlreadySetSeekers = false;
 }
 
 CGameControllerHidNSek::~CGameControllerHidNSek()
@@ -61,11 +63,12 @@ void CGameControllerHidNSek::Tick()
 		ResetSeekers();
 		m_DoResetSeekers = false;
 		m_ToldSeekers = false;
+		m_AlreadySetSeekers = false;
 	}
 
 	if(!IsGamePaused() && HasEnoughPlayers())
 	{
-		if(Seekers() < Config()->m_SvHidNSekSeekers && Seekers() < GetRealPlayerNum()/2)
+		if(!m_AlreadySetSeekers && Seekers() < Config()->m_SvHidNSekSeekers && Seekers() < GetRealPlayerNum()/2)
 		{
 			bool Found = false;
 			while(!Found)
@@ -112,6 +115,8 @@ void CGameControllerHidNSek::Tick()
 					}
 				}
 			}
+
+			m_AlreadySetSeekers = true;
 		}
 		else if(!m_ToldSeekers)
 		{
@@ -204,7 +209,10 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 	// give start equipment
 	pChr->IncreaseArmor(10);
 	// prevent respawn
-	pChr->GetPlayer()->m_RespawnDisabled = GetStartRespawnState();
+	if(m_HidNSekPlayers[pChr->GetPlayer()->GetCID()].m_IsSeeker)
+		pChr->GetPlayer()->m_RespawnDisabled = false;
+	else
+		pChr->GetPlayer()->m_RespawnDisabled = GetStartRespawnState();
 
 	for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 		pChr->RemoveWeapon(i);
