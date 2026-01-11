@@ -1956,13 +1956,13 @@ void CGameContext::BotsMinimumPlayersCheck(int DontUseID)
 		}
 		else
 		{
-			int BotPlayersTarget = WantedPlayerCount - HumanPlayers;
+			int BotPlayersTarget = clamp(WantedPlayerCount - HumanPlayers, 0, (int)MAX_CLIENTS);
 			int BotsToJoin = BotPlayersTarget - BotPlayers;
 
 			if (BotsToJoin > 0)
 				for (int i = 0; i < BotsToJoin; i++)
 				{
-					for(int i = 0; i < MAX_CLIENTS; i++)
+					for(int i = MAX_CLIENTS-1; i >= 0; i--)
 					{
 						int Type = Config()->m_SvBotsType;
 						int Difficulty = Config()->m_SvBotsDifficulty;
