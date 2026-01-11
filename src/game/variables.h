@@ -156,3 +156,6 @@ MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_SERVER, 
 MACRO_CONFIG_INT(SvBetweenMatchTime, sv_between_match_time, 10, 0, 30, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many seconds to wait before starting the next match")
 MACRO_CONFIG_INT(SvBetweenRoundTime, sv_between_round_time, 5, 0, 30, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many seconds to wait before starting the next round")
 MACRO_CONFIG_INT(SvMotdHelpMenu, sv_motd_help_menu, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Replace MOTD with help menu")
+MACRO_CONFIG_INT(SvBotsMinimumPlayers, sv_bots_minimum_players, 0, 0, MAX_PLAYERS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Add bots such that there are at least this many players playing")
+MACRO_CONFIG_INT(SvBotsType, sv_bots_type, 2, 0, 256, CFGFLAG_SAVE|CFGFLAG_SERVER, "Bot type to be used")
+MACRO_CONFIG_INT(SvBotsDifficulty, sv_bots_difficulty, 4, 0, 256, CFGFLAG_SAVE|CFGFLAG_SERVER, "Bot difficulty to be used")

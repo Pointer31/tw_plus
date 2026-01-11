@@ -760,6 +760,8 @@ void CGameContext::OnClientEnter(int ClientID)
 		Msg.m_Team = NewClientInfoMsg.m_Team;
 		Server()->SendPackMsg(&Msg, MSGFLAG_NOSEND, -1);
 	}
+
+	BotsMinimumPlayersCheck();
 }
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
@@ -794,6 +796,8 @@ void CGameContext::OnClientTeamChange(int ClientID)
 		if(p->GetOwner() == ClientID)
 			p->LoseOwner();
 	}
+	
+	BotsMinimumPlayersCheck();
 }
 
 void CGameContext::OnClientDrop(int ClientID, const char *pReason)
@@ -832,6 +836,8 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 
 	delete m_apPlayers[ClientID];
 	m_apPlayers[ClientID] = 0;
+
+	BotsMinimumPlayersCheck(ClientID);
 
 	m_VoteUpdate = true;
 }
@@ -1917,4 +1923,74 @@ const char *CGameContext::GetBotClan(int ClientID)
 	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_pBotAI)
 		return m_apPlayers[ClientID]->m_pBotAI->GetClan();
     return "";
+}
+
+void CGameContext::BotsMinimumPlayersCheck(int DontUseID)
+{
+	int WantedPlayerCount = Config()->m_SvBotsMinimumPlayers;
+	if (WantedPlayerCount > 0)
+	{
+		int HumanPlayers = 0;
+		int BotPlayers = 0;
+		for (int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if (m_apPlayers[i] && m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
+			{
+				if (!m_apPlayers[i]->IsDummy())
+					HumanPlayers++;
+				else
+					BotPlayers++;
+			}
+		}
+		int TotalPlayers = HumanPlayers + BotPlayers;
+
+		if (HumanPlayers == 0)
+		{
+			for(int i = 0; i < MAX_CLIENTS; i++)
+			{
+				if(m_apPlayers[i] && m_apPlayers[i]->m_pBotAI)
+				{
+					OnClientDrop(i, "removing bot");
+				}
+			}
+		}
+		else
+		{
+			int BotPlayersTarget = WantedPlayerCount - HumanPlayers;
+			int BotsToJoin = BotPlayersTarget - BotPlayers;
+
+			if (BotsToJoin > 0)
+				for (int i = 0; i < BotsToJoin; i++)
+				{
+					for(int i = 0; i < MAX_CLIENTS; i++)
+					{
+						int Type = Config()->m_SvBotsType;
+						int Difficulty = Config()->m_SvBotsDifficulty;
+
+						if(m_apPlayers[i] || i == DontUseID)
+							continue;
+
+						OnClientConnected(i, false, false);
+						if(m_apPlayers[i])
+						{
+							m_apPlayers[i]->m_pBotAI = CBotAI::CreateBot(this, m_apPlayers[i], Type, Difficulty);
+							OnClientEnter(i);
+							break;
+						}
+					}
+				}
+			else if (BotsToJoin < 0)
+				for (int i = 0; i < -BotsToJoin; i++)
+				{
+					for(int i = 0; i < MAX_CLIENTS; i++)
+					{
+						if(m_apPlayers[i] && m_apPlayers[i]->m_pBotAI)
+						{
+							OnClientDrop(i, "removing bot");
+							break;
+						}
+					}
+				}
+		}
+	}
 }

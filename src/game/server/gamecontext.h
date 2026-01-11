@@ -208,6 +208,8 @@ public:
 
 	virtual const char *GetBotName(int ClientID) override;
 	virtual const char *GetBotClan(int ClientID) override;
+
+	void BotsMinimumPlayersCheck(int DontUseID = -1);
 };
 
 inline int64 CmaskAll() { return -1; }
