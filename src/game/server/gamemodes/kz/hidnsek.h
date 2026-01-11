@@ -25,7 +25,8 @@ public:
     virtual bool CanChangeSkin(int ClientID) override;
     virtual bool CanSpecID(int ClientID) override;
     virtual bool CanFireWeapon(class CCharacter &Char) override;
-	virtual void DoWincheckRound() override;
+    virtual bool DoWincheckMatch() override;
+    virtual void DoWincheckRound() override;
 
     virtual void OnPlayerConnect(class CPlayer *pPlayer) override;
 

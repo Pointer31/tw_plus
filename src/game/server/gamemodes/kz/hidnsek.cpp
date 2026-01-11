@@ -14,6 +14,7 @@ CGameControllerHidNSek::CGameControllerHidNSek(CGameContext *pGameServer)
 {
     m_pGameType = "HidNSek";
     m_GameFlags = GAMEFLAG_SURVIVAL;
+	m_Instagib = 0;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -53,9 +54,6 @@ void CGameControllerHidNSek::Tick()
 	if(!Config()->m_SvTimelimit)
 		Config()->m_SvTimelimit = 1;
 
-	if(!HasEnoughPlayers())
-		SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
-
 	IGameController::Tick();
 
 	if(!GameServer()->m_World.m_Paused && m_DoResetSeekers)
@@ -78,6 +76,9 @@ void CGameControllerHidNSek::Tick()
 						continue;
 
 					if(pPlayer->GetTeam() == TEAM_SPECTATORS)
+						continue;
+
+					if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
 						continue;
 
 					if(m_HidNSekPlayers[pPlayer->GetCID()].m_WasSeeker)
@@ -238,6 +239,9 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 
 bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClient)
 {
+	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker) //always snap seekers
+		return false;
+
 	if(SnappingClient < 0 || SnappingClient >= MAX_CLIENTS)
 		return false;
 
@@ -319,6 +323,12 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 		return true;
 	}
 
+	if(m_HidNSekPlayers[From].m_IsSeeker == m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker) //do nothing for same team
+	{
+		Character.GetCore().m_Vel += Force;
+		return true;
+	}
+
 	if(m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
 	{
 		Character.GetCore().m_Vel += Force;
@@ -327,12 +337,6 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 		{
 			m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_FrozenTick = Server()->Tick();
 		}
-		return true;
-	}
-
-	if(m_HidNSekPlayers[From].m_IsSeeker == m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
-	{
-		Character.GetCore().m_Vel += Force;
 		return true;
 	}
 
@@ -399,7 +403,32 @@ bool CGameControllerHidNSek::CanFireWeapon(CCharacter &Char)
     return true;
 }
 
-// game
+bool CGameControllerHidNSek::DoWincheckMatch()
+{
+	// gather some stats
+	int Topscore = 0;
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if (GameServer()->m_apPlayers[i])
+		{
+			if (GameServer()->m_apPlayers[i]->m_Score > Topscore)
+			{
+				Topscore = GameServer()->m_apPlayers[i]->m_Score;
+			}
+		}
+	}
+
+	// check score win condition
+	if ((m_GameInfo.m_ScoreLimit > 0 && Topscore >= m_GameInfo.m_ScoreLimit) ||
+		(m_GameInfo.m_TimeLimit > 0 && (Server()->Tick() - m_GameStartTick) >= m_GameInfo.m_TimeLimit * Server()->TickSpeed() * 60))
+	{
+		EndMatch();
+		return true;
+	}
+
+	return false;
+}
+
 void CGameControllerHidNSek::DoWincheckRound()
 {
 	if(!Seekers())
