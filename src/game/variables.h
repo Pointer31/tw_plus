@@ -159,3 +159,7 @@ MACRO_CONFIG_INT(SvMotdHelpMenu, sv_motd_help_menu, 0, 0, 1, CFGFLAG_SAVE|CFGFLA
 MACRO_CONFIG_INT(SvBotsMinimumPlayers, sv_bots_minimum_players, 0, 0, MAX_PLAYERS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Add bots such that there are at least this many players playing")
 MACRO_CONFIG_INT(SvBotsType, sv_bots_type, 2, 0, 256, CFGFLAG_SAVE|CFGFLAG_SERVER, "Bot type to be used")
 MACRO_CONFIG_INT(SvBotsDifficulty, sv_bots_difficulty, 4, 0, 256, CFGFLAG_SAVE|CFGFLAG_SERVER, "Bot difficulty to be used")
+MACRO_CONFIG_STR(SvInfoSources, sv_info_sources, 900, "Source: https://github.com/Pointer31/tw_plus", CFGFLAG_SAVE|CFGFLAG_SERVER, "/info source code url")
+MACRO_CONFIG_STR(SvInfoLine1, sv_info_line1, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "/info line 1, can be used for contact links and such")
+MACRO_CONFIG_STR(SvInfoLine2, sv_info_line2, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "/info line 2, can be used for contact links and such")
+MACRO_CONFIG_STR(SvInfoLine3, sv_info_line3, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "/info line 3, can be used for contact links and such")
