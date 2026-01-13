@@ -1626,7 +1626,7 @@ void CGameContext::ConAddBot(IConsole::IResult *pResult, void *pUserData)
 	if(Difficulty < 0)
 		Difficulty = 0;
 
-	for(int i = 0; i < MAX_CLIENTS; i++)
+	for(int i = MAX_CLIENTS-1; i >= 0; i--)
 	{
 		if(pSelf->m_apPlayers[i])
 			continue;
