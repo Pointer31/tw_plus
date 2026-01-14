@@ -248,7 +248,26 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClient)
 {
 	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker) //always snap seekers
+	{
+		if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
+		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
+		{
+			CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Pickup)));
+
+			if(pPickup)
+			{
+				vec2 postemp;
+				postemp.x = pChar->GetPos().x + 32*sin((float)Server()->Tick() / 25.0);
+				postemp.y = pChar->GetPos().y + 32*cos((float)Server()->Tick() / 25.0);
+
+				pPickup->m_Type = PICKUP_ARMOR;
+				pPickup->m_X = round_to_int(postemp.x);
+				pPickup->m_Y = round_to_int(postemp.y);
+			}
+		}
+
 		return false;
+	}
 
 	if(SnappingClient < 0 || SnappingClient >= MAX_CLIENTS)
 		return false;
@@ -285,22 +304,6 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 			pProj->m_VelY = 0;
 			pProj->m_X = round_to_int(postemp.x);
 			pProj->m_Y = round_to_int(postemp.y);
-		}
-	}
-	else if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
-		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
-	{
-		CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Pickup)));
-
-		if(pPickup)
-		{
-			vec2 postemp;
-			postemp.x = pChar->GetPos().x + 32*sin((float)Server()->Tick() / 25.0);
-			postemp.y = pChar->GetPos().y + 32*cos((float)Server()->Tick() / 25.0);
-
-			pPickup->m_Type = PICKUP_ARMOR;
-			pPickup->m_X = round_to_int(postemp.x);
-			pPickup->m_Y = round_to_int(postemp.y);
 		}
 	}
 
