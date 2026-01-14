@@ -1677,6 +1677,13 @@ void CGameContext::ConGiveWeapon(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "no player found");
 }
 
+void CGameContext::ConBotsCheckCount(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	pSelf->BotsMinimumPlayersCheck();
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1707,6 +1714,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("add_bot", "i[AI] ?i[Difficulty]", CFGFLAG_SERVER, ConAddBot, this, "Add a bot");
 	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
 	Console()->Register("give", "i[id] i[weapon]", CFGFLAG_SERVER, ConGiveWeapon, this, "Give a player a weapon");
+	Console()->Register("bots_check_count", "", CFGFLAG_SERVER, ConBotsCheckCount, this, "Check playercount and add or remove bots. Useful in combination with sv_bots_minimum_players");
 }
 
 void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
