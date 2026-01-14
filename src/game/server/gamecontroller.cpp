@@ -1330,7 +1330,7 @@ void IGameController::Com_Restart(IConsole::IResult *pResult, void *pContext)
 
 	int ClientID = pComContext->m_ClientID;
 
-	pSelf->GameServer()->StartVote("Restart round", "restart", "/restart");
+	pSelf->GameServer()->StartVote("Restart match", "restart", "/restart");
 }
 
 void IGameController::Com_ServerInfo(IConsole::IResult *pResult, void *pContext)
@@ -1363,7 +1363,7 @@ void IGameController::RegisterChatCommands(CCommandManager *pManager)
 {
 	pManager->AddCommand("emote", "set your default eye emote", "r", Com_DefaultEmote, this);
 	pManager->AddCommand("help", "get info about the current gametype", "", Com_GameHelp, this);
-	pManager->AddCommand("restart", "vote for restarting the round", "", Com_Restart, this);
+	pManager->AddCommand("restart", "vote for restarting the match", "", Com_Restart, this);
 	pManager->AddCommand("info", "get info about the server and contact links", "", Com_ServerInfo, this);
 	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }
