@@ -116,7 +116,8 @@ void CGameControllerHidNSek::Tick()
 				}
 			}
 
-			m_AlreadySetSeekers = true;
+			if(Seekers() >= Config()->m_SvHidNSekSeekers && Seekers() >= GetRealPlayerNum()/2)
+				m_AlreadySetSeekers = true;
 		}
 		else if(!m_ToldSeekers)
 		{
