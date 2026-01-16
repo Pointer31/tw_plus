@@ -369,6 +369,9 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 		if(m_SpecialMode == SPECIAL_MODE_INFECTION)
 		{
 			SetPlayerSeeker(Character.GetPlayer()->GetCID(), true, true);
+			Character.RemoveWeapon(WEAPON_HAMMER);
+			Character.GiveWeapon(Config()->m_SvHidNSekSeekerWeapon, -1);
+			Character.SetWeapon(Config()->m_SvHidNSekSeekerWeapon);
 		}
 		else if(m_SpecialMode == SPECIAL_MODE_FREEZE)
 		{
