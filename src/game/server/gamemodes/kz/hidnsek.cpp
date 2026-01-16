@@ -250,8 +250,9 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 {
 	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker) //always snap seekers
 	{
-		if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
-		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
+		if(m_SpecialMode == SPECIAL_MODE_FREEZE ||
+			(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
+		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit))
 		{
 			CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Pickup)));
 
