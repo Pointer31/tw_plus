@@ -70,9 +70,9 @@ void CPointerBotAI::HandleInput(CNetObj_PlayerInput &Input)
             Input.m_Hook = false;
             //Input.m_PlayerFlags = PLAYERFLAG_PLAYING;
             Input.m_WantedWeapon = WEAPON_GUN + 1;
-            if (GameServer()->m_pController->GetGameType()[0] == 'i')
+            if (GameServer()->m_pController->IsInstagibLaser())
                 Input.m_WantedWeapon = WEAPON_LASER + 1;
-            if (GameServer()->m_pController->GetGameType()[0] == 'g')
+            if (GameServer()->m_pController->IsInstagibGrenade())
                 Input.m_WantedWeapon = WEAPON_GRENADE + 1;
             Input.m_NextWeapon = WEAPON_GUN + 1;
             Input.m_PrevWeapon = WEAPON_GUN + 1;
@@ -111,6 +111,25 @@ void CPointerBotAI::HandleInput(CNetObj_PlayerInput &Input)
             }
             if (m_isBot >= 4 && pOwnChar)
             {
+                if (GetPlayer()->GetCharacter() && m_botAggro >= 0 && GameServer()->m_apPlayers[m_botAggro] && GameServer()->m_apPlayers[m_botAggro]->GetCharacter())
+                {
+                    vec2 posAggro = GameServer()->m_apPlayers[m_botAggro]->GetCharacter()->GetPos();
+                    int distance = sqrt((posAggro.x - pOwnChar->GetPos().x) * (posAggro.x - pOwnChar->GetPos().x) 
+                                    + (posAggro.y - pOwnChar->GetPos().y) * (posAggro.y - pOwnChar->GetPos().y));
+                    if (GetPlayer()->GetCharacter()->GetWeaponAmmo(WEAPON_LASER))
+                        Input.m_WantedWeapon = WEAPON_LASER + 1;
+                    else if (GetPlayer()->GetCharacter()->GetWeaponGot(WEAPON_HAMMER) && distance < 2*32)
+                        Input.m_WantedWeapon = WEAPON_HAMMER + 1;
+                    else if (GetPlayer()->GetCharacter()->GetWeaponAmmo(WEAPON_GRENADE))
+                        Input.m_WantedWeapon = WEAPON_GRENADE + 1;
+                    else if (GetPlayer()->GetCharacter()->GetWeaponAmmo(WEAPON_SHOTGUN) && distance < 16*32)
+                        Input.m_WantedWeapon = WEAPON_SHOTGUN + 1;
+                    else
+                        Input.m_WantedWeapon = WEAPON_GUN + 1;
+
+                    if (m_isBot >= 5 && GetPlayer()->GetCharacter()->GetWeaponGot(WEAPON_GUN))
+                        GetPlayer()->GetCharacter()->GiveWeapon(WEAPON_GUN, 10);
+                }
                 if (GameServer()->Server()->Tick() % (SERVER_TICK_SPEED) == 1)
                 {
                     // get a new aggro
@@ -142,7 +161,7 @@ void CPointerBotAI::HandleInput(CNetObj_PlayerInput &Input)
                 else
                 {
                     m_ticksSinceFire++;
-                    if (GameServer()->m_pController->GetGameType()[0] == 'g')
+                    if (GameServer()->m_pController->IsInstagibGrenade())
                     {
                         if (m_isBot >= 5 || m_ticksSinceFire > 50)
                         {
@@ -182,7 +201,7 @@ void CPointerBotAI::HandleInput(CNetObj_PlayerInput &Input)
                         float d = sqrt((pos.x - pOwnChar->GetPos().x) * (pos.x - pOwnChar->GetPos().x) + (pos.y - pOwnChar->GetPos().y) * (pos.y - pOwnChar->GetPos().y));
                         Input.m_TargetX = pos.x - pOwnChar->GetPos().x; // aim
                         Input.m_TargetY = pos.y - pOwnChar->GetPos().y;
-                        if (GameServer()->m_pController->GetGameType()[0] == 'g') // grenade curve correction, somewhat
+                        if (GetPlayer()->GetCharacter()->GetActiveWeapon() == WEAPON_GRENADE) // grenade curve correction, somewhat
                             Input.m_TargetY = Input.m_TargetY + (-abs(Input.m_TargetX) * 0.3);
                         if (m_isBot <= 5) // aim worse
                         {
@@ -192,17 +211,12 @@ void CPointerBotAI::HandleInput(CNetObj_PlayerInput &Input)
                     }
                 }
             }
-            if (GetPlayer()->GetCharacter())
-            {
-                GetPlayer()->GetCharacter()->GiveWeapon(WEAPON_GUN, 10);
-            }
         }
     }
 }
 
 void CPointerBotAI::GetSkin(STeeInfos &TeeInfos)
 {
-    //@Pointer modify this
     CBotAI::GetSkin(TeeInfos);
 }
 
