@@ -354,6 +354,7 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 
 	if(m_HidNSekPlayers[From].m_IsSeeker && !m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
 	{
+		Character.GetCore().m_Vel += Force;
 		// do damage Hit sound
 		if(From >= 0 && From != Character.GetPlayer()->GetCID() && GameServer()->m_apPlayers[From])
 		{
