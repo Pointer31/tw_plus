@@ -160,7 +160,7 @@ void CGameControllerHidNSek::SetPlayerSeeker(int ClientID, bool set, bool infect
 	}
 	else
 	{
-		if(m_HidNSekPlayers[ClientID].m_IsSeeker)
+		if(m_HidNSekPlayers[ClientID].m_IsSeeker && !m_HidNSekPlayers[ClientID].m_Infected)
 			m_HidNSekPlayers[ClientID].m_WasSeeker = true;
 		m_HidNSekPlayers[ClientID].m_IsSeeker = false;
 	}
