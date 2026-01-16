@@ -1330,7 +1330,25 @@ void IGameController::Com_Restart(IConsole::IResult *pResult, void *pContext)
 
 	int ClientID = pComContext->m_ClientID;
 
-	pSelf->GameServer()->StartVote("Restart round", "restart", "/restart");
+	pSelf->GameServer()->StartVote("Restart match", "restart", "/restart");
+}
+
+void IGameController::Com_ServerInfo(IConsole::IResult *pResult, void *pContext)
+{
+	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
+	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
+
+	int ClientID = pComContext->m_ClientID;
+
+	pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, "TWplus server mod");
+	if (str_comp(pSelf->Config()->m_SvInfoSources, "") != 0)
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoSources);
+	if (str_comp(pSelf->Config()->m_SvInfoLine1, "") != 0)
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoLine1);
+	if (str_comp(pSelf->Config()->m_SvInfoLine2, "") != 0)
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoLine2);
+	if (str_comp(pSelf->Config()->m_SvInfoLine3, "") != 0)
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoLine3);
 }
 
 /*void IGameController::Com_Example(IConsole::IResult *pResult, void *pContext)
@@ -1345,6 +1363,7 @@ void IGameController::RegisterChatCommands(CCommandManager *pManager)
 {
 	pManager->AddCommand("emote", "set your default eye emote", "r", Com_DefaultEmote, this);
 	pManager->AddCommand("help", "get info about the current gametype", "", Com_GameHelp, this);
-	pManager->AddCommand("restart", "vote for restarting the round", "", Com_Restart, this);
+	pManager->AddCommand("restart", "vote for restarting the match", "", Com_Restart, this);
+	pManager->AddCommand("info", "get info about the server and contact links", "", Com_ServerInfo, this);
 	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }

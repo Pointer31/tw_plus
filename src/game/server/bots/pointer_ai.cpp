@@ -9,7 +9,15 @@
 CPointerBotAI::CPointerBotAI(CGameContext *pContext, CPlayer *pPlayer, int Difficulty) :
 CBotAI(pContext, pPlayer)
 {
-    m_isBot = Difficulty;
+    m_isBot = clamp(Difficulty, 1, 6);
+    str_format(m_Clan, sizeof(m_Clan), "bot%i", m_isBot);
+
+    str_copy(pPlayer->m_TeeInfos.m_aaSkinPartNames[0], rand() % 2 == 0 ? "kitty" : "dog", MAX_SKIN_LENGTH);
+    for (int i = 0; i < NUM_SKINPARTS; i++)
+    {   
+        pPlayer->m_TeeInfos.m_aUseCustomColors[i] = true;
+        pPlayer->m_TeeInfos.m_aSkinPartColors[i] = 917601 + (rand() % 150);
+    }
 }
 
 void CPointerBotAI::HandleInput(CNetObj_PlayerInput &Input)
@@ -196,4 +204,9 @@ void CPointerBotAI::GetSkin(STeeInfos &TeeInfos)
 {
     //@Pointer modify this
     CBotAI::GetSkin(TeeInfos);
+}
+
+const char * CPointerBotAI::GetClan()
+{
+    return m_Clan;
 }

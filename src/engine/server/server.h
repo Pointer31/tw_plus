@@ -226,7 +226,7 @@ public:
 	virtual void GetClientAddr(int ClientID, char *pAddrStr, int Size) const override;
 	virtual int GetClientVersion(int ClientID) const override;
 	virtual const char *ClientName(int ClientID) override;
-	virtual const char *ClientClan(int ClientID) const override;
+	virtual const char *ClientClan(int ClientID) override;
 	virtual int ClientCountry(int ClientID) const override;
 	virtual bool ClientIngame(int ClientID) const override;
 

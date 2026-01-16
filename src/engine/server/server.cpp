@@ -448,8 +448,11 @@ const char *CServer::ClientName(int ClientID)
 
 }
 
-const char *CServer::ClientClan(int ClientID) const
+const char *CServer::ClientClan(int ClientID)
 {
+	if(GameServer()->IsClientBot(ClientID))
+		return GameServer()->GetBotClan(ClientID);
+
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State == CServer::CClient::STATE_EMPTY)
 		return "";
 	if(m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME)

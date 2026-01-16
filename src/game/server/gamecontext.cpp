@@ -200,6 +200,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	char aBuf[256];
 	if(ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS)
 	{
+		To = -1;
 		if(Mode == CHAT_TEAM)
 		{
 			int TeamID = m_apPlayers[ChatterClientID]->GetTeam();
@@ -232,7 +233,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	Msg.m_TargetID = -1;
 
 	if(Mode == CHAT_ALL)
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
 	else if(Mode == CHAT_TEAM)
 	{
 		// pack one for the recording only
@@ -760,6 +761,8 @@ void CGameContext::OnClientEnter(int ClientID)
 		Msg.m_Team = NewClientInfoMsg.m_Team;
 		Server()->SendPackMsg(&Msg, MSGFLAG_NOSEND, -1);
 	}
+
+	BotsMinimumPlayersCheck();
 }
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
@@ -794,6 +797,8 @@ void CGameContext::OnClientTeamChange(int ClientID)
 		if(p->GetOwner() == ClientID)
 			p->LoseOwner();
 	}
+	
+	BotsMinimumPlayersCheck();
 }
 
 void CGameContext::OnClientDrop(int ClientID, const char *pReason)
@@ -832,6 +837,8 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 
 	delete m_apPlayers[ClientID];
 	m_apPlayers[ClientID] = 0;
+
+	BotsMinimumPlayersCheck(ClientID);
 
 	m_VoteUpdate = true;
 }
@@ -1130,7 +1137,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		{
 			CNetMsg_Cl_Emoticon *pMsg = (CNetMsg_Cl_Emoticon *)pRawMsg;
 
-			if(Config()->m_SvSpamprotection && pPlayer->m_LastEmoteTick && pPlayer->m_LastEmoteTick+Server()->TickSpeed()*3 > Server()->Tick())
+			if(Config()->m_SvSpamprotection && pPlayer->m_LastEmoteTick && pPlayer->m_LastEmoteTick+Server()->TickSpeed()/10 > Server()->Tick())
 				return;
 
 			pPlayer->m_LastEmoteTick = Server()->Tick();
@@ -1620,7 +1627,7 @@ void CGameContext::ConAddBot(IConsole::IResult *pResult, void *pUserData)
 	if(Difficulty < 0)
 		Difficulty = 0;
 
-	for(int i = 0; i < MAX_CLIENTS; i++)
+	for(int i = MAX_CLIENTS-1; i >= 0; i--)
 	{
 		if(pSelf->m_apPlayers[i])
 			continue;
@@ -1647,6 +1654,34 @@ void CGameContext::ConRemoveBot(IConsole::IResult *pResult, void *pUserData)
 			break;
 		}
 	}
+}
+
+void CGameContext::ConGiveWeapon(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	int ClientID = pResult->GetInteger(0);
+
+	if(pSelf->m_apPlayers[ClientID] && pSelf->m_apPlayers[ClientID]->GetCharacter())
+	{
+		int Weapon = clamp(pResult->GetInteger(1), 0, NUM_WEAPONS-1);
+
+		if (Weapon == WEAPON_NINJA)
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveNinja();
+		else
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveWeapon(Weapon, -1);
+
+		return;
+	}
+	if (!pSelf->m_apPlayers[ClientID])
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "no player found");
+}
+
+void CGameContext::ConBotsCheckCount(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	pSelf->BotsMinimumPlayersCheck();
 }
 
 void CGameContext::OnConsoleInit()
@@ -1678,6 +1713,8 @@ void CGameContext::OnConsoleInit()
 
 	Console()->Register("add_bot", "i[AI] ?i[Difficulty]", CFGFLAG_SERVER, ConAddBot, this, "Add a bot");
 	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
+	Console()->Register("give", "i[id] i[weapon]", CFGFLAG_SERVER, ConGiveWeapon, this, "Give a player a weapon");
+	Console()->Register("bots_check_count", "", CFGFLAG_SERVER, ConBotsCheckCount, this, "Check playercount and add or remove bots. Useful in combination with sv_bots_minimum_players");
 }
 
 void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
@@ -1765,6 +1802,15 @@ void CGameContext::OnInit()
 	// clamp sv_player_slots to 0..MaxClients
 	if(Config()->m_SvMaxClients < Config()->m_SvPlayerSlots)
 		Config()->m_SvPlayerSlots = Config()->m_SvMaxClients;
+
+	if (Config()->m_SvMotdHelpMenu)
+	{
+		str_format(Config()->m_SvMotd, sizeof(Config()->m_SvMotd), "%s\n\n%s\n\n%s",
+			"Welcome to TWplus!",
+		 	m_pController->GetGameHelpText(),
+			m_pController->IsInstagib() == 0 ? "" : (m_pController->IsInstagibLaser() == 1 ? "Instagib is enabled. Your rifle instakills others." : "Instagib is enabled. Your grenade launcher instakills others.")
+		);
+	}
 
 #ifdef CONF_DEBUG
 	// clamp dbg_dummies to 0..MAX_CLIENTS-1
@@ -1879,4 +1925,81 @@ const char *CGameContext::GetBotName(int ClientID)
 	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_pBotAI)
 		return m_apPlayers[ClientID]->m_pBotAI->GetName();
     return "Debug Dummy";
+}
+
+const char *CGameContext::GetBotClan(int ClientID)
+{
+	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_pBotAI)
+		return m_apPlayers[ClientID]->m_pBotAI->GetClan();
+    return "";
+}
+
+void CGameContext::BotsMinimumPlayersCheck(int DontUseID)
+{
+	int WantedPlayerCount = Config()->m_SvBotsMinimumPlayers;
+	if (WantedPlayerCount > 0)
+	{
+		int HumanPlayers = 0;
+		int BotPlayers = 0;
+		for (int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if (m_apPlayers[i] && m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
+			{
+				if (!m_apPlayers[i]->IsDummy())
+					HumanPlayers++;
+				else
+					BotPlayers++;
+			}
+		}
+		int TotalPlayers = HumanPlayers + BotPlayers;
+
+		if (HumanPlayers == 0)
+		{
+			for(int i = 0; i < MAX_CLIENTS; i++)
+			{
+				if(m_apPlayers[i] && m_apPlayers[i]->m_pBotAI)
+				{
+					OnClientDrop(i, "removing bot");
+				}
+			}
+		}
+		else
+		{
+			int BotPlayersTarget = clamp(WantedPlayerCount - HumanPlayers, 0, (int)MAX_CLIENTS);
+			int BotsToJoin = BotPlayersTarget - BotPlayers;
+
+			if (BotsToJoin > 0)
+				for (int i = 0; i < BotsToJoin; i++)
+				{
+					for(int i = MAX_CLIENTS-1; i >= 0; i--)
+					{
+						int Type = Config()->m_SvBotsType;
+						int Difficulty = Config()->m_SvBotsDifficulty;
+
+						if(m_apPlayers[i] || i == DontUseID)
+							continue;
+
+						OnClientConnected(i, false, false);
+						if(m_apPlayers[i])
+						{
+							m_apPlayers[i]->m_pBotAI = CBotAI::CreateBot(this, m_apPlayers[i], Type, Difficulty);
+							OnClientEnter(i);
+							break;
+						}
+					}
+				}
+			else if (BotsToJoin < 0)
+				for (int i = 0; i < -BotsToJoin; i++)
+				{
+					for(int i = 0; i < MAX_CLIENTS; i++)
+					{
+						if(m_apPlayers[i] && m_apPlayers[i]->m_pBotAI)
+						{
+							OnClientDrop(i, "removing bot");
+							break;
+						}
+					}
+				}
+		}
+	}
 }

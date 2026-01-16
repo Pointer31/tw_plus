@@ -11,11 +11,14 @@ class CPointerBotAI : public CBotAI
 	int m_ticksSinceFire = 0;
 	int m_botDirection = 1;
 
+    char m_Clan[10];
+
     public:
     CPointerBotAI(CGameContext *pContext, CPlayer *pPlayer, int Difficulty);
     virtual void HandleInput(CNetObj_PlayerInput &Input) override;
     virtual void GetSkin(STeeInfos &TeeInfos) override;
     virtual const char * GetName() override { return "Bot"; };
+    virtual const char * GetClan() override;
     virtual EBotAIType GetAIType() override { return BOT_AI_POINTER; }
 };
 #endif
