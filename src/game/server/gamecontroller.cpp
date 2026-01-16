@@ -1289,6 +1289,15 @@ void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
 
 	int ClientID = pComContext->m_ClientID;
 
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Mode = CHAT_ALL;
+		Msg.m_ClientID = -1;
+		Msg.m_pMessage = pSelf->GetGameHelpText();
+		Msg.m_TargetID = ClientID;
+		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
+
 	if (pSelf->IsInstagibLaser()) 
 	{
 		CNetMsg_Sv_Chat Msg;
@@ -1304,15 +1313,6 @@ void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
 		Msg.m_Mode = CHAT_ALL;
 		Msg.m_ClientID = -1;
 		Msg.m_pMessage = "Instagib is enabled. Your grenade launcher instakills others.";
-		Msg.m_TargetID = ClientID;
-		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-	}
-
-	{
-		CNetMsg_Sv_Chat Msg;
-		Msg.m_Mode = CHAT_ALL;
-		Msg.m_ClientID = -1;
-		Msg.m_pMessage = pSelf->GetGameHelpText();
 		Msg.m_TargetID = ClientID;
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	}
