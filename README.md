@@ -1,3 +1,17 @@
+TWplus
+=========
+
+A fun mod for a fun game
+---------------------------
+
+This mods adds two new gametypes: hold the flag (HTF) and hide and seek (HNS). Additionally, for all gametypes except HNS you can choose if you want a laser/grenade instagib mod added!
+
+Some server-side bots have also been added of which there are two types and of the second type multiple difficulties. They are most suited for playing DM, and can play CTF too.
+
+Some map features have been added. Right now: map teleports!
+
+Below is the upstream teeworlds readme:
+
 <a href="https://repology.org/metapackage/teeworlds/versions">
     <img src="https://repology.org/badge/vertical-allrepos/teeworlds.svg" alt="Packaging status" align="right">
 </a>
