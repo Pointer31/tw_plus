@@ -198,9 +198,11 @@ void CGameContext::CreateSound(vec2 Pos, int Sound, int64 Mask)
 void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 {
 	char aBuf[256];
+	if (ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS && Mode != CHAT_WHISPER)
+		To = -1;
+		
 	if(ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS)
 	{
-		To = -1;
 		if(Mode == CHAT_TEAM)
 		{
 			int TeamID = m_apPlayers[ChatterClientID]->GetTeam();
