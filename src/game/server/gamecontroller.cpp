@@ -257,7 +257,7 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	}
 	else if (m_Instagib == 2)
 	{
-		pChr->GiveWeapon(WEAPON_GRENADE, -1);
+		pChr->GiveWeapon(WEAPON_GRENADE, Config()->m_SvGrenadeAmmo);
 	}
 	else
 	{
