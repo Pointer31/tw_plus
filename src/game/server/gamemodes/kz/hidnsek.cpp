@@ -160,7 +160,7 @@ void CGameControllerHidNSek::SetPlayerSeeker(int ClientID, bool set, bool infect
 	}
 	else
 	{
-		if(m_HidNSekPlayers[ClientID].m_IsSeeker)
+		if(m_HidNSekPlayers[ClientID].m_IsSeeker && !m_HidNSekPlayers[ClientID].m_Infected)
 			m_HidNSekPlayers[ClientID].m_WasSeeker = true;
 		m_HidNSekPlayers[ClientID].m_IsSeeker = false;
 	}
@@ -250,8 +250,9 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 {
 	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker) //always snap seekers
 	{
-		if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
-		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit)
+		if(m_SpecialMode == SPECIAL_MODE_FREEZE ||
+			(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
+		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit))
 		{
 			CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Pickup)));
 
@@ -354,6 +355,7 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 
 	if(m_HidNSekPlayers[From].m_IsSeeker && !m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
 	{
+		Character.GetCore().m_Vel += Force;
 		// do damage Hit sound
 		if(From >= 0 && From != Character.GetPlayer()->GetCID() && GameServer()->m_apPlayers[From])
 		{
@@ -369,6 +371,9 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 		if(m_SpecialMode == SPECIAL_MODE_INFECTION)
 		{
 			SetPlayerSeeker(Character.GetPlayer()->GetCID(), true, true);
+			Character.RemoveWeapon(WEAPON_HAMMER);
+			Character.GiveWeapon(Config()->m_SvHidNSekSeekerWeapon, -1);
+			Character.SetWeapon(Config()->m_SvHidNSekSeekerWeapon);
 		}
 		else if(m_SpecialMode == SPECIAL_MODE_FREEZE)
 		{
