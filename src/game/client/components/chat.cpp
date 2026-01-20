@@ -721,9 +721,9 @@ void CChat::AddLine(const char *pLine, int ClientID, int Mode, int TargetID)
 		if(ClientID < 0)
 			ChatType = CHAT_SERVER;
 		else if(Highlighted || Mode == CHAT_WHISPER)
-			ChatType = CHAT_HIGHLIGHT;
+			ChatType = Config()->m_ClOldChatSounds ? CHAT_CLIENT : CHAT_HIGHLIGHT;
 		else
-			ChatType = CHAT_CLIENT;
+			ChatType = Config()->m_ClOldChatSounds ? CHAT_HIGHLIGHT : CHAT_CLIENT;
 
 		const int64 Now = time_get();
 		if(Now - m_aLastSoundPlayed[ChatType] >= time_freq() * 0.3f)
