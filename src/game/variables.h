@@ -152,6 +152,7 @@ MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SA
 MACRO_CONFIG_INT(DbgFocus, dbg_focus, 0, 0, 1, CFGFLAG_CLIENT, "")
 MACRO_CONFIG_INT(DbgTuning, dbg_tuning, 0, 0, 1, CFGFLAG_CLIENT, "")
 #endif
+MACRO_CONFIG_INT(ClOldChatSounds, cl_old_chat_sounds, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_CLIENT, "old chat sounds (swap highlight and normal sounds)")
 
 MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib (0=off, 1=laser, 2=grenade)")
 MACRO_CONFIG_INT(SvGrenadeAmmo, sv_grenade_ammo, 6, -1, 10, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib grenade ammo (or -1)")
