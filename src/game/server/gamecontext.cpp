@@ -927,7 +927,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				char bBuf[256] = "";
 				char* split = str_skip_to_whitespace(aBuf);
 				
-				if (!*split)
+				if (*split)
 					str_copy(bBuf, split+1, sizeof(bBuf));
 
 				*split = '\0';
