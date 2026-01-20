@@ -927,7 +927,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				char bBuf[256] = "";
 				char* split = str_skip_to_whitespace(aBuf);
 				
-				if (*split != NULL)
+				if (!*split)
 					str_copy(bBuf, split+1, sizeof(bBuf));
 
 				*split = '\0';
@@ -1953,7 +1953,7 @@ void CGameContext::BotsMinimumPlayersCheck(int DontUseID)
 					BotPlayers++;
 			}
 		}
-		int TotalPlayers = HumanPlayers + BotPlayers;
+		// int TotalPlayers = HumanPlayers + BotPlayers;
 
 		if (HumanPlayers == 0)
 		{

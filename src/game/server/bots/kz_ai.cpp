@@ -48,8 +48,8 @@ void CKZBotAI::HandleInput(CNetObj_PlayerInput &Input)
     //Spaghetti yummy
 
     CCharacter *pOwnChar = nullptr;
-    if(!(pOwnChar = GetPlayer()->GetCharacter()))
-        return;
+	if(!(pOwnChar = GetPlayer()->GetCharacter()))
+		return;
 	
 	CCharacter *pClosestChar = nullptr;
 	CPickup *pClosestPickup = nullptr;
@@ -424,7 +424,8 @@ void CKZBotAI::HandleInput(CNetObj_PlayerInput &Input)
 				if(!(Collision()->FastIntersectLine(*m_pPos,*m_pPos + vec2(0.f,1000.f),nullptr,nullptr)))
 				{
 					//danger no floor, remove directionsmart
-					m_TryingOppositeSmart = m_TryingDirectionSmart = 0;
+					m_TryingOppositeSmart = 0;
+					m_TryingDirectionSmart = 0;
 				}
 			}
 			else if(((TargetPos.x - m_pPos->x < 0 ? (TargetPos.y - m_pPos->y < 0 ? TargetPos.x - m_pPos->x > TargetPos.y - m_pPos->y : (TargetPos.x - m_pPos->x)*-1 < TargetPos.y - m_pPos->y) : (TargetPos.y - m_pPos->y < 0 ? TargetPos.x - m_pPos->x < (TargetPos.y - m_pPos->y)*-1 : TargetPos.x - m_pPos->x < TargetPos.y - m_pPos->y)) && TargetPos.x > m_pPos->x - 500.0f && TargetPos.x < m_pPos->x + 500.0f))
@@ -720,7 +721,8 @@ void CKZBotAI::HandleInput(CNetObj_PlayerInput &Input)
 	
 	if(m_TryingDirectionSmart && !Collision()->FastIntersectLine(*m_pPos,TargetPos,nullptr,nullptr))
 	{
-		m_TryingOppositeSmart = m_TryingDirectionSmart = 0;
+		m_TryingOppositeSmart = 0;
+		m_TryingDirectionSmart = 0;
 		m_StopUntilTouchGround = true;
 	}
 	

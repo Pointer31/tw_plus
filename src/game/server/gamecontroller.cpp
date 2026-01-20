@@ -624,8 +624,10 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 		}
 		break;
 	case IGS_END_ROUND:
-		Timer = Config()->m_SvBetweenRoundTime;
 	case IGS_END_MATCH:
+		if(GameState == IGS_END_ROUND)
+			Timer = Config()->m_SvBetweenRoundTime;
+
 		if(GameState == IGS_END_ROUND && DoWincheckMatch())
 			break;
 
@@ -1327,8 +1329,6 @@ void IGameController::Com_Restart(IConsole::IResult *pResult, void *pContext)
 {
 	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
 	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
-
-	int ClientID = pComContext->m_ClientID;
 
 	pSelf->GameServer()->StartVote("Restart match", "restart", "/restart");
 }

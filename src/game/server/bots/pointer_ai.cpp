@@ -88,8 +88,8 @@ void CPointerBotAI::HandleInput(CNetObj_PlayerInput &Input)
                     Input.m_Jump = true;
                 if (str_comp_nocase(GameServer()->m_pController->GetGameType(), "CTF+") == 0 || str_comp_nocase(GameServer()->m_pController->GetGameType(), "iCTF+") == 0 || str_comp_nocase(GameServer()->m_pController->GetGameType(), "gCTF+") == 0)
                 {
-                    int team = GetPlayer()->GetTeam();
-                    int teamEnemy = 1 - GetPlayer()->GetTeam();
+                    // int team = GetPlayer()->GetTeam();
+                    // int teamEnemy = 1 - GetPlayer()->GetTeam();
                     if (pTeamFlag && pEnemyFlag)
                     {
                         if (pEnemyFlag->GetCarrier() == pOwnChar)
