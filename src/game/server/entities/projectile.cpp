@@ -15,7 +15,7 @@ CProjectile::CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, 
 	m_Direction.y = round_to_int(Dir.y*100.0f) / 100.0f;
 	m_LifeSpan = Span;
 	m_Owner = Owner;
-	m_OwnerTeam = GameServer()->m_apPlayers[Owner]->GetTeam();
+	m_OwnerTeam = Owner >= 0 ? GameServer()->m_apPlayers[Owner]->GetTeam() : PLAYER_TEAM_RED;
 	m_Force = Force;
 	m_Damage = Damage;
 	m_SoundImpact = SoundImpact;
