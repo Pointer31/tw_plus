@@ -1111,6 +1111,34 @@ set(EXPECTED_DATA
   ui/gametypes/mod.png
   ui/gametypes/race.png
   ui/gametypes/tdm.png
+  ui/gametypes/ctf+.png 
+  ui/gametypes/ddracenetwork.png
+  ui/gametypes/gctf.png
+  ui/gametypes/ghtf+.png
+  ui/gametypes/HidNSek.png
+  ui/gametypes/ictf.png
+  ui/gametypes/ihtf+.png
+  ui/gametypes/infclassR.png	
+  ui/gametypes/lts+.png
+  ui/gametypes/tdm+.png
+  ui/gametypes/ddrace.png
+  ui/gametypes/fng2+.png
+  ui/gametypes/gdm+.png
+  ui/gametypes/glms+.png
+  ui/gametypes/htf+.png
+  ui/gametypes/idm+.png
+  ui/gametypes/ilms+.png
+  ui/gametypes/lms+.png
+  ui/gametypes/solofng2+.png
+  ui/gametypes/dm+.png
+  ui/gametypes/gctf+.png
+  ui/gametypes/gdm.png
+  ui/gametypes/glms.png
+  ui/gametypes/ictf+.png
+  ui/gametypes/idm.png
+  ui/gametypes/ilms.png
+  ui/gametypes/solofng.png
+  ui/gametypes/zcatch.png
   ui/gui_buttons.png
   ui/gui_cursor.png
   ui/gui_icons.png
