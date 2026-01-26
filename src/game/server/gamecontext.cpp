@@ -151,7 +151,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamag
 		if(l)
 			Force = normalize(Diff) * MaxForce;
 		float Factor = 1 - clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
-		if((int)(Factor * MaxDamage))
+		if((int)(Factor * MaxDamage) || MaxDamage == 0)
 			apEnts[i]->TakeDamage(Force * Factor, Diff*-1, (int)(Factor * MaxDamage), Owner, Weapon);
 	}
 }

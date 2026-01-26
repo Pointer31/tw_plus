@@ -156,6 +156,7 @@ MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_SERVER, 
 MACRO_CONFIG_INT(SvGrenadeAmmo, sv_grenade_ammo, 6, -1, 10, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib grenade ammo (or -1)")
 MACRO_CONFIG_INT(SvGrenadeAmmoRegen, sv_grenade_ammo_regen, 900, 100, 2000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib grenade ammo regen time (ms)")
 MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 4, 2, 6, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib grenade minimum damage required for a kill")
+MACRO_CONFIG_INT(SvLaserJumps, sv_laserjumps, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib laser jumps")
 MACRO_CONFIG_INT(SvBetweenMatchTime, sv_between_match_time, 10, 0, 30, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many seconds to wait before starting the next match")
 MACRO_CONFIG_INT(SvBetweenRoundTime, sv_between_round_time, 5, 0, 30, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many seconds to wait before starting the next round")
 MACRO_CONFIG_INT(SvMotdHelpMenu, sv_motd_help_menu, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Replace MOTD with help menu")
