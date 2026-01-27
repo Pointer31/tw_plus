@@ -22,6 +22,7 @@
 #include "gamemodes/mod.h"
 #include "gamemodes/tdm.h"
 #include "gamemodes/kz/hidnsek.h"
+#include "gamemodes/race.h"
 #include "gamecontext.h"
 #include "player.h"
 #include "bots/base_ai.h"
@@ -1766,6 +1767,8 @@ void CGameContext::OnInit()
 		m_pController = new CGameControllerTDM(this);
 	else if(str_comp_nocase(Config()->m_SvGametype, "hidnsek") == 0 || str_comp_nocase(Config()->m_SvGametype, "hns") == 0)
 		m_pController = new CGameControllerHidNSek(this);
+	else if(str_comp_nocase(Config()->m_SvGametype, "race") == 0)
+		m_pController = new CGameControllerRACE(this);
 	else
 		m_pController = new CGameControllerDM(this);
 

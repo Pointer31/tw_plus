@@ -168,3 +168,4 @@ MACRO_CONFIG_STR(SvInfoLine1, sv_info_line1, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVE
 MACRO_CONFIG_STR(SvInfoLine2, sv_info_line2, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "/info line 2, can be used for contact links and such")
 MACRO_CONFIG_STR(SvInfoLine3, sv_info_line3, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "/info line 3, can be used for contact links and such")
 MACRO_CONFIG_INT(SvPickupParticles, sv_pickup_particles, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Show particles to indicate a pickup is regenerating")
+MACRO_CONFIG_INT(SvRaceFriendlyFire, sv_race_friendly_fire, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Enable friendly fire on race gametypes")
