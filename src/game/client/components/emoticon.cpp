@@ -170,7 +170,7 @@ void CEmoticon::OnRender()
 
 	CServerInfo Info;
 	Client()->GetServerInfo(&Info);
-	if(IsRace(&Info) && Config()->m_ClEyeWheel)
+	if((IsRace(&Info) || IsBlockWorlds(&Info) || IsPlus(&Info)) && Config()->m_ClEyeWheel)
 	{
 		Graphics()->TextureClear();
 		Graphics()->QuadsBegin();
