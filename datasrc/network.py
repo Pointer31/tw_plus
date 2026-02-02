@@ -277,6 +277,12 @@ Objects = [
 	NetObjectEx("MyOwnEvent", "my-own-event@heinrich5991.de", [
 		NetIntAny("m_Test"),
 	]),
+
+	NetObjectEx("PickupCustom", "pickup-custom@pointerstwplus", [
+		NetIntAny("m_X"),
+		NetIntAny("m_Y"),
+		NetIntAny("m_ResourceId"),
+	]),
 ]
 
 Messages = [
@@ -494,6 +500,12 @@ Messages = [
 
 	NetMessageEx("Sv_MyOwnMessage", "my-own-message@heinrich5991.de", [
 		NetIntAny("m_Test"),
+	]),
+
+	NetMessageEx("Sv_ImageResource", "image-resource@pointerstwplus", [
+		NetIntAny("m_Id"),
+		NetString("m_pName"),
+		NetString("m_pHash"),
 	]),
     
 	NetMessageEx("Sv_PreInput", "preinput@netmsg.ddnet.org", [
