@@ -786,6 +786,12 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
 
 	// send settings
 	SendSettings(ClientID);
+
+	CNetMsg_Sv_ImageResource Msg;
+	Msg.m_Id = 0;
+	Msg.m_pName = "dead";
+	Msg.m_pHash = "";
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 }
 
 void CGameContext::OnClientTeamChange(int ClientID)
