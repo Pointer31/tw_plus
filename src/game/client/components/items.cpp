@@ -159,6 +159,32 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 	Graphics()->QuadsEnd();
 }
 
+void CItems::RenderPickupCustom(const CNetObj_PickupCustom *pPrev, const CNetObj_PickupCustom *pCurrent)
+{
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	Graphics()->QuadsBegin();
+	vec2 Pos = mix(vec2(pPrev->m_X, pPrev->m_Y), vec2(pCurrent->m_X, pCurrent->m_Y), Client()->IntraGameTick());
+	float Size = 64.0f;
+	const int aResources[] = {
+		SPRITE_PICKUP_HEALTH,
+	};
+
+	RenderTools()->SelectSprite(aResources[0]);
+
+	const float Now = Client()->LocalTime();
+	static float s_Time = 0.0f;
+	static float s_LastLocalTime = Now;
+	s_Time += (Now - s_LastLocalTime) * m_pClient->GetAnimationPlaybackSpeed();
+	const float Offset = Pos.y/32.0f + Pos.x/32.0f;
+	Pos.x += cosf(s_Time*2.0f+Offset)*2.5f;
+	Pos.y += sinf(s_Time*2.0f+Offset)*2.5f;
+	s_LastLocalTime = Now;
+
+	Graphics()->QuadsSetRotation(0.0f);
+	RenderTools()->DrawSprite(Pos.x, Pos.y, Size);
+	Graphics()->QuadsEnd();
+}
+
 void CItems::RenderFlag(const CNetObj_Flag *pPrev, const CNetObj_Flag *pCurrent, const CNetObj_GameDataFlag *pPrevGameDataFlag, const CNetObj_GameDataFlag *pCurGameDataFlag)
 {
 	const float Size = 42.0f;
@@ -279,6 +305,12 @@ void CItems::OnRender()
 			const void *pPrev = Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_ID);
 			if(pPrev)
 				RenderPickup((const CNetObj_Pickup *)pPrev, (const CNetObj_Pickup *)pData);
+		}
+		else if(Item.m_Type == NETOBJTYPE_PICKUPCUSTOM)
+		{
+			const void *pPrev = Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_ID);
+			if(pPrev)
+				RenderPickupCustom((const CNetObj_PickupCustom *)pPrev, (const CNetObj_PickupCustom *)pData);
 		}
 		else if(Item.m_Type == NETOBJTYPE_LASER)
 		{
