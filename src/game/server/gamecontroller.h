@@ -70,8 +70,6 @@ class IGameController
 		int m_FriendlyTeam;
 		float m_Score;
 	};
-	vec2 m_aaSpawnPoints[3][64];
-	int m_aNumSpawnPoints[3];
 
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type) const;
@@ -80,6 +78,9 @@ class IGameController
 	int ClampTeam(int Team) const;
 
 protected:
+	vec2 m_aaSpawnPoints[3][64];
+	int m_aNumSpawnPoints[3];
+
 	CGameContext *GameServer() const { return m_pGameServer; }
 	CConfig *Config() const { return m_pConfig; }
 	IServer *Server() const { return m_pServer; }
