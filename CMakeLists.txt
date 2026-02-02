@@ -1098,6 +1098,7 @@ set(EXPECTED_DATA
   skins/warpaint.json
   skins/x_ninja.json
   skins/xmas_hat.png
+  resources/unknown.png
   ui/blob.png
   ui/console.png
   ui/console_bar.png
@@ -1485,6 +1486,8 @@ if(CLIENT)
     components/stats.h
     components/voting.cpp
     components/voting.h
+    components/resources.cpp
+    components/resources.h
     gameclient.cpp
     gameclient.h
     lineinput.cpp
