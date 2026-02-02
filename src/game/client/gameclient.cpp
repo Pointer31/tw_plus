@@ -1010,6 +1010,12 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		m_aClients[pMsg->m_ClientID].m_Emoticon = pMsg->m_Emoticon;
 		m_aClients[pMsg->m_ClientID].m_EmoticonStart = Client()->GameTick();
 	}
+	else if (MsgId == NETMSGTYPE_SV_IMAGERESOURCE)
+	{
+		CNetMsg_Sv_ImageResource *pMsg = (CNetMsg_Sv_ImageResource *)pRawMsg;
+
+		m_pResources->OnResourceMessage(pMsg);
+	}
 	else if(MsgId == NETMSGTYPE_DE_CLIENTENTER && Client()->State() == IClient::STATE_DEMOPLAYBACK)
 	{
 		CNetMsg_De_ClientEnter *pMsg = (CNetMsg_De_ClientEnter *)pRawMsg;

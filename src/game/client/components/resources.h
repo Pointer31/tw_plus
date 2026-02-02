@@ -6,6 +6,8 @@
 #include <base/tl/sorted_array.h>
 #include <game/client/component.h>
 
+#include <generated/protocol.h>
+
 // todo: fix duplicate skins (different paths)
 class CResources : public CComponent
 {
@@ -61,8 +63,10 @@ public:
 
 	// int Num();
 	// int NumSkinPart(int Part);
-	const CResource *Get(int Index);
+	const CResource *Get(int ResourceId);
 	int Find(const char *pName);
+
+	void OnResourceMessage(CNetMsg_Sv_ImageResource* msg);
 	// const CSkinPart *GetSkinPart(int Part, int Index);
 	// int FindSkinPart(int Part, const char *pName, bool AllowSpecialPart);
 	// void RandomizeSkin();
@@ -80,6 +84,7 @@ private:
 	// int m_ScanningPart;
 	// sorted_array<CSkinPart> m_aaSkinParts[NUM_SKINPARTS];
 	sorted_array<CResource> m_aResources;
+	char ResourceMapping[64][64];
 	// CSkin m_DummySkin;
 
 	// static int SkinPartScan(const char *pName, int IsDir, int DirType, void *pUser);

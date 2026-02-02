@@ -167,11 +167,11 @@ void CItems::RenderPickupCustom(const CNetObj_PickupCustom *pPrev, const CNetObj
 	vec2 Pos = mix(vec2(pPrev->m_X, pPrev->m_Y), vec2(pCurrent->m_X, pCurrent->m_Y), Client()->IntraGameTick());
 	float Size = 64.0f;
 
-	int ResourceLocalId = m_pClient->m_pResources->Find("race");
-	if (ResourceLocalId < 0)
-		ResourceLocalId = m_pClient->m_pResources->Find("unknown");
+	// int ResourceLocalId = m_pClient->m_pResources->Find("race");
+	// if (ResourceLocalId < 0)
+	// 	ResourceLocalId = m_pClient->m_pResources->Find("unknown");
 
-	const CResources::CResource* res =  m_pClient->m_pResources->Get(ResourceLocalId);
+	const CResources::CResource* res = m_pClient->m_pResources->Get(pCurrent->m_ResourceId);
 	// RenderTools()->SelectSprite(aResources[0]);
 	dbg_assert(res != NULL, "no resource!");
 

@@ -11,6 +11,8 @@
 #include <engine/shared/jsonparser.h>
 #include <engine/shared/jsonwriter.h>
 
+#include <generated/protocol.h>
+
 #include "menus.h"
 #include "resources.h"
 
@@ -81,6 +83,11 @@ int CResources::GetInitAmount() const
 
 void CResources::OnInit()
 {
+	for (int index = 0; index < 64; index++)
+	{
+		str_copy(ResourceMapping[index], "\0", 64);
+	}
+
 	m_aResources.clear();
 	Storage()->ListDirectory(IStorage::TYPE_ALL, "resources", SkinScan, this);
 }
@@ -120,9 +127,12 @@ void CResources::OnInit()
 // 	return m_aaSkinParts[Part].size();
 // }
 
-const CResources::CResource *CResources::Get(int Index)
+const CResources::CResource *CResources::Get(int ResourceId)
 {
-	return &m_aResources[Index];
+	if (ResourceMapping[ResourceId] && Find(ResourceMapping[ResourceId]) >= 0)
+		return &m_aResources[Find(ResourceMapping[ResourceId])];
+	else
+		return &m_aResources[Find("unknown")];
 }
 
 int CResources::Find(const char *pName)
@@ -133,6 +143,22 @@ int CResources::Find(const char *pName)
 			return i;
 	}
 	return -1;
+}
+
+void CResources::OnResourceMessage(CNetMsg_Sv_ImageResource* msg)
+{
+
+	char aBuf[IO_MAX_PATH_LENGTH];
+
+	int Id = msg->m_Id;
+	const char* pName = msg->m_pName;
+
+	str_format(aBuf, sizeof(aBuf), "got resource id %i, name='%s'", Id, pName);
+
+	str_copy(ResourceMapping[Id], pName, sizeof(ResourceMapping[Id]));
+	// pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "resources", aBuf);
+	Console()->Print(0, "resources", aBuf);
+	return;
 }
 
 // const CResources::CSkinPart *CResources::GetSkinPart(int Part, int Index)
