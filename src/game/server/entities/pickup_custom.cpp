@@ -97,7 +97,7 @@ void CPickupCustom::Snap(int SnappingClient)
 
 	pP->m_X = round_to_int(m_Pos.x);
 	pP->m_Y = round_to_int(m_Pos.y);
-	pP->m_ResourceId = 0;
+	pP->m_ResourceId = GetID() % 3;
 	// CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	// if(!pP)
 	// 	return;

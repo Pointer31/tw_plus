@@ -787,11 +787,27 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
 	// send settings
 	SendSettings(ClientID);
 
-	CNetMsg_Sv_ImageResource Msg;
-	Msg.m_Id = 0;
-	Msg.m_pName = "dead";
-	Msg.m_pHash = "";
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	{
+		CNetMsg_Sv_ImageResource Msg;
+		Msg.m_Id = 0;
+		Msg.m_pName = "star";
+		Msg.m_pHash = "";
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	}
+	{
+		CNetMsg_Sv_ImageResource Msg;
+		Msg.m_Id = 1;
+		Msg.m_pName = "star2";
+		Msg.m_pHash = "";
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	}
+	{
+		CNetMsg_Sv_ImageResource Msg;
+		Msg.m_Id = 2;
+		Msg.m_pName = "star3";
+		Msg.m_pHash = "";
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	}
 }
 
 void CGameContext::OnClientTeamChange(int ClientID)
