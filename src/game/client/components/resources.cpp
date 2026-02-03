@@ -102,9 +102,8 @@ void CResources::OnResourceMessage(CNetMsg_Sv_ImageResource* msg)
 	const char* pName = msg->m_pName;
 
 	str_format(aBuf, sizeof(aBuf), "got resource id %i, name='%s'", Id, pName);
+	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
 
 	str_copy(ResourceMapping[Id], pName, sizeof(ResourceMapping[Id]));
-	// pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "resources", aBuf);
-	Console()->Print(0, "resources", aBuf);
 	return;
 }
