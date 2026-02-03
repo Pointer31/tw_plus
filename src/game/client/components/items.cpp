@@ -162,18 +162,10 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 
 void CItems::RenderPickupCustom(const CNetObj_PickupCustom *pPrev, const CNetObj_PickupCustom *pCurrent)
 {
-	// Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
-	// Graphics()->QuadsBegin();
 	vec2 Pos = mix(vec2(pPrev->m_X, pPrev->m_Y), vec2(pCurrent->m_X, pCurrent->m_Y), Client()->IntraGameTick());
-	float Size = 64.0f;
-
-	// int ResourceLocalId = m_pClient->m_pResources->Find("race");
-	// if (ResourceLocalId < 0)
-	// 	ResourceLocalId = m_pClient->m_pResources->Find("unknown");
-
+	
 	const CResources::CResource* res = m_pClient->m_pResources->Get(pCurrent->m_ResourceId);
-	// RenderTools()->SelectSprite(aResources[0]);
-	dbg_assert(res != NULL, "no resource!");
+	dbg_assert(res != NULL, "no resource found, not even fallback!");
 
 	const float Now = Client()->LocalTime();
 	static float s_Time = 0.0f;
@@ -184,14 +176,13 @@ void CItems::RenderPickupCustom(const CNetObj_PickupCustom *pPrev, const CNetObj
 	Pos.y += sinf(s_Time*2.0f+Offset)*2.5f;
 	s_LastLocalTime = Now;
 
-	{
-		IGraphics::CQuadItem Item(Pos.x, Pos.y, 64, 64);
-		Graphics()->TextureSet(res->m_OrgTexture);
-		Graphics()->QuadsBegin();
-		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
-		Graphics()->QuadsDraw(&Item, 1);
-		Graphics()->QuadsEnd();
-	}
+	const int size = 128; // 4 tiles wide
+	IGraphics::CQuadItem Item(Pos.x, Pos.y, size, size);
+	Graphics()->TextureSet(res->m_Texture);
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	Graphics()->QuadsDraw(&Item, 1);
+	Graphics()->QuadsEnd();
 }
 
 void CItems::RenderFlag(const CNetObj_Flag *pPrev, const CNetObj_Flag *pCurrent, const CNetObj_GameDataFlag *pPrevGameDataFlag, const CNetObj_GameDataFlag *pCurGameDataFlag)
