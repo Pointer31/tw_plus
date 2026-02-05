@@ -16,7 +16,7 @@
 #include "menus.h"
 #include "resources.h"
 
-int CResources::SkinScan(const char *pName, int IsDir, int DirType, void *pUser)
+int CResources::FileScan(const char *pName, int IsDir, int DirType, void *pUser)
 {
 	if(IsDir || !str_endswith(pName, ".png"))
 		return 0;
@@ -72,12 +72,16 @@ void CResources::OnInit()
 	}
 
 	m_aResources.clear();
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "resources", SkinScan, this);
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "resources", FileScan, this);
+	
+	dbg_assert(Find("unknown") >= 0, "data/resources/unknown.png has not been loaded");
 }
 
 const CResources::CResource *CResources::Get(int ResourceId)
 {
-	if (ResourceMapping[ResourceId] && Find(ResourceMapping[ResourceId]) >= 0)
+	if (ResourceId < 0 || ResourceId >= MAX_RESOURCES)
+		return &m_aResources[Find("unknown")];
+	else if (ResourceMapping[ResourceId] && Find(ResourceMapping[ResourceId]) >= 0)
 		return &m_aResources[Find(ResourceMapping[ResourceId])];
 	else
 		return &m_aResources[Find("unknown")];
@@ -101,6 +105,18 @@ void CResources::OnResourceMessage(CNetMsg_Sv_ImageResource* msg)
 	int Id = msg->m_Id;
 	const char* pName = msg->m_pName;
 
+	if (!pName[0])
+	{
+		str_format(aBuf, sizeof(aBuf), "got invalid resource id %i, name='%s'", Id, pName);
+		Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
+		return;
+	}
+	if (Id < 0 || Id >= MAX_RESOURCES)
+	{
+		str_format(aBuf, sizeof(aBuf), "got out of bounds resource id %i, name='%s'", Id, pName);
+		Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
+		return;
+	}
 	str_format(aBuf, sizeof(aBuf), "got resource id %i, name='%s'", Id, pName);
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
 

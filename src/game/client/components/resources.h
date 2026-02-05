@@ -9,14 +9,15 @@
 #include <generated/protocol.h>
 
 const int MAX_RESOURCE_ARRAY_SIZE = 64;
-// todo: fix duplicate skins (different paths)
+const int MAX_RESOURCES = 64;
+
 class CResources : public CComponent
 {
 public:
 	struct CResource
 	{
 		// int m_Flags;
-		char m_aName[MAX_SKIN_ARRAY_SIZE];
+		char m_aName[MAX_RESOURCE_ARRAY_SIZE];
 		IGraphics::CTextureHandle m_Texture;
 
 		bool operator<(const CResource &Other) { return str_comp_nocase(m_aName, Other.m_aName) < 0; }
@@ -30,8 +31,8 @@ public:
 	
 private:
 	sorted_array<CResource> m_aResources;
-	char ResourceMapping[64][MAX_RESOURCE_ARRAY_SIZE];
-	static int SkinScan(const char *pName, int IsDir, int DirType, void *pUser);
+	char ResourceMapping[MAX_RESOURCES][MAX_RESOURCE_ARRAY_SIZE];
+	static int FileScan(const char *pName, int IsDir, int DirType, void *pUser);
 };
 
 #endif
