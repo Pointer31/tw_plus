@@ -10,6 +10,7 @@
 #include <game/client/gameclient.h>
 #include <game/client/animstate.h>
 #include <game/client/render.h>
+#include <game/client/components/resources.h>
 
 #include "menus.h"
 #include "controls.h"
@@ -628,14 +629,28 @@ void CHud::RenderCursor()
 
 	vec2 Pos = *m_pClient->m_pCamera->GetCenter();
 	RenderTools()->MapScreenToGroup(Pos.x, Pos.y, Layers()->GameGroup(), m_pClient->m_pCamera->GetZoom());
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
-	Graphics()->QuadsBegin();
 
-	// render cursor
-	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[maximum(0, m_pClient->m_Snap.m_pLocalCharacter->m_Weapon%NUM_WEAPONS)].m_pSpriteCursor);
-	float CursorSize = 64;
-	RenderTools()->DrawSprite(m_pClient->m_pControls->m_TargetPos.x, m_pClient->m_pControls->m_TargetPos.y, CursorSize);
-	Graphics()->QuadsEnd();
+	const int Weapon = m_pClient->m_Snap.m_pLocalCharacter->m_Weapon;
+	if (Weapon >= NUM_WEAPONS)
+	{
+		IGraphics::CQuadItem Item(m_pClient->m_pControls->m_TargetPos.x, m_pClient->m_pControls->m_TargetPos.y, 128, 128);
+		Graphics()->TextureSet(m_pClient->m_pResources->GetWeaponResourceCrosshair(Weapon)->m_Texture);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+		Graphics()->QuadsDraw(&Item, 1);
+		Graphics()->QuadsEnd();
+	}
+	else
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+		Graphics()->QuadsBegin();
+
+		// render cursor
+		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[maximum(0, Weapon%NUM_WEAPONS)].m_pSpriteCursor);
+		float CursorSize = 64;
+		RenderTools()->DrawSprite(m_pClient->m_pControls->m_TargetPos.x, m_pClient->m_pControls->m_TargetPos.y, CursorSize);
+		Graphics()->QuadsEnd();
+	}
 }
 
 void CHud::RenderNinjaBar(float x, float y, float Progress)
@@ -717,6 +732,19 @@ void CHud::RenderHealthAndAmmo(const CNetObj_Character *pCharacter)
 	int i;
 	IGraphics::CQuadItem Array[10];
 
+	if (pCharacter->m_Weapon >= NUM_WEAPONS)
+	{
+		for(i = 0; i < minimum(pCharacter->m_AmmoCount, 10); i++)
+		{
+			IGraphics::CQuadItem Item(x+i*12+6, y+24+6, 20, 20);
+			Graphics()->TextureSet(m_pClient->m_pResources->GetWeaponResourceAmmo(pCharacter->m_Weapon)->m_Texture);
+			Graphics()->QuadsBegin();
+			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+			Graphics()->QuadsDraw(&Item, 1);
+			Graphics()->QuadsEnd();
+		}
+	}
+
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->WrapClamp();
 
@@ -730,7 +758,7 @@ void CHud::RenderHealthAndAmmo(const CNetObj_Character *pCharacter)
 		float NinjaProgress = clamp(pCharacter->m_AmmoCount-Client()->GameTick(), 0, Max) / (float)Max;
 		RenderNinjaBar(x, y+24.f, NinjaProgress);
 	}
-	else
+	else if (pCharacter->m_Weapon < NUM_WEAPONS)
 	{
 		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[maximum(0, pCharacter->m_Weapon%NUM_WEAPONS)].m_pSpriteProj);
 		if(pCharacter->m_Weapon == WEAPON_GRENADE)

@@ -17,6 +17,7 @@
 #include <game/client/components/effects.h>
 #include <game/client/components/sounds.h>
 #include <game/client/components/controls.h>
+#include <game/client/components/resources.h>
 
 #include "players.h"
 
@@ -198,8 +199,33 @@ void CPlayers::RenderPlayer(
 		);
 	}
 
+
+	if (Player.m_Weapon >= NUM_WEAPONS)
+	{
+		const int Weapon = WEAPON_LASER;
+		vec2 p;
+		// TODO: should be an animation
+		const float RecoilTick = (Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick)/5.0f;
+		const float Recoil = RecoilTick < 1.0f ? sinf(RecoilTick*pi) : 0.0f;
+		p = Position + Direction * (g_pData->m_Weapons.m_aId[Weapon].m_Offsetx - Recoil * 10.0f);
+		p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
+		// RenderTools()->DrawSprite(p.x, p.y,);
+
+		IGraphics::CQuadItem Item(p.x, p.y, Direction.x < 0 ? -128 : 128, 128);
+		Graphics()->TextureSet(m_pClient->m_pResources->GetWeaponResource(Player.m_Weapon)->m_Texture);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+		Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle*pi*2+Angle);
+		if(Direction.x < 0)
+		{
+			Graphics()->QuadsSetRotation(pi+Angle);
+			p.x -= g_pData->m_Weapons.m_aId[Weapon].m_Offsetx;
+		}
+		Graphics()->QuadsDraw(&Item, 1);
+		Graphics()->QuadsEnd();
+	}
 	// draw gun
-	if(Player.m_Weapon >= 0)
+	else if(Player.m_Weapon >= 0)
 	{
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 		Graphics()->QuadsBegin();

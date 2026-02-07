@@ -87,6 +87,38 @@ const CResources::CResource *CResources::Get(int ResourceId)
 		return &m_aResources[Find("unknown")];
 }
 
+const CResources::CResource *CResources::GetWeaponResource(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return Get(-1);
+	else
+		return Get(WeaponMapping[WeaponId][0]);
+}
+
+const CResources::CResource *CResources::GetWeaponResourceProjectile(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return Get(-1);
+	else
+		return Get(WeaponMapping[WeaponId][1]);
+}
+
+const CResources::CResource *CResources::GetWeaponResourceCrosshair(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return Get(-1);
+	else
+		return Get(WeaponMapping[WeaponId][2]);
+}
+
+const CResources::CResource *CResources::GetWeaponResourceAmmo(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return Get(-1);
+	else
+		return Get(WeaponMapping[WeaponId][3]);
+}
+
 int CResources::Find(const char *pName)
 {
 	for(int i = 0; i < m_aResources.size(); i++)
@@ -122,4 +154,27 @@ void CResources::OnResourceMessage(CNetMsg_Sv_ImageResource* msg)
 
 	str_copy(ResourceMapping[Id], pName, sizeof(ResourceMapping[Id]));
 	return;
+}
+
+void CResources::OnCustomWeaponInfoMessage(CNetMsg_Sv_CustomWeaponInfo* msg)
+{
+	char aBuf[IO_MAX_PATH_LENGTH];
+
+	const int WeaponId = msg->m_WeaponId;
+
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+	{
+		str_format(aBuf, sizeof(aBuf), "got out of bounds weapon id %i", WeaponId);
+		Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
+		return;
+	}
+	str_format(aBuf, sizeof(aBuf), "got weapon id %i", WeaponId);
+	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
+
+	// msg->m_LooksLike;
+	// msg->m_PredictsLike;
+	WeaponMapping[WeaponId][0] = msg->m_ResourceIdWeapon;
+	WeaponMapping[WeaponId][1] = msg->m_ResourceIdProjectile;
+	WeaponMapping[WeaponId][2] = msg->m_ResourceIdCrosshair;
+	WeaponMapping[WeaponId][3] = msg->m_ResourceIdAmmo;
 }

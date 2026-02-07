@@ -1016,6 +1016,12 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 
 		m_pResources->OnResourceMessage(pMsg);
 	}
+	else if (MsgId == NETMSGTYPE_SV_CUSTOMWEAPONINFO)
+	{
+		CNetMsg_Sv_CustomWeaponInfo *pMsg = (CNetMsg_Sv_CustomWeaponInfo *)pRawMsg;
+
+		m_pResources->OnCustomWeaponInfoMessage(pMsg);
+	}
 	else if(MsgId == NETMSGTYPE_DE_CLIENTENTER && Client()->State() == IClient::STATE_DEMOPLAYBACK)
 	{
 		CNetMsg_De_ClientEnter *pMsg = (CNetMsg_De_ClientEnter *)pRawMsg;

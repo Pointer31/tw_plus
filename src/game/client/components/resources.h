@@ -27,11 +27,18 @@ public:
 	const CResource *Get(int ResourceId);
 	int Find(const char *pName);
 
+	const CResource *GetWeaponResource(int WeaponId);
+	const CResource *GetWeaponResourceCrosshair(int WeaponId);
+	const CResource *GetWeaponResourceAmmo(int WeaponId);
+	const CResource *GetWeaponResourceProjectile(int WeaponId);
+
 	void OnResourceMessage(CNetMsg_Sv_ImageResource* msg);
+	void OnCustomWeaponInfoMessage(CNetMsg_Sv_CustomWeaponInfo* msg);
 	
 private:
 	sorted_array<CResource> m_aResources;
 	char ResourceMapping[MAX_RESOURCES][MAX_RESOURCE_ARRAY_SIZE];
+	int WeaponMapping[MAX_RESOURCES][4];
 	static int FileScan(const char *pName, int IsDir, int DirType, void *pUser);
 };
 
