@@ -1099,6 +1099,12 @@ set(EXPECTED_DATA
   skins/x_ninja.json
   skins/xmas_hat.png
   resources/unknown.png
+  resources/star.png
+  resources/star2.png
+  resources/star3.png
+  resources/star_crosshair.png
+  resources/star_projectile.png
+  resources/star_weapon.png
   ui/blob.png
   ui/console.png
   ui/console_bar.png
