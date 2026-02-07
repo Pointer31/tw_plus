@@ -180,7 +180,7 @@ Objects = [
 		NetIntRange("m_Health", 0, 10),
 		NetIntRange("m_Armor", 0, 10),
 		NetIntAny("m_AmmoCount"),
-		NetIntRange("m_Weapon", -1, 'NUM_WEAPONS-1'),
+		NetIntAny("m_Weapon"),
 		NetEnum("m_Emote", Emotes),
 		NetTick("m_AttackTick"),
 		NetFlag("m_TriggeredEvents", CoreEventFlags),
@@ -506,6 +506,16 @@ Messages = [
 		NetIntAny("m_Id"),
 		NetString("m_pName"),
 		NetString("m_pHash"),
+	]),
+
+	NetMessageEx("Sv_CustomWeaponInfo", "custom-weapon-info@pointerstwplus", [
+		NetIntAny("m_WeaponId"),
+		NetIntAny("m_LooksLike"), # may be used to distinguish hammer-like and gun-like weapons, etc
+		NetIntAny("m_PredictsLike"), # may be used by clients with antiping?
+		NetIntAny("m_ResourceIdWeapon"),
+		NetIntAny("m_ResourceIdProjectile"),
+		NetIntAny("m_ResourceIdCrosshair"), 
+		NetIntAny("m_ResourceIdAmmo"),
 	]),
     
 	NetMessageEx("Sv_PreInput", "preinput@netmsg.ddnet.org", [
