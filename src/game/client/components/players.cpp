@@ -202,26 +202,48 @@ void CPlayers::RenderPlayer(
 
 	if (Player.m_Weapon >= NUM_WEAPONS)
 	{
-		const int Weapon = WEAPON_LASER;
+		const int Weapon = m_pClient->m_pResources->GetWeaponResourceLooksLike(Player.m_Weapon) == WEAPON_HAMMER ? WEAPON_HAMMER : WEAPON_LASER;
 		vec2 p;
-		// TODO: should be an animation
-		const float RecoilTick = (Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick)/5.0f;
-		const float Recoil = RecoilTick < 1.0f ? sinf(RecoilTick*pi) : 0.0f;
-		p = Position + Direction * (g_pData->m_Weapons.m_aId[Weapon].m_Offsetx - Recoil * 10.0f);
-		p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
-		// RenderTools()->DrawSprite(p.x, p.y,);
 
-		IGraphics::CQuadItem Item(p.x, p.y, Direction.x < 0 ? -128 : 128, 128);
 		Graphics()->TextureSet(m_pClient->m_pResources->GetWeaponResource(Player.m_Weapon)->m_Texture);
 		Graphics()->QuadsBegin();
-		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle*pi*2+Angle);
-		if(Direction.x < 0)
+		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+		if(Weapon == WEAPON_HAMMER)
 		{
-			Graphics()->QuadsSetRotation(pi+Angle);
-			p.x -= g_pData->m_Weapons.m_aId[Weapon].m_Offsetx;
+			float ct = (Client()->PrevGameTick()-Player.m_AttackTick)/(float)SERVER_TICK_SPEED + s_LastGameTickTime;
+			State.Add(&g_pData->m_aAnimations[ANIM_HAMMER_SWING], clamp(ct*5.0f,0.0f,1.0f), 1.0f);
+			// Static position for hammer
+			p = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
+			p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
+			// if attack is under way, bash stuffs
+			if(Direction.x < 0)
+			{
+				Graphics()->QuadsSetRotation(-pi/2-State.GetAttach()->m_Angle*pi*2);
+				p.x -= g_pData->m_Weapons.m_aId[Weapon].m_Offsetx;
+			}
+			else
+			{
+				Graphics()->QuadsSetRotation(-pi/2+State.GetAttach()->m_Angle*pi*2);
+			}
+			IGraphics::CQuadItem Item(p.x, p.y, 128, 128);
+			Graphics()->QuadsDraw(&Item, 1);
 		}
-		Graphics()->QuadsDraw(&Item, 1);
+		else
+		{
+			const float RecoilTick = (Client()->GameTick() - Player.m_AttackTick + s_LastIntraTick)/5.0f;
+			const float Recoil = RecoilTick < 1.0f ? sinf(RecoilTick*pi) : 0.0f;
+			p = Position + Direction * (g_pData->m_Weapons.m_aId[Weapon].m_Offsetx - Recoil * 10.0f);
+			p.y += g_pData->m_Weapons.m_aId[Weapon].m_Offsety;
+
+			if(Direction.x < 0)
+			{
+				Graphics()->QuadsSetRotation(pi+Angle);
+				p.x -= g_pData->m_Weapons.m_aId[Weapon].m_Offsetx;
+			}
+			IGraphics::CQuadItem Item(p.x, p.y, Direction.x < 0 ? -128 : 128, 128);
+			Graphics()->QuadsDraw(&Item, 1);
+		}
 		Graphics()->QuadsEnd();
 	}
 	// draw gun
