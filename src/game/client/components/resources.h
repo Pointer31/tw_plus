@@ -31,6 +31,8 @@ public:
 	const CResource *GetWeaponResourceCrosshair(int WeaponId);
 	const CResource *GetWeaponResourceAmmo(int WeaponId);
 	const CResource *GetWeaponResourceProjectile(int WeaponId);
+	const int GetWeaponResourceLooksLike(int WeaponId);
+	const int GetWeaponResourcePredictsLike(int WeaponId);
 
 	void OnResourceMessage(CNetMsg_Sv_ImageResource* msg);
 	void OnCustomWeaponInfoMessage(CNetMsg_Sv_CustomWeaponInfo* msg);

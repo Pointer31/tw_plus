@@ -8,6 +8,7 @@
 
 #include <game/client/gameclient.h>
 #include <game/client/animstate.h>
+#include <game/client/components/resources.h>
 #include "infomessages.h"
 
 #include "chat.h"
@@ -247,7 +248,15 @@ void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
 
 	// render weapon
 	x -= 44.0f;
-	if(pInfoMsg->m_Weapon >= 0)
+	if(pInfoMsg->m_Weapon >= NUM_WEAPONS)
+	{
+		Graphics()->TextureSet(m_pClient->m_pResources->GetWeaponResource(pInfoMsg->m_Weapon)->m_Texture);
+		Graphics()->QuadsBegin();
+		IGraphics::CQuadItem QuadItem(x-16, y+28, 128, 128);
+		Graphics()->QuadsDraw(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
+	else if(pInfoMsg->m_Weapon >= 0)
 	{
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 		Graphics()->QuadsBegin();

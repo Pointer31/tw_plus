@@ -119,6 +119,22 @@ const CResources::CResource *CResources::GetWeaponResourceAmmo(int WeaponId)
 		return Get(WeaponMapping[WeaponId][3]);
 }
 
+const int CResources::GetWeaponResourceLooksLike(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return -1;
+	else
+		return WeaponMapping[WeaponId][4];
+}
+
+const int CResources::GetWeaponResourcePredictsLike(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return -1;
+	else
+		return WeaponMapping[WeaponId][5];
+}
+
 int CResources::Find(const char *pName)
 {
 	for(int i = 0; i < m_aResources.size(); i++)
@@ -171,10 +187,11 @@ void CResources::OnCustomWeaponInfoMessage(CNetMsg_Sv_CustomWeaponInfo* msg)
 	str_format(aBuf, sizeof(aBuf), "got weapon id %i", WeaponId);
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
 
-	// msg->m_LooksLike;
-	// msg->m_PredictsLike;
+
 	WeaponMapping[WeaponId][0] = msg->m_ResourceIdWeapon;
 	WeaponMapping[WeaponId][1] = msg->m_ResourceIdProjectile;
 	WeaponMapping[WeaponId][2] = msg->m_ResourceIdCrosshair;
 	WeaponMapping[WeaponId][3] = msg->m_ResourceIdAmmo;
+	WeaponMapping[WeaponId][4] = msg->m_LooksLike;
+	WeaponMapping[WeaponId][5] = msg->m_PredictsLike;
 }

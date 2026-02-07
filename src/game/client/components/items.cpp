@@ -22,21 +22,24 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 	// get positions
 	float Curvature = 0;
 	float Speed = 0;
-	if(pCurrent->m_Type == WEAPON_GRENADE)
+
+	int WeaponPredict = pCurrent->m_Type >= NUM_WEAPONS ? m_pClient->m_pResources->GetWeaponResourcePredictsLike(pCurrent->m_Type) : pCurrent->m_Type;
+	if(WeaponPredict == WEAPON_GRENADE)
 	{
 		Curvature = m_pClient->m_Tuning.m_GrenadeCurvature;
 		Speed = m_pClient->m_Tuning.m_GrenadeSpeed;
 	}
-	else if(pCurrent->m_Type == WEAPON_SHOTGUN)
+	else if(WeaponPredict == WEAPON_SHOTGUN)
 	{
 		Curvature = m_pClient->m_Tuning.m_ShotgunCurvature;
 		Speed = m_pClient->m_Tuning.m_ShotgunSpeed;
 	}
-	else if(pCurrent->m_Type == WEAPON_GUN)
+	else if(WeaponPredict == WEAPON_GUN)
 	{
 		Curvature = m_pClient->m_Tuning.m_GunCurvature;
 		Speed = m_pClient->m_Tuning.m_GunSpeed;
 	}
+		
 
 	static float s_LastGameTickTime = Client()->GameTickTime();
 	if(!m_pClient->IsWorldPaused() && !m_pClient->IsDemoPlaybackPaused())
@@ -75,14 +78,20 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 	vec2 Pos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct);
 	vec2 PrevPos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct-0.001f);
 
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	if (pCurrent->m_Type >= NUM_WEAPONS)
+		Graphics()->TextureSet(m_pClient->m_pResources->GetWeaponResourceProjectile(pCurrent->m_Type)->m_Texture);
+	else
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 
-	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[clamp(pCurrent->m_Type, 0, NUM_WEAPONS-1)].m_pSpriteProj);
+	if (pCurrent->m_Type < NUM_WEAPONS)
+		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[clamp(pCurrent->m_Type, 0, NUM_WEAPONS-1)].m_pSpriteProj);
+
 	const vec2 Vel = Pos-PrevPos;
 
 	// add particle for this projectile
-	if(pCurrent->m_Type == WEAPON_GRENADE)
+	int WeaponLooks = pCurrent->m_Type >= NUM_WEAPONS ? m_pClient->m_pResources->GetWeaponResourceLooksLike(pCurrent->m_Type) : pCurrent->m_Type;
+	if(WeaponLooks == WEAPON_GRENADE)
 	{
 		m_pClient->m_pEffects->SmokeTrail(Pos, Vel*-1);
 		const float Now = Client()->LocalTime();
@@ -98,7 +107,8 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 		Graphics()->QuadsSetRotation(length(Vel) > 0.00001f ? angle(Vel) : 0);
 	}
 
-	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, 32, 32);
+	const int Size = pCurrent->m_Type >= NUM_WEAPONS ? 64 : 32;
+	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, Size, Size);
 	Graphics()->QuadsDraw(&QuadItem, 1);
 	Graphics()->QuadsSetRotation(0);
 	Graphics()->QuadsEnd();
