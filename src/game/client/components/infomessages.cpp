@@ -252,7 +252,10 @@ void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
 	{
 		Graphics()->TextureSet(m_pClient->m_pResources->GetWeaponResource(pInfoMsg->m_Weapon)->m_Texture);
 		Graphics()->QuadsBegin();
-		IGraphics::CQuadItem QuadItem(x-16, y+28, 128, 128);
+		const bool fallback = m_pClient->m_pResources->IsWeaponKillMsgFallback(pInfoMsg->m_Weapon);
+		const int Size = fallback ? 128 : 96;
+		const int XOffset = fallback ? -16 : 0;
+		IGraphics::CQuadItem QuadItem(x+XOffset, y+28, Size, Size);
 		Graphics()->QuadsDraw(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 	}

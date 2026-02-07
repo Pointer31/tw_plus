@@ -31,6 +31,8 @@ public:
 	const CResource *GetWeaponResourceCrosshair(int WeaponId);
 	const CResource *GetWeaponResourceAmmo(int WeaponId);
 	const CResource *GetWeaponResourceProjectile(int WeaponId);
+	const bool IsWeaponKillMsgFallback(int WeaponId);
+	const CResource *GetWeaponResourceKillMsg(int WeaponId);
 	const int GetWeaponResourceLooksLike(int WeaponId);
 	const int GetWeaponResourcePredictsLike(int WeaponId);
 
@@ -40,7 +42,7 @@ public:
 private:
 	sorted_array<CResource> m_aResources;
 	char ResourceMapping[MAX_RESOURCES][MAX_RESOURCE_ARRAY_SIZE];
-	int WeaponMapping[MAX_RESOURCES][4];
+	int WeaponMapping[MAX_RESOURCES][7];
 	static int FileScan(const char *pName, int IsDir, int DirType, void *pUser);
 };
 

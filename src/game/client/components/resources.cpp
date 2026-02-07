@@ -119,12 +119,29 @@ const CResources::CResource *CResources::GetWeaponResourceAmmo(int WeaponId)
 		return Get(WeaponMapping[WeaponId][3]);
 }
 
+const bool CResources::IsWeaponKillMsgFallback(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return false;
+	return WeaponMapping[WeaponId][4] == -1;
+} 
+
+const CResources::CResource *CResources::GetWeaponResourceKillMsg(int WeaponId)
+{
+	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
+		return Get(-1);
+	else if (WeaponMapping[WeaponId][4] == -1)
+		return Get(WeaponMapping[WeaponId][0]);
+	else
+		return Get(WeaponMapping[WeaponId][4]);
+}
+
 const int CResources::GetWeaponResourceLooksLike(int WeaponId)
 {
 	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
 		return -1;
 	else
-		return WeaponMapping[WeaponId][4];
+		return WeaponMapping[WeaponId][5];
 }
 
 const int CResources::GetWeaponResourcePredictsLike(int WeaponId)
@@ -132,7 +149,7 @@ const int CResources::GetWeaponResourcePredictsLike(int WeaponId)
 	if (WeaponId < 0 || WeaponId >= MAX_RESOURCES)
 		return -1;
 	else
-		return WeaponMapping[WeaponId][5];
+		return WeaponMapping[WeaponId][6];
 }
 
 int CResources::Find(const char *pName)
@@ -192,6 +209,7 @@ void CResources::OnCustomWeaponInfoMessage(CNetMsg_Sv_CustomWeaponInfo* msg)
 	WeaponMapping[WeaponId][1] = msg->m_ResourceIdProjectile;
 	WeaponMapping[WeaponId][2] = msg->m_ResourceIdCrosshair;
 	WeaponMapping[WeaponId][3] = msg->m_ResourceIdAmmo;
-	WeaponMapping[WeaponId][4] = msg->m_LooksLike;
-	WeaponMapping[WeaponId][5] = msg->m_PredictsLike;
+	WeaponMapping[WeaponId][4] = msg->m_ResourceIdKillMsg;
+	WeaponMapping[WeaponId][5] = msg->m_LooksLike;
+	WeaponMapping[WeaponId][6] = msg->m_PredictsLike;
 }
