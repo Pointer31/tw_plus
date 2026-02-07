@@ -110,7 +110,7 @@ Objects = [
 		NetIntAny("m_VelX"),
 		NetIntAny("m_VelY"),
 
-		NetIntRange("m_Type", 0, 'NUM_WEAPONS-1'),
+		NetIntAny("m_Type"),
 		NetTick("m_StartTick"),
 	]),
 
@@ -313,7 +313,7 @@ Messages = [
 	NetMessage("Sv_KillMsg", [
 		NetIntRange("m_Killer", -2, 'MAX_CLIENTS-1'),
 		NetIntRange("m_Victim", 0, 'MAX_CLIENTS-1'),
-		NetIntRange("m_Weapon", -3, 'NUM_WEAPONS-1'),
+		NetIntAny("m_Weapon"),
 		NetIntAny("m_ModeSpecial"),
 	]),
 
