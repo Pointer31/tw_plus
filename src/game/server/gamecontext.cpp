@@ -838,6 +838,7 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
 		Msg.m_ResourceIdProjectile = 5;
 		Msg.m_ResourceIdCrosshair = 4;
 		Msg.m_ResourceIdAmmo = 5;
+		Msg.m_ResourceIdKillMsg = -1;
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 	}
 }
