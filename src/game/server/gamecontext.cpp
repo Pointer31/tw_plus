@@ -808,6 +808,38 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
 		Msg.m_pHash = "";
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 	}
+	{
+		CNetMsg_Sv_ImageResource Msg;
+		Msg.m_Id = 3;
+		Msg.m_pName = "star_weapon";
+		Msg.m_pHash = "";
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	}
+	{
+		CNetMsg_Sv_ImageResource Msg;
+		Msg.m_Id = 4;
+		Msg.m_pName = "star_crosshair";
+		Msg.m_pHash = "";
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	}
+	{
+		CNetMsg_Sv_ImageResource Msg;
+		Msg.m_Id = 5;
+		Msg.m_pName = "star_projectile";
+		Msg.m_pHash = "";
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	}
+	{
+		CNetMsg_Sv_CustomWeaponInfo Msg;
+		Msg.m_WeaponId = 8;
+		Msg.m_LooksLike = WEAPON_LASER;
+		Msg.m_PredictsLike = WEAPON_GRENADE;
+		Msg.m_ResourceIdWeapon = 3;
+		Msg.m_ResourceIdProjectile = 5;
+		Msg.m_ResourceIdCrosshair = 4;
+		Msg.m_ResourceIdAmmo = 5;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	}
 }
 
 void CGameContext::OnClientTeamChange(int ClientID)
