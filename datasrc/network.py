@@ -516,6 +516,7 @@ Messages = [
 		NetIntAny("m_ResourceIdProjectile"),
 		NetIntAny("m_ResourceIdCrosshair"), 
 		NetIntAny("m_ResourceIdAmmo"),
+		NetIntAny("m_ResourceIdKillMsg"),
 	]),
     
 	NetMessageEx("Sv_PreInput", "preinput@netmsg.ddnet.org", [
