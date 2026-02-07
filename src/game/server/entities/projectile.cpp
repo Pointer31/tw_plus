@@ -131,7 +131,7 @@ void CProjectile::FillInfo(CNetObj_Projectile *pProj)
 	pProj->m_VelX = round_to_int(m_Direction.x*100.0f);
 	pProj->m_VelY = round_to_int(m_Direction.y*100.0f);
 	pProj->m_StartTick = m_StartTick;
-	pProj->m_Type = m_Type;
+	pProj->m_Type = (m_Type == WEAPON_GRENADE && str_comp(GameServer()->GameType(), "MOD") == 0) ? 8 : m_Type;
 }
 
 void CProjectile::Snap(int SnappingClient)

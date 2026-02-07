@@ -767,7 +767,7 @@ void CCharacter::Die(int Killer, int Weapon)
 		else
 		{
 			Msg.m_Killer = Killer;
-			Msg.m_Weapon = Weapon;
+			Msg.m_Weapon = (Weapon == WEAPON_GRENADE && str_comp(GameServer()->GameType(), "MOD") == 0) ? 8 : Weapon;
 		}
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
 	}
