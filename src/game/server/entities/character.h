@@ -7,7 +7,7 @@
 
 #include <game/gamecore.h>
 #include <game/server/entity.h>
-
+#include <game/server/weapons_list.h>
 
 class CCharacter : public CEntity
 {
@@ -77,7 +77,7 @@ public:
 		int m_Ammo;
 		bool m_Got;
 
-	} m_aWeapons[NUM_WEAPONS];
+	} m_aWeapons[WEAPON_CUSTOM_END];
 
 private:
 	// player controlling this character
