@@ -462,6 +462,27 @@ void CCharacter::HandleWeapons()
 		}
 	}
 
+	if (GameServer()->m_pController->IsInstagib())
+	{
+		int AmmoRegenTime = Config()->m_SvGrenadeAmmoRegen;
+		if(AmmoRegenTime && m_aWeapons[WEAPON_GRENADE].m_Ammo >= 0)
+		{
+			// try regen ammo
+			{
+				if(m_aWeapons[WEAPON_GRENADE].m_AmmoRegenStart < 0)
+					m_aWeapons[WEAPON_GRENADE].m_AmmoRegenStart = Server()->Tick();
+
+				if((Server()->Tick() - m_aWeapons[WEAPON_GRENADE].m_AmmoRegenStart) >= AmmoRegenTime * Server()->TickSpeed() / 1000)
+				{
+					// Add some ammo
+					m_aWeapons[WEAPON_GRENADE].m_Ammo = minimum(m_aWeapons[WEAPON_GRENADE].m_Ammo + 1,
+						Config()->m_SvGrenadeAmmo);
+					m_aWeapons[WEAPON_GRENADE].m_AmmoRegenStart = Server()->Tick();
+				}
+			}
+		}
+	}
+
 	return;
 }
 
@@ -792,8 +813,8 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 
 	if(GameServer()->m_pController->IsInstagib())
 	{
-		if (Dmg >= 4)
-			Dmg = 20;
+		if (Dmg >= (GameServer()->m_pController->IsInstagibGrenade() ? Config()->m_SvGrenadeMinDamage : 1))
+			Dmg = 10;
 		else
 			return true;
 	}

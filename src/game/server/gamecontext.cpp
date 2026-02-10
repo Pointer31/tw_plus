@@ -22,6 +22,7 @@
 #include "gamemodes/mod.h"
 #include "gamemodes/tdm.h"
 #include "gamemodes/kz/hidnsek.h"
+#include "gamemodes/race.h"
 #include "gamecontext.h"
 #include "player.h"
 #include "bots/base_ai.h"
@@ -151,7 +152,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamag
 		if(l)
 			Force = normalize(Diff) * MaxForce;
 		float Factor = 1 - clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
-		if((int)(Factor * MaxDamage))
+		if((int)(Factor * MaxDamage) || MaxDamage == 0)
 			apEnts[i]->TakeDamage(Force * Factor, Diff*-1, (int)(Factor * MaxDamage), Owner, Weapon);
 	}
 }
@@ -198,9 +199,11 @@ void CGameContext::CreateSound(vec2 Pos, int Sound, int64 Mask)
 void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 {
 	char aBuf[256];
+	if (ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS && Mode != CHAT_WHISPER)
+		To = -1;
+		
 	if(ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS)
 	{
-		To = -1;
 		if(Mode == CHAT_TEAM)
 		{
 			int TeamID = m_apPlayers[ChatterClientID]->GetTeam();
@@ -925,7 +928,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				char bBuf[256] = "";
 				char* split = str_skip_to_whitespace(aBuf);
 				
-				if (*split != NULL)
+				if (*split)
 					str_copy(bBuf, split+1, sizeof(bBuf));
 
 				*split = '\0';
@@ -1764,6 +1767,8 @@ void CGameContext::OnInit()
 		m_pController = new CGameControllerTDM(this);
 	else if(str_comp_nocase(Config()->m_SvGametype, "hidnsek") == 0 || str_comp_nocase(Config()->m_SvGametype, "hns") == 0)
 		m_pController = new CGameControllerHidNSek(this);
+	else if(str_comp_nocase(Config()->m_SvGametype, "race") == 0)
+		m_pController = new CGameControllerRACE(this);
 	else
 		m_pController = new CGameControllerDM(this);
 
@@ -1951,7 +1956,7 @@ void CGameContext::BotsMinimumPlayersCheck(int DontUseID)
 					BotPlayers++;
 			}
 		}
-		int TotalPlayers = HumanPlayers + BotPlayers;
+		// int TotalPlayers = HumanPlayers + BotPlayers;
 
 		if (HumanPlayers == 0)
 		{

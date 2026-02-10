@@ -410,7 +410,7 @@ endif()
 ########################################################################
 
 if(NOT(GTEST_FOUND) AND DOWNLOAD_GTEST)
-  set(TEEWORLDS_GTEST_VERSION v1.13.0)
+  set(TEEWORLDS_GTEST_VERSION v1.17.0)
   configure_file(cmake/Download_GTest_CMakeLists.txt.in googletest-download/CMakeLists.txt)
   execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
     RESULT_VARIABLE result
@@ -1622,10 +1622,10 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   gamecontroller.h
   gamemodes/ctf.cpp
   gamemodes/ctf.h
-  gamemodes/htf.cpp
-  gamemodes/htf.h
   gamemodes/dm.cpp
   gamemodes/dm.h
+  gamemodes/htf.cpp
+  gamemodes/htf.h
   gamemodes/kz/hidnsek.cpp
   gamemodes/kz/hidnsek.h
   gamemodes/lms.cpp
@@ -1636,6 +1636,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   gamemodes/mod.h
   gamemodes/tdm.cpp
   gamemodes/tdm.h
+  gamemodes/race.cpp
+  gamemodes/race.h
   gameworld.cpp
   gameworld.h
   player.cpp

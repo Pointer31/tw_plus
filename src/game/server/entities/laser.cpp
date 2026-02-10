@@ -1,6 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <engine/shared/config.h>
 #include <generated/server_data.h>
+#include <game/server/gamecontroller.h>
 #include <game/server/gamecontext.h>
 
 #include "character.h"
@@ -63,6 +65,12 @@ void CLaser::DoBounce()
 
 			m_Energy -= distance(m_From, m_Pos) + GameServer()->Tuning()->m_LaserBounceCost;
 			m_Bounces++;
+
+			if (GameServer()->m_pController->IsInstagib() && Config()->m_SvLaserJumps && distance(m_From, m_Pos) < 96 && m_Bounces <= 1)
+			{
+				GameServer()->CreateExplosion(To, m_Owner, 4, 0);
+				m_Energy = -1;
+			}
 
 			if(m_Bounces > GameServer()->Tuning()->m_LaserBounceNum)
 				m_Energy = -1;

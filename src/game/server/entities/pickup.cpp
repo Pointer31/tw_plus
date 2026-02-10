@@ -1,11 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <engine/shared/config.h>
 #include <generated/server_data.h>
 #include <game/server/gamecontext.h>
 #include <game/server/player.h>
 
 #include "character.h"
 #include "pickup.h"
+#include "projectile.h"
 
 CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP, Pos, PickupPhysSize)
@@ -30,6 +32,14 @@ void CPickup::Tick()
 	// wait for respawn
 	if(m_SpawnTick > 0)
 	{
+		if (Server()->Tick() % 4 == 0 && Config()->m_SvPickupParticles) {
+			CProjectile *pProj = new CProjectile(GameWorld(), WEAPON_HAMMER,
+											 -1,
+											 {m_Pos.x - 32/2 + rand() % 32, m_Pos.y - 32/2 + rand() % 32},
+											 {0,1},
+											 10,
+											 0, 0, 0, 0, WEAPON_HAMMER);
+		}
 		if(Server()->Tick() > m_SpawnTick)
 		{
 			// respawn

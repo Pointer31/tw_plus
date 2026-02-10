@@ -257,7 +257,7 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	}
 	else if (m_Instagib == 2)
 	{
-		pChr->GiveWeapon(WEAPON_GRENADE, -1);
+		pChr->GiveWeapon(WEAPON_GRENADE, Config()->m_SvGrenadeAmmo);
 	}
 	else
 	{
@@ -624,8 +624,10 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 		}
 		break;
 	case IGS_END_ROUND:
-		Timer = Config()->m_SvBetweenRoundTime;
 	case IGS_END_MATCH:
+		if(GameState == IGS_END_ROUND)
+			Timer = Config()->m_SvBetweenRoundTime;
+
 		if(GameState == IGS_END_ROUND && DoWincheckMatch())
 			break;
 
@@ -1289,6 +1291,15 @@ void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
 
 	int ClientID = pComContext->m_ClientID;
 
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Mode = CHAT_ALL;
+		Msg.m_ClientID = -1;
+		Msg.m_pMessage = pSelf->GetGameHelpText();
+		Msg.m_TargetID = ClientID;
+		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
+
 	if (pSelf->IsInstagibLaser()) 
 	{
 		CNetMsg_Sv_Chat Msg;
@@ -1307,15 +1318,6 @@ void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
 		Msg.m_TargetID = ClientID;
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	}
-
-	{
-		CNetMsg_Sv_Chat Msg;
-		Msg.m_Mode = CHAT_ALL;
-		Msg.m_ClientID = -1;
-		Msg.m_pMessage = pSelf->GetGameHelpText();
-		Msg.m_TargetID = ClientID;
-		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-	}
 }
 
 const char* IGameController::GetGameHelpText()
@@ -1327,8 +1329,6 @@ void IGameController::Com_Restart(IConsole::IResult *pResult, void *pContext)
 {
 	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
 	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
-
-	int ClientID = pComContext->m_ClientID;
 
 	pSelf->GameServer()->StartVote("Restart match", "restart", "/restart");
 }
