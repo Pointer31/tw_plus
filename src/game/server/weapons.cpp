@@ -8,6 +8,7 @@
 #include <game/server/entities/character.h>
 #include <game/server/entities/projectile.h>
 #include <game/server/entities/laser.h>
+#include <game/server/entities/laser_better.h>
 #include <game/server/player.h>
 
 #include <stdio.h>
@@ -42,9 +43,21 @@ void CWeapons::Init()
     WeaponInfos[WEAPON_STARGUN].m_PredictsLike = WEAPON_GUN;
     WeaponInfos[WEAPON_STARGUN].m_FireDelay = 200;
 
-    WeaponInfos[WEAPON_PLASMAGUN].m_LooksLike = WEAPON_SHOTGUN;
+    WeaponInfos[WEAPON_LASER_REPEATER].m_LooksLike = WEAPON_SHOTGUN;
+    WeaponInfos[WEAPON_LASER_REPEATER].m_PredictsLike = -1;
+    WeaponInfos[WEAPON_LASER_REPEATER].m_FireDelay = 300;
+
+    WeaponInfos[WEAPON_PLASMAGUN].m_LooksLike = WEAPON_LASER;
     WeaponInfos[WEAPON_PLASMAGUN].m_PredictsLike = -1;
-    WeaponInfos[WEAPON_PLASMAGUN].m_FireDelay = 200;
+    WeaponInfos[WEAPON_PLASMAGUN].m_FireDelay = 400;
+
+    WeaponInfos[WEAPON_SPIRAL].m_LooksLike = WEAPON_SHOTGUN;
+    WeaponInfos[WEAPON_SPIRAL].m_PredictsLike = WEAPON_LASER;
+    WeaponInfos[WEAPON_SPIRAL].m_FireDelay = 1000;
+
+    WeaponInfos[WEAPON_CHARGE_HAMMER].m_LooksLike = WEAPON_HAMMER;
+    WeaponInfos[WEAPON_CHARGE_HAMMER].m_PredictsLike = WEAPON_HAMMER;
+    WeaponInfos[WEAPON_CHARGE_HAMMER].m_FireDelay = 200;
 }
 
 void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
@@ -61,7 +74,7 @@ void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
                 ProjStartPos,
                 Direction,
                 (int)(pChar->Server()->TickSpeed()*pChar->GameServer()->Tuning()->m_GunLifetime),
-                5, 
+                3, 
                 true, 
                 0, 
                 SOUND_GRENADE_EXPLODE, 
@@ -70,11 +83,74 @@ void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
             pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_GUN_FIRE);
         } break;
 
-        case WEAPON_PLASMAGUN:
+        case WEAPON_LASER_REPEATER:
         {
-            new CLaser(pChar->GameWorld(), pChar->GetPos(), Direction, pChar->GameServer()->Tuning()->m_LaserReach, pChar->GetPlayer()->GetCID());
+            CLaserBetter* laser = new CLaserBetter(pChar->GameWorld(), pChar->GetPos(), Direction, pChar->GameServer()->Tuning()->m_LaserReach, pChar->GetPlayer()->GetCID());
+            laser->m_MaxLength = 128;
+            laser->m_MaxBounces = 30;
+            laser->m_TimeToBounce = 80;
+            laser->m_Damage = 5;
+            laser->m_Pierces = true;
+            laser->DoBounce();
+
 			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_LASER_FIRE);
         } break;
+
+        case WEAPON_PLASMAGUN:
+        {
+            for (int i = -1; i < 2; i += 2)
+            {
+                const float ExtraAngle = 0.1;
+                vec2 Direction2 = direction(angle(Direction) - i*2*ExtraAngle);
+                CLaserBetter* laser = new CLaserBetter(pChar->GameWorld(), pChar->GetPos(), Direction2, 600, pChar->GetPlayer()->GetCID());
+                laser->m_MaxLength = 100;
+                laser->m_MaxBounces = 10;
+                laser->m_TimeToBounce = 100;
+                laser->m_IgnoreSolids = true;
+                laser->m_RotateAngle = i*ExtraAngle;
+                laser->m_Damage = 5;
+                laser->DoBounce();
+            }
+
+			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_LASER_FIRE);
+        } break;
+
+        case WEAPON_SPIRAL:
+        {
+            for (int i = -5; i < 6; i += 2)
+            {
+                const float ExtraAngle = 0.05*i;
+                vec2 Direction2 = direction(angle(Direction) + ExtraAngle);
+                CLaserBetter* laser = new CLaserBetter(pChar->GameWorld(), pChar->GetPos(), Direction2, 600, pChar->GetPlayer()->GetCID());
+                laser->m_MaxLength = 100;
+                laser->m_MaxBounces = 10;
+                laser->m_TimeToBounce = 100;
+                laser->m_RotateAngle = ExtraAngle;
+                laser->m_Damage = 4;
+                laser->DoBounce();
+            }
+			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_HAMMER_FIRE);
+        } break;
+
+        case WEAPON_CHARGE_HAMMER:
+		{
+            int Ticks = pChar->Server()->Tick() - pChar->GetAttackTick();
+            const int WIDTH_TILE = 32;
+
+			pChar->GameServer()->CreateSound(pChar->GetPos() + Direction*WIDTH_TILE*4, SOUND_GRENADE_EXPLODE);
+			pChar->GameServer()->CreateExplosion(pChar->GetPos() + Direction*WIDTH_TILE*4, pChar->GetPlayer()->GetCID(), WEAPON_HAMMER, 5);
+			if (Ticks > 30)
+				pChar->GameServer()->CreateExplosion(pChar->GetPos() + Direction*WIDTH_TILE*7, pChar->GetPlayer()->GetCID(), WEAPON_HAMMER, 5);
+			if (Ticks > 45)
+				pChar->GameServer()->CreateExplosion(pChar->GetPos() + Direction*WIDTH_TILE*10, pChar->GetPlayer()->GetCID(), WEAPON_HAMMER, 4);
+			if (Ticks > 60)
+				pChar->GameServer()->CreateExplosion(pChar->GetPos() + Direction*WIDTH_TILE*13, pChar->GetPlayer()->GetCID(), WEAPON_HAMMER, 3);
+            
+            // pChar->GameServer()->CreateExplosion(Pos, pChar->GetPlayer()->GetCID(), WEAPON_HAMMER, 4);
+
+			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_GRENADE_EXPLODE);
+			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_HAMMER_FIRE);
+		} break;
     
         default:
             break;

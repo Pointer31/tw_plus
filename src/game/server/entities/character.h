@@ -70,6 +70,7 @@ public:
 	int GetActiveWeapon() { return m_ActiveWeapon; }
 	bool GetWeaponGot(int Weapon) { return m_aWeapons[Weapon].m_Got; }
 	int GetWeaponAmmo(int Weapon) { return m_aWeapons[Weapon].m_Ammo; }
+	int GetAttackTick() { return m_AttackTick; }
 
 	struct WeaponStat
 	{
