@@ -1669,7 +1669,7 @@ void CGameContext::ConGiveWeapon(IConsole::IResult *pResult, void *pUserData)
 
 	if(pSelf->m_apPlayers[ClientID] && pSelf->m_apPlayers[ClientID]->GetCharacter())
 	{
-		int Weapon = clamp(pResult->GetInteger(1), 0, (int)WEAPON_CUSTOM_END);
+		int Weapon = clamp(pResult->GetInteger(1), 0, (int)WEAPON_CUSTOM_END - 1);
 
 		if (Weapon == WEAPON_NINJA)
 			pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveNinja();
