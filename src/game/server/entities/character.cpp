@@ -272,7 +272,7 @@ void CCharacter::FireWeapon()
 	DoWeaponSwitch();
 
 	bool FullAuto = false;
-	if(m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER || m_ActiveWeapon >= WEAPON_CUSTOM_START)
+	if((m_ActiveWeapon == WEAPON_GUN && Config()->m_SvPistolAuto) || m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER || m_ActiveWeapon >= WEAPON_CUSTOM_START)
 		FullAuto = true;
 
 
