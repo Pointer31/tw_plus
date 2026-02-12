@@ -20,6 +20,8 @@ GameMsgIDs = Enum("GAMEMSG", ["TEAM_SWAP", "SPEC_INVALID_ID", "TEAM_SHUFFLE", "T
 
 							"GAME_PAUSED"]) # todo 0.8: sort (1 para)
 
+GameInfoFlagsTWPlus = Flags("GAMETWPLUSFLAG", ["PREDICT_PTWPLUS_TILES", "LASERJUMPS", "GUN_FULLAUTO"])
+
 
 RawHeader = '''
 
@@ -82,6 +84,7 @@ Flags = [
 	GameStateFlags,
 	CoreEventFlags,
 	RaceFlags,
+	GameInfoFlagsTWPlus,
 ]
 
 Objects = [
@@ -276,6 +279,10 @@ Objects = [
 
 	NetObjectEx("MyOwnEvent", "my-own-event@heinrich5991.de", [
 		NetIntAny("m_Test"),
+	]),
+
+	NetObjectEx("GameInfoTWPlus", "gameinfo-twplus@pointerstwplus", [
+		NetIntAny("m_Flags"),
 	]),
 ]
 
