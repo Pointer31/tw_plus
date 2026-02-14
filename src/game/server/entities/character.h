@@ -7,7 +7,7 @@
 
 #include <game/gamecore.h>
 #include <game/server/entity.h>
-
+#include <game/server/weapons_list.h>
 
 class CCharacter : public CEntity
 {
@@ -70,6 +70,7 @@ public:
 	int GetActiveWeapon() { return m_ActiveWeapon; }
 	bool GetWeaponGot(int Weapon) { return m_aWeapons[Weapon].m_Got; }
 	int GetWeaponAmmo(int Weapon) { return m_aWeapons[Weapon].m_Ammo; }
+	int GetAttackTick() { return m_AttackTick; }
 
 	struct WeaponStat
 	{
@@ -77,7 +78,7 @@ public:
 		int m_Ammo;
 		bool m_Got;
 
-	} m_aWeapons[NUM_WEAPONS];
+	} m_aWeapons[WEAPON_CUSTOM_END];
 
 private:
 	// player controlling this character

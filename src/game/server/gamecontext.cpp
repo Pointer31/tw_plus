@@ -11,6 +11,8 @@
 #include <game/collision.h>
 #include <game/gamecore.h>
 #include <game/version.h>
+#include <game/server/weapons.h>
+#include <game/server/weapons_list.h>
 
 #include "entities/character.h"
 #include "entities/projectile.h"
@@ -110,8 +112,8 @@ void CGameContext::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount,
 		pEvent->m_Y = (int)Pos.y;
 		pEvent->m_ClientID = Id;
 		pEvent->m_Angle = (int)(f*256.0f);
-		pEvent->m_HealthAmount = HealthAmount;
-		pEvent->m_ArmorAmount = ArmorAmount;
+		pEvent->m_HealthAmount = minimum(HealthAmount, 9);
+		pEvent->m_ArmorAmount = minimum(ArmorAmount, 9);
 		pEvent->m_Self = Self;
 	}
 }
@@ -1667,7 +1669,7 @@ void CGameContext::ConGiveWeapon(IConsole::IResult *pResult, void *pUserData)
 
 	if(pSelf->m_apPlayers[ClientID] && pSelf->m_apPlayers[ClientID]->GetCharacter())
 	{
-		int Weapon = clamp(pResult->GetInteger(1), 0, NUM_WEAPONS-1);
+		int Weapon = clamp(pResult->GetInteger(1), 0, (int)WEAPON_CUSTOM_END - 1);
 
 		if (Weapon == WEAPON_NINJA)
 			pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveNinja();
@@ -1816,6 +1818,8 @@ void CGameContext::OnInit()
 			m_pController->IsInstagib() == 0 ? "" : (m_pController->IsInstagibLaser() == 1 ? "Instagib is enabled. Your rifle instakills others." : "Instagib is enabled. Your grenade launcher instakills others.")
 		);
 	}
+
+	CWeapons::Init();
 
 #ifdef CONF_DEBUG
 	// clamp dbg_dummies to 0..MAX_CLIENTS-1

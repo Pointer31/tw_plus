@@ -773,6 +773,16 @@ void IGameController::Snap(int SnappingClient)
 		pGameDataTeam->m_TeamscoreBlue = m_aTeamscore[TEAM_BLUE];
 	}
 
+	CNetObj_GameInfoTWPlus *pGameInfoTWPlus = static_cast<CNetObj_GameInfoTWPlus *>(Server()->SnapNewItem(NETOBJTYPE_GAMEINFOTWPLUS, 0, sizeof(CNetObj_GameInfoTWPlus)));
+	if(!pGameInfoTWPlus)
+		return;
+
+	pGameInfoTWPlus->m_Flags = GAMETWPLUSFLAG_PREDICT_PTWPLUS_TILES;
+	if (Config()->m_SvLaserJumps && IsInstagib())
+		pGameInfoTWPlus->m_Flags |= GAMETWPLUSFLAG_LASERJUMPS;
+	if (Config()->m_SvPistolAuto)
+		pGameInfoTWPlus->m_Flags |= GAMETWPLUSFLAG_GUN_FULLAUTO;
+
 	// demo recording
 	if(SnappingClient == -1)
 	{

@@ -6,6 +6,8 @@
 #include <game/server/gamecontext.h>
 #include <game/server/gamecontroller.h>
 #include <game/server/player.h>
+#include <game/server/weapons.h>
+#include <game/server/weapons_list.h>
 
 #include "character.h"
 #include "laser.h"
@@ -113,7 +115,7 @@ void CCharacter::SetWeapon(int W)
 	m_ActiveWeapon = W;
 	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SWITCH);
 
-	if(m_ActiveWeapon < 0 || m_ActiveWeapon >= NUM_WEAPONS)
+	if(m_ActiveWeapon < 0 || m_ActiveWeapon >= WEAPON_CUSTOM_END)
 		m_ActiveWeapon = 0;
 	m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
 }
@@ -232,7 +234,7 @@ void CCharacter::HandleWeaponSwitch()
 	{
 		while(Next) // Next Weapon selection
 		{
-			WantedWeapon = (WantedWeapon+1)%NUM_WEAPONS;
+			WantedWeapon = (WantedWeapon+1)%WEAPON_CUSTOM_END;
 			if(m_aWeapons[WantedWeapon].m_Got)
 				Next--;
 		}
@@ -242,7 +244,7 @@ void CCharacter::HandleWeaponSwitch()
 	{
 		while(Prev) // Prev Weapon selection
 		{
-			WantedWeapon = (WantedWeapon-1)<0?NUM_WEAPONS-1:WantedWeapon-1;
+			WantedWeapon = (WantedWeapon-1)<0?WEAPON_CUSTOM_END-1:WantedWeapon-1;
 			if(m_aWeapons[WantedWeapon].m_Got)
 				Prev--;
 		}
@@ -253,7 +255,7 @@ void CCharacter::HandleWeaponSwitch()
 		WantedWeapon = m_Input.m_WantedWeapon-1;
 
 	// check for insane values
-	if(WantedWeapon >= 0 && WantedWeapon < NUM_WEAPONS && WantedWeapon != m_ActiveWeapon && m_aWeapons[WantedWeapon].m_Got)
+	if(WantedWeapon >= 0 && WantedWeapon < WEAPON_CUSTOM_END && WantedWeapon != m_ActiveWeapon && m_aWeapons[WantedWeapon].m_Got)
 		m_QueuedWeapon = WantedWeapon;
 
 	DoWeaponSwitch();
@@ -268,10 +270,9 @@ void CCharacter::FireWeapon()
 		return;
 
 	DoWeaponSwitch();
-	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
 
 	bool FullAuto = false;
-	if(m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER)
+	if((m_ActiveWeapon == WEAPON_GUN && Config()->m_SvPistolAuto) || m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER || m_ActiveWeapon >= WEAPON_CUSTOM_START)
 		FullAuto = true;
 
 
@@ -299,6 +300,7 @@ void CCharacter::FireWeapon()
 		return;
 	}
 
+	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
 	vec2 ProjStartPos = m_Pos+Direction*GetProximityRadius()*0.75f;
 
 	if(Config()->m_Debug)
@@ -307,6 +309,8 @@ void CCharacter::FireWeapon()
 		str_format(aBuf, sizeof(aBuf), "shot player='%d:%s' team=%d weapon=%d", m_pPlayer->GetCID(), Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->GetTeam(), m_ActiveWeapon);
 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	}
+
+	CWeapons::FireWeapon(m_ActiveWeapon, this);
 
 	switch(m_ActiveWeapon)
 	{
@@ -419,8 +423,14 @@ void CCharacter::FireWeapon()
 	if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0) // -1 == unlimited
 		m_aWeapons[m_ActiveWeapon].m_Ammo--;
 
+
 	if(!m_ReloadTimer)
-		m_ReloadTimer = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay * Server()->TickSpeed() / 1000;
+	{
+		if (m_ActiveWeapon >= WEAPON_CUSTOM_START)
+			m_ReloadTimer = CWeapons::GetFireDelay(m_ActiveWeapon) * Server()->TickSpeed() / 1000;
+		else
+			m_ReloadTimer = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay * Server()->TickSpeed() / 1000;
+	}
 }
 
 void CCharacter::HandleWeapons()
@@ -929,7 +939,7 @@ void CCharacter::Snap(int SnappingClient)
 	pCharacter->m_Armor = 0;
 	pCharacter->m_TriggeredEvents = m_TriggeredEvents;
 
-	pCharacter->m_Weapon = m_ActiveWeapon;
+	pCharacter->m_Weapon = CWeapons::LooksLike(m_ActiveWeapon);
 	pCharacter->m_AttackTick = m_AttackTick;
 
 	pCharacter->m_Direction = m_Input.m_Direction;
