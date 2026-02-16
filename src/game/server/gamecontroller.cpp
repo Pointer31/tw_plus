@@ -264,7 +264,10 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	}
 	else if (m_Instagib == 3)
 	{
-		pChr->GiveWeapon(m_NoItemsWeapon, -1);
+		if (m_NoItemsWeapon == WEAPON_NINJA)
+			pChr->GiveNinja();
+		else
+			pChr->GiveWeapon(m_NoItemsWeapon, -1);
 	}
 	else
 	{
