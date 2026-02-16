@@ -6,7 +6,13 @@
 CGameControllerDM::CGameControllerDM(CGameContext *pGameServer)
 : IGameController(pGameServer)
 {
-	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gDM+" : "iDM+") : "DM+";
+	switch (m_Instagib)
+	{
+	case 1: m_pGameType = "iDM+"; break;
+	case 2: m_pGameType = "gDM+"; break;
+	case 3: m_pGameType = "nDM+"; break;
+	default: m_pGameType = "DM+"; break;
+	}
 }
 
 const char* CGameControllerDM::GetGameHelpText()

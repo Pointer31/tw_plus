@@ -18,6 +18,7 @@ public:
     static int GetFireDelay(int WeaponId);
     static int GetAmmoRegen(int WeaponId);
     static int LooksLike(int WeaponId);
+    static const char* GetName(int WeaponId);
 };
 
 #endif

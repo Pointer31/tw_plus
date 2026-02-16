@@ -26,6 +26,7 @@ struct WeaponInfo
     int m_LooksLike;
     int m_PredictsLike;
     int m_FireDelay;
+    char m_Name[32];
 };
 
 static WeaponInfo WeaponInfos[WEAPON_CUSTOM_END];
@@ -38,26 +39,37 @@ void CWeapons::Init()
     WeaponInfos[WEAPON_GRENADE].m_LooksLike = WEAPON_GRENADE;
     WeaponInfos[WEAPON_LASER].m_LooksLike = WEAPON_LASER;
     WeaponInfos[WEAPON_NINJA].m_LooksLike = WEAPON_NINJA;
+    str_copy(WeaponInfos[WEAPON_GUN].m_Name, "Pistol", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
+    str_copy(WeaponInfos[WEAPON_HAMMER].m_Name, "Hammer", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
+    str_copy(WeaponInfos[WEAPON_SHOTGUN].m_Name, "Shotgun", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
+    str_copy(WeaponInfos[WEAPON_GRENADE].m_Name, "Grenade Launcher", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
+    str_copy(WeaponInfos[WEAPON_LASER].m_Name, "Laser Rifle", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
+    str_copy(WeaponInfos[WEAPON_NINJA].m_Name, "Ninja", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
 
     WeaponInfos[WEAPON_STARGUN].m_LooksLike = WEAPON_GUN;
     WeaponInfos[WEAPON_STARGUN].m_PredictsLike = WEAPON_GUN;
     WeaponInfos[WEAPON_STARGUN].m_FireDelay = 200;
+    str_copy(WeaponInfos[WEAPON_STARGUN].m_Name, "Stargun", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
 
     WeaponInfos[WEAPON_LASER_REPEATER].m_LooksLike = WEAPON_SHOTGUN;
     WeaponInfos[WEAPON_LASER_REPEATER].m_PredictsLike = -1;
     WeaponInfos[WEAPON_LASER_REPEATER].m_FireDelay = 300;
+    str_copy(WeaponInfos[WEAPON_LASER_REPEATER].m_Name, "Laser Repeater", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
 
     WeaponInfos[WEAPON_PLASMAGUN].m_LooksLike = WEAPON_LASER;
     WeaponInfos[WEAPON_PLASMAGUN].m_PredictsLike = -1;
     WeaponInfos[WEAPON_PLASMAGUN].m_FireDelay = 400;
+    str_copy(WeaponInfos[WEAPON_PLASMAGUN].m_Name, "Plasmagun", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
 
     WeaponInfos[WEAPON_SPIRAL].m_LooksLike = WEAPON_SHOTGUN;
     WeaponInfos[WEAPON_SPIRAL].m_PredictsLike = WEAPON_LASER;
     WeaponInfos[WEAPON_SPIRAL].m_FireDelay = 1000;
+    str_copy(WeaponInfos[WEAPON_SPIRAL].m_Name, "Spiral", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
 
     WeaponInfos[WEAPON_CHARGE_HAMMER].m_LooksLike = WEAPON_HAMMER;
     WeaponInfos[WEAPON_CHARGE_HAMMER].m_PredictsLike = WEAPON_HAMMER;
     WeaponInfos[WEAPON_CHARGE_HAMMER].m_FireDelay = 200;
+    str_copy(WeaponInfos[WEAPON_CHARGE_HAMMER].m_Name, "Charge Hammer", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
 }
 
 void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
@@ -172,3 +184,7 @@ int CWeapons::GetAmmoRegen(int WeaponId)
     return 0;
 }
 
+const char* CWeapons::GetName(int WeaponId)
+{
+    return WeaponInfos[WeaponId].m_Name;
+}

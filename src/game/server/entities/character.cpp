@@ -72,6 +72,11 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		m_ActiveWeapon = WEAPON_GRENADE;
 		m_LastWeapon = WEAPON_GRENADE;
 	}
+	else if (GameServer()->m_pController->IsNoItems())
+	{
+		m_ActiveWeapon = GameServer()->m_pController->m_NoItemsWeapon;
+		m_LastWeapon = GameServer()->m_pController->m_NoItemsWeapon;
+	}
 	else
 	{
 		m_ActiveWeapon = WEAPON_GUN;

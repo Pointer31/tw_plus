@@ -9,7 +9,13 @@
 
 CGameControllerLTS::CGameControllerLTS(CGameContext *pGameServer) : IGameController(pGameServer)
 {
-	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gLTS+" : "iLTS+") : "LTS+";
+	switch (m_Instagib)
+	{
+	case 1: m_pGameType = "iLTS+"; break;
+	case 2: m_pGameType = "gLTS+"; break;
+	case 3: m_pGameType = "nLTS+"; break;
+	default: m_pGameType = "LTS+"; break;
+	}
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_SURVIVAL;
 }
 

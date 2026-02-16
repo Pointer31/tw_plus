@@ -9,7 +9,13 @@
 
 CGameControllerTDM::CGameControllerTDM(class CGameContext *pGameServer) : IGameController(pGameServer)
 {
-	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gTDM+" : "iTDM+") : "TDM+";
+	switch (m_Instagib)
+	{
+	case 1: m_pGameType = "iTDM+"; break;
+	case 2: m_pGameType = "gTDM+"; break;
+	case 3: m_pGameType = "nTDM+"; break;
+	default: m_pGameType = "TDM+"; break;
+	}
 	m_GameFlags = GAMEFLAG_TEAMS;
 }
 

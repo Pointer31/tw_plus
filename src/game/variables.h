@@ -152,7 +152,7 @@ MACRO_CONFIG_INT(DbgFocus, dbg_focus, 0, 0, 1, CFGFLAG_CLIENT, "")
 MACRO_CONFIG_INT(DbgTuning, dbg_tuning, 0, 0, 1, CFGFLAG_CLIENT, "")
 #endif
 
-MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib (0=off, 1=laser, 2=grenade)")
+MACRO_CONFIG_INT(SvInstagib, sv_instagib, 0, 0, 3, CFGFLAG_SAVE|CFGFLAG_SERVER, "mod (0=off, 1=laser insta, 2=grenade insta, 3=no-items)")
 MACRO_CONFIG_INT(SvGrenadeAmmo, sv_grenade_ammo, 6, -1, 10, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib grenade ammo (or -1)")
 MACRO_CONFIG_INT(SvGrenadeAmmoRegen, sv_grenade_ammo_regen, 900, 100, 2000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib grenade ammo regen time (ms)")
 MACRO_CONFIG_INT(SvGrenadeMinDamage, sv_grenade_min_damage, 4, 2, 6, CFGFLAG_SAVE|CFGFLAG_SERVER, "Instagib grenade minimum damage required for a kill")

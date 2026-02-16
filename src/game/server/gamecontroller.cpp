@@ -9,6 +9,7 @@
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
+#include "weapons.h"
 
 
 IGameController::IGameController(CGameContext *pGameServer)
@@ -40,6 +41,8 @@ IGameController::IGameController(CGameContext *pGameServer)
 	m_GameFlags = 0;
 	m_pGameType = "unknown";
 	m_Instagib = Config()->m_SvInstagib;
+	m_NoItemsTick = 0;
+	m_NoItemsWeapon = WEAPON_SHOTGUN;
 	m_GameInfo.m_MatchCurrent = m_MatchCount+1;
 	m_GameInfo.m_MatchNum = (str_length(Config()->m_SvMaprotation) && Config()->m_SvMatchesPerMap) ? Config()->m_SvMatchesPerMap : 0;
 	m_GameInfo.m_ScoreLimit = Config()->m_SvScorelimit;
@@ -258,6 +261,10 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	else if (m_Instagib == 2)
 	{
 		pChr->GiveWeapon(WEAPON_GRENADE, Config()->m_SvGrenadeAmmo);
+	}
+	else if (m_Instagib == 3)
+	{
+		pChr->GiveWeapon(m_NoItemsWeapon, -1);
 	}
 	else
 	{
@@ -880,6 +887,57 @@ void IGameController::Tick()
 		default:
 			if(Server()->Tick() > m_UnbalancedTick+Config()->m_SvTeambalanceTime*Server()->TickSpeed()*60)
 				DoTeamBalance();
+		}
+	}
+
+	// no-items modification code
+	if (IsNoItems())
+	{
+		int ticksPassed = Server()->Tick() - m_NoItemsTick;
+		static int nextWeapon = WEAPON_GRENADE;
+		if (ticksPassed > 50*15)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "new weapon: %s", CWeapons::GetName(nextWeapon));
+			GameServer()->SendBroadcast(aBuf, -1);
+
+			m_NoItemsTick = Server()->Tick();
+			
+			for(int i = 0; i < MAX_CLIENTS; ++i)
+			{
+				if(!GameServer()->m_apPlayers[i] || !GameServer()->m_apPlayers[i]->GetCharacter())
+					continue;
+
+				if (nextWeapon == WEAPON_NINJA)
+					GameServer()->m_apPlayers[i]->GetCharacter()->GiveNinja();
+				else
+					GameServer()->m_apPlayers[i]->GetCharacter()->GiveWeapon(nextWeapon, -1);
+				GameServer()->m_apPlayers[i]->GetCharacter()->SetWeapon(nextWeapon);
+				GameServer()->m_apPlayers[i]->GetCharacter()->RemoveWeapon(m_NoItemsWeapon);
+			}
+			m_NoItemsWeapon = nextWeapon;
+			nextWeapon = rand() % (WEAPON_CUSTOM_END-1);
+			if (nextWeapon >= m_NoItemsWeapon)
+				nextWeapon++;
+
+		}
+		else if (ticksPassed == 50*14)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "next weapon 1: %s", CWeapons::GetName(nextWeapon));
+			GameServer()->SendBroadcast(aBuf, -1);
+		}
+		else if (ticksPassed == 50*13)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "next weapon 2: %s", CWeapons::GetName(nextWeapon));
+			GameServer()->SendBroadcast(aBuf, -1);
+		}
+		else if (ticksPassed == 50*12)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "next weapon 3: %s", CWeapons::GetName(nextWeapon));
+			GameServer()->SendBroadcast(aBuf, -1);
 		}
 	}
 

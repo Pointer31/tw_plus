@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 
-#include <game/mapitems.h>
-
 #include <game/server/entities/character.h>
 #include <game/server/entities/flag.h>
 #include <game/server/gamecontext.h>
@@ -16,7 +14,13 @@ CGameControllerCTF::CGameControllerCTF(CGameContext *pGameServer)
 	// game
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
-	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gCTF+" : "iCTF+") : "CTF+";
+	switch (m_Instagib)
+	{
+	case 1: m_pGameType = "iCTF+"; break;
+	case 2: m_pGameType = "gCTF+"; break;
+	case 3: m_pGameType = "nCTF+"; break;
+	default: m_pGameType = "CTF+"; break;
+	}
 	m_GameFlags = GAMEFLAG_TEAMS|GAMEFLAG_FLAGS;
 }
 

@@ -16,7 +16,13 @@ CGameControllerHTF::CGameControllerHTF(CGameContext *pGameServer)
 	// game
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
-	m_pGameType = m_Instagib ? (m_Instagib == 2 ? "gHTF+" : "iHTF+") : "HTF+";
+	switch (m_Instagib)
+	{
+	case 1: m_pGameType = "iHTF+"; break;
+	case 2: m_pGameType = "gHTF+"; break;
+	case 3: m_pGameType = "nHTF+"; break;
+	default: m_pGameType = "HTF+"; break;
+	}
 	m_GameFlags = GAMEFLAG_FLAGS;
 }
 

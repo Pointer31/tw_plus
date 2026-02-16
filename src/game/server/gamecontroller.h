@@ -218,9 +218,10 @@ public:
 	bool IsTeamChangeAllowed() const;
 	bool IsTeamplay() const { return m_GameFlags&GAMEFLAG_TEAMS; }
 	bool IsSurvival() const { return m_GameFlags&GAMEFLAG_SURVIVAL; }
-	bool IsInstagib() const { return m_Instagib; }
+	bool IsInstagib() const { return m_Instagib == 1 || m_Instagib == 2; }
 	bool IsInstagibLaser() const { return m_Instagib == 1; }
 	bool IsInstagibGrenade() const { return m_Instagib == 2; }
+	bool IsNoItems() const { return m_Instagib == 3; }
 
 	const char *GetGameType() const { return m_pGameType; }
 
@@ -249,6 +250,9 @@ public:
 	static void Com_Whisper(IConsole::IResult *pResult, void *pContext);
 	//static void Com_Example(IConsole::IResult *pResult, void *pContext);
 	virtual void RegisterChatCommands(CCommandManager *pManager);
+
+	int m_NoItemsTick;
+	int m_NoItemsWeapon;
 
 	private:
 	EGameState m_GameState;
