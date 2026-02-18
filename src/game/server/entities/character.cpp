@@ -956,7 +956,7 @@ void CCharacter::Snap(int SnappingClient)
 		pCharacter->m_Armor = m_Armor;
 		if(m_ActiveWeapon == WEAPON_NINJA)
 			pCharacter->m_AmmoCount = m_Ninja.m_ActivationTick + g_pData->m_Weapons.m_Ninja.m_Duration * Server()->TickSpeed() / 1000;
-		else if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
+		else if(m_aWeapons[m_ActiveWeapon].m_Ammo >= -1)
 			pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo;
 	}
 
