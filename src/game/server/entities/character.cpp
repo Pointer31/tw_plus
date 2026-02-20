@@ -454,8 +454,8 @@ void CCharacter::HandleWeapons()
 	FireWeapon();
 
 	// ammo regen
-	int AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
-	if(AmmoRegenTime && m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
+	int AmmoRegenTime = m_ActiveWeapon < NUM_WEAPONS ? g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime : 0;
+	if(m_ActiveWeapon < NUM_WEAPONS && AmmoRegenTime && m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
 	{
 		// If equipped and not active, regen ammo?
 		if(m_ReloadTimer <= 0)
@@ -506,7 +506,7 @@ bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 	if(m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got)
 	{
 		m_aWeapons[Weapon].m_Got = true;
-		m_aWeapons[Weapon].m_Ammo = minimum(g_pData->m_Weapons.m_aId[Weapon].m_Maxammo, Ammo);
+		m_aWeapons[Weapon].m_Ammo = m_ActiveWeapon < NUM_WEAPONS ? minimum(g_pData->m_Weapons.m_aId[Weapon].m_Maxammo, Ammo) : Ammo;
 		return true;
 	}
 	return false;
