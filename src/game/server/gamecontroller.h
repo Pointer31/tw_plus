@@ -253,6 +253,7 @@ public:
 
 	int m_NoItemsTick;
 	int m_NoItemsWeapon;
+	int m_NoItemsWeaponNext;
 
 	private:
 	EGameState m_GameState;
