@@ -24,11 +24,26 @@ CGameControllerHTF::CGameControllerHTF(CGameContext *pGameServer)
 	default: m_pGameType = "HTF+"; break;
 	}
 	m_GameFlags = GAMEFLAG_FLAGS;
+	m_UseTimeDisplay = Config()->m_SvHTFTimeDisplay;
+	if (m_UseTimeDisplay)
+		m_GameFlags |= GAMEFLAG_RACE;
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		m_aHTFPlayers[i].PointTicks = Server()->TickSpeed();
+	}
 }
 
 const char* CGameControllerHTF::GetGameHelpText()
 {
 	return "Gametype: Hold The Flag. Hold the flag to continually get points!";
+}
+
+void CGameControllerHTF::OnPlayerConnect(class CPlayer *pPlayer)
+{
+	SetGameState(IGS_GAME_RUNNING);
+	IGameController::OnPlayerConnect(pPlayer);
+	m_aHTFPlayers[pPlayer->GetCID()].PointTicks = Server()->TickSpeed();
 }
 
 // balancing
@@ -215,37 +230,14 @@ void CGameControllerHTF::Tick()
 		//
 		if(F->GetCarrier())
 		{
-			if (Server()->Tick() % Server()->TickSpeed() == 0)
+			CPlayer *pPlayer = F->GetCarrier()->GetPlayer();
+			if (m_aHTFPlayers[pPlayer->GetCID()].PointTicks <= 0)
 			{
-				F->GetCarrier()->GetPlayer()->m_Score += 1;
+				m_aHTFPlayers[pPlayer->GetCID()].PointTicks = Server()->TickSpeed();
+				pPlayer->m_Score += 1;
 				DoWincheckMatch();
 			}
-			// if(m_apFlags[fi^1] && m_apFlags[fi^1]->IsAtStand())
-			// {
-			// 	if(distance(F->GetPos(), m_apFlags[fi^1]->GetPos()) < CFlag::ms_PhysSize + CCharacter::ms_PhysSize)
-			// 	{
-			// 		// CAPTURE! \o/
-			// 		m_aTeamscore[fi^1] += 100;
-			// 		F->GetCarrier()->GetPlayer()->m_Score += 5;
-			// 		float Diff = Server()->Tick() - F->GetGrabTick();
-
-			// 		char aBuf[64];
-			// 		str_format(aBuf, sizeof(aBuf), "flag_capture player='%d:%s' team=%d time=%.2f",
-			// 			F->GetCarrier()->GetPlayer()->GetCID(),
-			// 			Server()->ClientName(F->GetCarrier()->GetPlayer()->GetCID()),
-			// 			F->GetCarrier()->GetPlayer()->GetTeam(),
-			// 			Diff / (float)Server()->TickSpeed()
-			// 		);
-			// 		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-
-			// 		GameServer()->SendGameMsg(GAMEMSG_CTF_CAPTURE, fi, F->GetCarrier()->GetPlayer()->GetCID(), Diff, -1);
-			// 		for(int i = 0; i < 2; i++)
-			// 			m_apFlags[i]->Reset();
-			// 		// do a win check(capture could trigger win condition)
-			// 		if(DoWincheckMatch())
-			// 			return;
-			// 	}
-			// }
+			m_aHTFPlayers[pPlayer->GetCID()].PointTicks--;
 		}
 		else
 		{
@@ -284,4 +276,12 @@ void CGameControllerHTF::Tick()
 	}
 	// do a win check(grabbing flags could trigger win condition)
 	DoWincheckMatch();
+}
+
+int CGameControllerHTF::GetPlayerScore(CPlayer *pPlayer, int SnappingClient)
+{
+	if (m_UseTimeDisplay)
+		return (Config()->m_SvScorelimit - pPlayer->m_Score - 1)*1000 + (m_aHTFPlayers[pPlayer->GetCID()].PointTicks/5*5)*1000/Server()->TickSpeed();
+	else
+		return pPlayer->m_Score;
 }

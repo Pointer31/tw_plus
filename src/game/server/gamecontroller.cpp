@@ -219,6 +219,11 @@ void IGameController::DoTeamBalance()
 	GameServer()->SendGameMsg(GAMEMSG_TEAM_BALANCE, -1);
 }
 
+int IGameController::GetPlayerScore(CPlayer *pPlayer, int SnappingClient)
+{
+	return pPlayer->m_Score;
+}
+
 // event
 int IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon)
 {
