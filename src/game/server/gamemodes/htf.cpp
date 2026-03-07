@@ -285,3 +285,13 @@ int CGameControllerHTF::GetPlayerScore(CPlayer *pPlayer, int SnappingClient)
 	else
 		return pPlayer->m_Score;
 }
+
+void CGameControllerHTF::StartMatch()
+{
+	IGameController::StartMatch();
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		m_aHTFPlayers[i].PointTicks = Server()->TickSpeed();
+	}
+}

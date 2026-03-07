@@ -46,7 +46,6 @@ class IGameController
 	virtual bool DoWincheckMatch();		// returns true when the match is over
 	virtual void DoWincheckRound() {}
 	void ResetGame();
-	void StartMatch();
 	void StartRound();
 
 	// map
@@ -90,6 +89,8 @@ protected:
 	int m_RoundCount;
 	int m_SuddenDeath;
 	int m_aTeamscore[NUM_TEAMS];
+
+	virtual void StartMatch();
 
 	void EndMatch() { SetGameState(IGS_END_MATCH, TIMER_END); }
 	void EndRound() { SetGameState(IGS_END_ROUND, TIMER_END/2); }

@@ -25,6 +25,9 @@ class CGameControllerHTF : public IGameController
 	
 	HTFPlayer m_aHTFPlayers[MAX_CLIENTS];
 
+protected:
+	virtual void StartMatch();
+
 public:
 	CGameControllerHTF(class CGameContext *pGameServer);
 	virtual const char *GetGameHelpText();
