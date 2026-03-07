@@ -235,7 +235,6 @@ void CGameControllerHTF::Tick()
 			{
 				m_aHTFPlayers[pPlayer->GetCID()].PointTicks = Server()->TickSpeed();
 				pPlayer->m_Score += 1;
-				DoWincheckMatch();
 			}
 			m_aHTFPlayers[pPlayer->GetCID()].PointTicks--;
 		}
