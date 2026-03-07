@@ -247,6 +247,9 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 		case SPECIAL_MODE_NONE:
 			GameServer()->SendBroadcast("Mode: Normal", pChr->GetPlayer()->GetCID());
 			break;
+		case SPECIAL_MODE_KAIZOINSTA:
+			GameServer()->SendBroadcast("Mode: Classic", pChr->GetPlayer()->GetCID());
+			break;
 		}
 
 		m_HidNSekPlayers[pChr->GetPlayer()->GetCID()].m_SentSpecialModeBroadcast = true;
@@ -257,8 +260,7 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 {
 	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker) //always snap seekers
 	{
-		if(m_SpecialMode == SPECIAL_MODE_FREEZE ||
-			(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
+		if((m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
 		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit))
 		{
 			CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Pickup)));
@@ -281,21 +283,25 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 	if(SnappingClient < 0 || SnappingClient >= MAX_CLIENTS)
 		return false;
 
-	CPlayer * pPlayer = GameServer()->m_apPlayers[SnappingClient];
-	if(!pPlayer)
-		return false;
-
-	CCharacter *pOther = GameServer()->GetPlayerChar(SnappingClient);
-	if(!pOther)
+	//always snap frozen hiders
+	if(!(m_SpecialMode == SPECIAL_MODE_FREEZE && !m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker && m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenSpecial))
 	{
-		if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
+		CPlayer * pPlayer = GameServer()->m_apPlayers[SnappingClient];
+		if(!pPlayer)
 			return false;
-		else
+
+		CCharacter *pOther = GameServer()->GetPlayerChar(SnappingClient);
+		if(!pOther)
+		{
+			if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
+				return false;
+			else
+				return true;
+		}
+
+		if(m_HidNSekPlayers[SnappingClient].m_IsSeeker && GameServer()->Collision()->FastIntersectLine(pChar->GetPos(), pOther->GetPos(), nullptr, nullptr))
 			return true;
 	}
-
-	if(m_HidNSekPlayers[SnappingClient].m_IsSeeker && GameServer()->Collision()->FastIntersectLine(pChar->GetPos(), pOther->GetPos(), nullptr, nullptr))
-		return true;
 
 	if(!m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
 	{
@@ -336,7 +342,7 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 		return true;
 	}
 
-	if(m_SpecialMode == SPECIAL_MODE_FREEZE && !m_HidNSekPlayers[From].m_IsSeeker)
+	if(m_SpecialMode == SPECIAL_MODE_FREEZE && !m_HidNSekPlayers[From].m_IsSeeker && !m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
 	{
 		Character.GetCore().m_Vel += Force;
 		m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_FrozenSpecial = false;
@@ -347,6 +353,11 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 	{
 		Character.GetCore().m_Vel += Force;
 		return true;
+	}
+
+	if(m_SpecialMode == SPECIAL_MODE_KAIZOINSTA && m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
+	{
+		return false; //do damage
 	}
 
 	if(m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
