@@ -1,0 +1,86 @@
+{
+"authors": {
+	"modified by": [
+		"",
+	],
+	"originally created by": ""
+},
+"translated strings": [
+	{
+		"or": "Welcome to TWplus!",
+		"tr": "Welkom tot TWplus!"
+	},
+	{
+		"or": "Gametype: Death Match. Kill others to get points!",
+		"tr": "Speeltype: Death Match. Dood anderen om punten te scoren!"
+	},
+	{
+		"or": "Gametype: Team Death Match. Kill the other team for points!",
+		"tr": "Speeltype: Team Deatch Match. Dood het andere team om punten te scoren!"
+	},
+	{
+		"or": "Gametype: Capture The Flag. Bring the other team's flag to your own to get points!",
+		"tr": "Speeltype: Capture The Flag. Pak de flag van het vijandige team naar je eigen flag om punten te scoren!"
+	},
+	{
+		"or": "Gametype: Last Man Standing. Kill others but avoid dying yourself!",
+		"tr": "Speeltype: Last Man Standing. Dood anderen maar ga zelf niet dood!"
+	},
+	{
+		"or": "Gametype: Last Team Standing. Kill the other team but avoid dying yourself!",
+		"tr": "Speeltype: Last Team Standing. Dood het andere team maar ga zelf niet dood!"
+	},
+	{
+		"or": "Gametype: Hold The Flag. Hold the flag to continually get points!",
+		"tr": "Speeltype: Hold The Flag. Pak en houd de flag om steeds punten te krijgen!"
+	},
+	{
+		"or": "Gametype: Hide & Seek, Seekers will try to kill the Hiders, Hiders need to run!",
+		"tr": "Speeltype: Hide & Seek. Sommigen moeten anderen proberen te doden en zij moeten rennen!"
+	},
+	{
+		"or": "Instagib is enabled. Your rifle instakills others.",
+		"tr": "Instagib is ingeschakeld. Je laser insta-dood anderen"
+	},
+	{
+		"or": "Instagib is enabled. Your grenade launcher instakills others.",
+		"tr": "Instagib is ingeschakeld. Je grenaat geweer insta-dood anderen"
+	},
+	{
+		"or": "No-items is enabled. The weapon you use changes every %i seconds.",
+		"tr": "No-items is ingeschakeld. Het wapen dat je gebruikt verandert elke %i seconden."
+	},
+	{
+		"or": "Red team has won the match!",
+		"tr": "Het rode team heeft het spel gewonnen!"
+	},
+	{
+		"or": "Blue team has won the match!",
+		"tr": "Het blauwe team heeft het spel gewonnen!"
+	},
+	{
+		"or": "Match is a draw!",
+		"tr": "Het is gelijkspel!"
+	},
+	{
+		"or": "'%s' has won the match!",
+		"tr": "'%s' heeft het spel gewonnen!"
+	},
+	{
+		"or": "You are a Seeker now! Kill the Hiders!",
+		"tr": "Je moet degenen die zich verstoppen vinden!"
+	},
+	{
+		"or": "You are a Hider now! Run away from the Seekers!",
+		"tr": "Je moet rennen en je verstoppen!"
+	},
+	{
+		"or": "Hiders won this round!",
+		"tr": "Degenen die zich verstoppen hebben de ronde gewonnen!"
+	},
+	{
+		"or": "Seekers won this round!",
+		"tr": "Degenen die zoeken hebben de ronde gewonnen!"
+	}
+]
+}

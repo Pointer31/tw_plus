@@ -30,6 +30,8 @@
 #include "bots/base_ai.h"
 #include <cstdio>
 
+#include "localization.h"
+
 enum
 {
 	RESET,
@@ -1745,6 +1747,9 @@ void CGameContext::OnInit()
 	m_Events.SetGameServer(this);
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 
+	if (str_comp(Config()->m_SvDefaultLanguageFile, "") != 0)
+		g_Localization.Load(Config()->m_SvDefaultLanguageFile, Storage(), Console());
+
 	// HACK: only set static size for items, which were available in the first 0.7 release
 	// so new items don't break the snapshot delta
 	static const int OLD_NUM_NETOBJTYPES = 23;
@@ -1813,12 +1818,12 @@ void CGameContext::OnInit()
 	if (Config()->m_SvMotdHelpMenu)
 	{
 		str_format(Config()->m_SvMotd, sizeof(Config()->m_SvMotd), "%s\n\n%s\n\n%s",
-			"Welcome to TWplus!",
-		 	m_pController->GetGameHelpText(),
-			m_pController->IsInstagib() == 0 ? "" : (m_pController->IsInstagibLaser() == 1 ? "Instagib is enabled. Your rifle instakills others." : "Instagib is enabled. Your grenade launcher instakills others.")
+			Localize("Welcome to TWplus!"),
+		 	Localize(m_pController->GetGameHelpText()),
+			m_pController->IsInstagib() == 0 ? "" : (m_pController->IsInstagibLaser() == 1 ? Localize("Instagib is enabled. Your rifle instakills others.") : Localize("Instagib is enabled. Your grenade launcher instakills others."))
 		);
 	}
-
+	
 	CWeapons::Init();
 
 #ifdef CONF_DEBUG

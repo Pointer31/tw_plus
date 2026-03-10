@@ -11,6 +11,7 @@
 #include "player.h"
 #include "weapons.h"
 
+#include "localization.h"
 
 IGameController::IGameController(CGameContext *pGameServer)
 {
@@ -656,11 +657,11 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 				int scoreRed = m_aTeamscore[TEAM_RED];
 				int scoreBlue = m_aTeamscore[TEAM_BLUE];
 				if (scoreRed > scoreBlue)
-					str_format(aBuf, sizeof(aBuf), "★ Red team has won the match!");
+					str_format(aBuf, sizeof(aBuf), "★ %s", Localize("Red team has won the match!"));
 				else if (scoreRed < scoreBlue)
-					str_format(aBuf, sizeof(aBuf), "★ Blue team has won the match!");
+					str_format(aBuf, sizeof(aBuf), "★ %s", Localize("Blue team has won the match!"));
 				else
-					str_format(aBuf, sizeof(aBuf), "★ Match is a draw!");
+					str_format(aBuf, sizeof(aBuf), "★ %s", Localize("Match is a draw!"));
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 			} else { // Non-team gamemode
 				char aBuf[1024] = "No message (this should not appear)";
@@ -672,10 +673,12 @@ void IGameController::SetGameState(EGameState GameState, int Timer)
 
 					if (pP->m_Score > highestScore) {
 						highestScore = pP->m_Score;
-						str_format(aBuf, sizeof(aBuf), "★ '%s' has won the match!", Server()->ClientName(i));
+						char bBuf[1024];
+						str_format(bBuf, sizeof(bBuf), "★ %s", Localize("'%s' has won the match!"));
+						str_format(aBuf, sizeof(aBuf), bBuf, Server()->ClientName(i));
 					} else if (pP->m_Score == highestScore) {
 						highestScore = pP->m_Score;
-						str_format(aBuf, sizeof(aBuf), "★ Match is a draw!");
+						str_format(aBuf, sizeof(aBuf), "★ %s", Localize("Match is a draw!"));
 					}
 				}
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
@@ -1371,7 +1374,7 @@ void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
 		CNetMsg_Sv_Chat Msg;
 		Msg.m_Mode = CHAT_ALL;
 		Msg.m_ClientID = -1;
-		Msg.m_pMessage = pSelf->GetGameHelpText();
+		Msg.m_pMessage = Localize(pSelf->GetGameHelpText());
 		Msg.m_TargetID = ClientID;
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	}
@@ -1381,7 +1384,7 @@ void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
 		CNetMsg_Sv_Chat Msg;
 		Msg.m_Mode = CHAT_ALL;
 		Msg.m_ClientID = -1;
-		Msg.m_pMessage = "Instagib is enabled. Your rifle instakills others.";
+		Msg.m_pMessage = Localize("Instagib is enabled. Your rifle instakills others.");
 		Msg.m_TargetID = ClientID;
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	}
@@ -1390,7 +1393,18 @@ void IGameController::Com_GameHelp(IConsole::IResult *pResult, void *pContext)
 		CNetMsg_Sv_Chat Msg;
 		Msg.m_Mode = CHAT_ALL;
 		Msg.m_ClientID = -1;
-		Msg.m_pMessage = "Instagib is enabled. Your grenade launcher instakills others.";
+		Msg.m_pMessage = Localize("Instagib is enabled. Your grenade launcher instakills others.");
+		Msg.m_TargetID = ClientID;
+		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
+	else if (pSelf->IsNoItems()) 
+	{
+		CNetMsg_Sv_Chat Msg;
+		Msg.m_Mode = CHAT_ALL;
+		Msg.m_ClientID = -1;
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), Localize("No-items is enabled. The weapon you use changes every %i seconds."), 15); // for now it's hardcoded to 15s
+		Msg.m_pMessage = aBuf;
 		Msg.m_TargetID = ClientID;
 		pSelf->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	}

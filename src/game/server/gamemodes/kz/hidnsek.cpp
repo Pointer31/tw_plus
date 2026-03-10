@@ -13,6 +13,7 @@
 #include <engine/shared/config.h>
 #include <game/server/entities/character.h>
 #include <cstdio>
+#include <game/server/localization.h>
 
 int CGameControllerHidNSek::m_SpecialMode = 0;
 
@@ -138,11 +139,11 @@ void CGameControllerHidNSek::Tick()
 
 				if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
 				{
-					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, "You are a Seeker now! Kill the Hiders!");
+					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, Localize("You are a Seeker now! Kill the Hiders!"));
 				}
 				else
 				{
-					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, "You are a Hider now! Run away from the Seekers!");
+					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, Localize("You are a Hider now! Run away from the Seekers!"));
 				}
 			}
 			m_ToldSeekers = true;
@@ -485,7 +486,7 @@ void CGameControllerHidNSek::DoWincheckRound()
 		m_GameStartTick = Server()->Tick(); // hack to not end match
 		EndRound();
 		m_DoResetSeekers = true;
-		GameServer()->SendChat(-1, CHAT_ALL, -1, "Hiders won this round!");
+		GameServer()->SendChat(-1, CHAT_ALL, -1, Localize("Hiders won this round!"));
 	}
 	else
 	{
@@ -514,7 +515,7 @@ void CGameControllerHidNSek::DoWincheckRound()
 			}
 			EndRound();
 			m_DoResetSeekers = true;
-			GameServer()->SendChat(-1, CHAT_ALL, -1, "Seekers won this round!");
+			GameServer()->SendChat(-1, CHAT_ALL, -1, Localize("Seekers won this round!"));
 		}
 	}
 }

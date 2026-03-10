@@ -171,3 +171,5 @@ MACRO_CONFIG_INT(SvPickupParticles, sv_pickup_particles, 1, 0, 1, CFGFLAG_SAVE|C
 MACRO_CONFIG_INT(SvRaceFriendlyFire, sv_race_friendly_fire, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Enable friendly fire on race gametypes")
 MACRO_CONFIG_INT(SvPistolAuto, sv_pistol_auto, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Whether or not the pistol should autofire")
 MACRO_CONFIG_INT(SvHTFTimeDisplay, sv_htf_time_display, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Whether or not to use time to display score in htf")
+
+MACRO_CONFIG_STR(SvDefaultLanguageFile, sv_default_language_file, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "Which language file to load, if any")
