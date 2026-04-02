@@ -211,6 +211,14 @@ void CGameControllerHTF::Snap(int SnappingClient)
 	}
 	else
 		pGameDataFlag->m_FlagCarrierBlue = FLAG_MISSING;
+
+	CNetObj_GameDataRace *pGameDataRace = static_cast<CNetObj_GameDataRace *>(Server()->SnapNewItem(NETOBJTYPE_GAMEDATARACE, 0, sizeof(CNetObj_GameDataRace)));
+	if(!pGameDataRace)
+		return;
+
+	pGameDataRace->m_BestTime = -1;
+	pGameDataRace->m_Precision = 1;
+	pGameDataRace->m_RaceFlags = 0;
 }
 
 void CGameControllerHTF::Tick()
