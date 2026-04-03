@@ -1747,8 +1747,7 @@ void CGameContext::OnInit()
 	m_Events.SetGameServer(this);
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 
-	if (str_comp(Config()->m_SvDefaultLanguageFile, "") != 0)
-		g_Localization.Load(Config()->m_SvDefaultLanguageFile, Storage(), Console());
+	g_Localization.Load(Config()->m_SvDefaultLanguageFile, Storage(), Console());
 
 	// HACK: only set static size for items, which were available in the first 0.7 release
 	// so new items don't break the snapshot delta
