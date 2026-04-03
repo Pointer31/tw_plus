@@ -187,6 +187,19 @@ void CPlayer::Snap(int SnappingClient)
 		}
 	}
 
+	if(m_ClientID == SnappingClient)
+	{
+		int TicksLeft = m_RespawnTick - Server()->Tick();
+
+		if (!m_pCharacter && !(m_Team == TEAM_SPECTATORS || m_DeadSpecMode)) {
+			CNetObj_RespawnTimer *pRespawnTimer = static_cast<CNetObj_RespawnTimer *>(Server()->SnapNewItem(NETOBJTYPE_RESPAWNTIMER, m_ClientID, sizeof(CNetObj_RespawnTimer)));
+			if(!pRespawnTimer)
+				return;
+
+			pRespawnTimer->m_TicksLeft = std::max(0, TicksLeft);
+		}
+	}
+
 	// demo recording
 	if(SnappingClient == -1)
 	{

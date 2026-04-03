@@ -284,6 +284,10 @@ Objects = [
 	NetObjectEx("GameInfoTWPlus", "gameinfo-twplus@pointerstwplus", [
 		NetIntAny("m_Flags"),
 	]),
+
+	NetObjectEx("RespawnTimer", "respawn-timer@pointerstwplus", [
+		NetIntAny("m_TicksLeft"), # 0->can respawn, -1->cannot respawn
+	]),
 ]
 
 Messages = [
