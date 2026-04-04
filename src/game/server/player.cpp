@@ -191,12 +191,16 @@ void CPlayer::Snap(int SnappingClient)
 	{
 		int TicksLeft = m_RespawnTick - Server()->Tick();
 
-		if (!m_pCharacter && !(m_Team == TEAM_SPECTATORS || m_DeadSpecMode)) {
+		if (!m_pCharacter && 
+			!(GameServer()->m_pController->IsGameEnd()) && 
+			!((TicksLeft <= 0 || m_RespawnDisabled) && GameServer()->m_pController->IsGamePaused()) && 
+			!(m_Team == TEAM_SPECTATORS))
+		{
 			CNetObj_RespawnTimer *pRespawnTimer = static_cast<CNetObj_RespawnTimer *>(Server()->SnapNewItem(NETOBJTYPE_RESPAWNTIMER, m_ClientID, sizeof(CNetObj_RespawnTimer)));
 			if(!pRespawnTimer)
 				return;
 
-			pRespawnTimer->m_TicksLeft = std::max(0, TicksLeft);
+			pRespawnTimer->m_TicksLeft = m_RespawnDisabled ? -1 : std::max(0, TicksLeft);
 		}
 	}
 
