@@ -10,7 +10,8 @@ CFlag::CFlag(CGameWorld *pGameWorld, int Team, vec2 StandPos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FLAG, StandPos, ms_PhysSize)
 {
 	m_Team = Team;
-	m_StandPos = StandPos;
+	m_StandPositions[0] = StandPos;
+	m_no_stands = 1;
 
 	GameWorld()->InsertEntity(this);
 
@@ -21,7 +22,9 @@ void CFlag::Reset()
 {
 	m_pCarrier = 0;
 	m_AtStand = true;
-	m_Pos = m_StandPos;
+
+	int n = rand() % m_no_stands;
+	m_Pos = m_StandPositions[n];
 	m_Vel = vec2(0, 0);
 	m_GrabTick = 0;
 }

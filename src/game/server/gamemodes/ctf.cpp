@@ -86,11 +86,20 @@ bool CGameControllerCTF::OnEntity(int Index, vec2 Pos)
 	int Team = -1;
 	if(Index == ENTITY_FLAGSTAND_RED) Team = TEAM_RED;
 	if(Index == ENTITY_FLAGSTAND_BLUE) Team = TEAM_BLUE;
-	if(Team == -1 || m_apFlags[Team])
+	if(Team == -1)
 		return false;
 
-	CFlag *F = new CFlag(&GameServer()->m_World, Team, Pos);
-	m_apFlags[Team] = F;
+	if (!m_apFlags[Team])
+	{
+		CFlag *F = new CFlag(&GameServer()->m_World, Team, Pos);
+		m_apFlags[Team] = F;
+	}
+	else if (m_apFlags[Team]->m_no_stands < 10)
+	{
+		m_apFlags[Team]->m_StandPositions[m_apFlags[Team]->m_no_stands] = Pos;
+		m_apFlags[Team]->m_no_stands++;
+	}
+		
 	return true;
 }
 

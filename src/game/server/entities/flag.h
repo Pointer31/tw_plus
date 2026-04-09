@@ -10,7 +10,6 @@ class CFlag : public CEntity
 private:
 	/* Identity */
 	int m_Team;
-	vec2 m_StandPos;
 
 	/* State */
 	bool m_AtStand;
@@ -22,6 +21,8 @@ private:
 public:
 	/* Constants */
 	static int const ms_PhysSize = 14;
+	vec2 m_StandPositions[10];
+	int m_no_stands;
 
 	/* Constructor */
 	CFlag(CGameWorld *pGameWorld, int Team, vec2 StandPos);
