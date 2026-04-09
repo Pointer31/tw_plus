@@ -285,7 +285,7 @@ Objects = [
 		NetIntAny("m_Flags"),
 	]),
 
-	NetObjectEx("RespawnTimer", "respawn-timer@pointerstwplus", [
+	NetObjectEx("RespawnTimer", "respawn-timer@ddnet-community.github.io", [
 		NetIntAny("m_TicksLeft"), # 0->can respawn, -1->cannot respawn
 	]),
 ]
