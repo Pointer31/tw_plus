@@ -199,6 +199,7 @@ public:
 
 	CDemoRecorder m_DemoRecorder;
 	CRegister m_Register;
+	bool m_ServerInfoNeedsUpdate;
 
 	CServer();
 
@@ -252,7 +253,11 @@ public:
 	void ProcessClientPacket(CNetChunk *pPacket);
 
 	void SendServerInfo(int ClientID);
-	void GenerateServerInfo(CPacker *pPacker, bool IncludeClientInfo);
+	void GenerateServerInfo(CPacker *pPacker, int ServerInfoVersion, bool IncludeClientInfo);
+	// return: next StartClientID to continue from, or -1 if done
+	int GenerateServerInfoPlayers(CPacker *pPacker, int ServerInfoVersion, int StartClientID);
+	virtual void ExpireServerInfo();
+	void UpdateRegisterServerInfo();
 
 	void PumpNetwork();
 
@@ -260,7 +265,7 @@ public:
 	const char *GetMapName();
 	int LoadMap(const char *pMapName);
 
-	void InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, CConfig *pConfig, IConsole *pConsole);
+	void InitRegister(class IEngine *pEngine, class CConfig *pConfig, class IConsole *pConsole, TOKEN SecurityToken);
 	void InitInterfaces(IKernel *pKernel);
 	int Run();
 	void Free();

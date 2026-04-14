@@ -18,6 +18,8 @@
 #include <engine/shared/demo.h>
 #include <engine/shared/econ.h>
 #include <engine/shared/filecollection.h>
+#include <engine/shared/http_request.h>
+#include <engine/shared/jsonwriter.h>
 #include <engine/shared/mapchecker.h>
 #include <engine/shared/netban.h>
 #include <engine/shared/network.h>
@@ -266,6 +268,7 @@ CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
 	m_CurrentMapSize = 0;
 
 	m_MapReload = false;
+	m_ServerInfoNeedsUpdate = false;
 
 	m_RconClientID = IServer::RCON_CID_SERV;
 	m_RconAuthLevel = AUTHED_ADMIN;
@@ -1274,6 +1277,115 @@ void CServer::SendServerInfo(int ClientID)
 		SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 }
 
+void CServer::ExpireServerInfo()
+{
+	m_ServerInfoNeedsUpdate = true;
+}
+
+void CServer::UpdateRegisterServerInfo()
+{
+	// count the players
+	int PlayerCount = 0, ClientCount = 0;
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(m_aClients[i].m_State != CClient::STATE_INGAME)
+		{
+			if(GameServer()->IsClientPlayer(i))
+				PlayerCount++;
+
+			ClientCount++;
+		}
+	}
+
+	char aMapSha256[SHA256_MAXSTRSIZE];
+
+	sha256_str(m_CurrentMapSha256, aMapSha256, sizeof(aMapSha256));
+
+	array<char> lServerInfo;
+	memory_stream Stream(&lServerInfo);
+	CJsonWriter JsonWriter(&Stream);
+
+	JsonWriter.BeginObject();
+	JsonWriter.WriteAttribute("max_clients");
+	JsonWriter.WriteIntValue(m_NetServer.GetMaxClients());
+
+	JsonWriter.WriteAttribute("max_players");
+	JsonWriter.WriteIntValue(m_NetServer.GetMaxClients());
+
+	JsonWriter.WriteAttribute("passworded");
+	JsonWriter.WriteBoolValue(Config()->m_Password[0]);
+
+	JsonWriter.WriteAttribute("game_type");
+	JsonWriter.WriteStrValue(GameServer()->GameType());
+
+	if(Config()->m_SvRegisterCommunityToken[0])
+	{
+		if(Config()->m_SvFlag != -1)
+		{
+			JsonWriter.WriteAttribute("country");
+			JsonWriter.WriteIntValue(Config()->m_SvFlag); // ISO 3166-1 numeric
+		}
+	}
+
+	JsonWriter.WriteAttribute("name");
+	JsonWriter.WriteStrValue(Config()->m_SvName);
+
+	JsonWriter.WriteAttribute("map");
+	JsonWriter.BeginObject();
+	JsonWriter.WriteAttribute("name");
+	JsonWriter.WriteStrValue(GetMapName());
+	JsonWriter.WriteAttribute("sha256");
+	JsonWriter.WriteStrValue(aMapSha256);
+	JsonWriter.WriteAttribute("size");
+	JsonWriter.WriteIntValue(m_CurrentMapSize);
+	JsonWriter.EndObject();
+
+	JsonWriter.WriteAttribute("version");
+	JsonWriter.WriteStrValue(GameServer()->Version());
+
+	JsonWriter.WriteAttribute("client_score_kind");
+	JsonWriter.WriteStrValue("points");
+
+	JsonWriter.WriteAttribute("requires_login");
+	JsonWriter.WriteBoolValue(true);
+
+	JsonWriter.WriteAttribute("clients");
+	JsonWriter.BeginArray();
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(GameServer()->IsClientPlayer(i))
+		{
+			JsonWriter.BeginObject();
+
+			JsonWriter.WriteAttribute("name");
+			JsonWriter.WriteStrValue(ClientName(i));
+
+			JsonWriter.WriteAttribute("clan");
+			JsonWriter.WriteStrValue(ClientClan(i));
+
+			JsonWriter.WriteAttribute("country");
+			JsonWriter.WriteIntValue(m_aClients[i].m_Country); // ISO 3166-1 numeric
+
+			JsonWriter.WriteAttribute("score");
+			JsonWriter.WriteIntValue(m_aClients[i].m_Score);
+
+			JsonWriter.WriteAttribute("is_player");
+			JsonWriter.WriteBoolValue(GameServer()->IsClientPlayer(i));
+
+			GameServer()->OnUpdatePlayerServerInfo(&JsonWriter, i);
+
+			JsonWriter.EndObject();
+		}
+	}
+
+	JsonWriter.EndArray();
+	JsonWriter.EndObject();
+
+	Stream.write((unsigned char *) "", 1);
+
+	m_Register.OnNewInfo(lServerInfo.base_ptr());
+}
 
 void CServer::PumpNetwork()
 {
@@ -1287,7 +1399,7 @@ void CServer::PumpNetwork()
 	{
 		if(Packet.m_Flags&NETSENDFLAG_CONNLESS)
 		{
-			if(m_Register.RegisterProcessPacket(&Packet, ResponseToken))
+			if(ResponseToken == NET_TOKEN_NONE && m_Register.OnPacket(&Packet))
 				continue;
 			if(Packet.m_DataSize >= int(sizeof(SERVERBROWSE_GETINFO)) &&
 				mem_comp(Packet.m_pData, SERVERBROWSE_GETINFO, sizeof(SERVERBROWSE_GETINFO)) == 0)
@@ -1387,9 +1499,9 @@ int CServer::LoadMap(const char *pMapName)
 	return 1;
 }
 
-void CServer::InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, CConfig *pConfig, IConsole *pConsole)
+void CServer::InitRegister(class IEngine *pEngine, class CConfig *pConfig, class IConsole *pConsole, TOKEN SecurityToken)
 {
-	m_Register.Init(pNetServer, pMasterServer, pConfig, pConsole);
+	m_Register.Init(pEngine, pConfig, pConsole, SecurityToken);
 }
 
 void CServer::InitInterfaces(IKernel *pKernel)
@@ -1446,6 +1558,8 @@ int CServer::Run()
 		return -1;
 	}
 
+	InitRegister(Kernel()->RequestInterface<IEngine>(), Config(), Console(), m_NetServer.GetGlobalToken());
+
 	m_Econ.Init(Config(), Console(), &m_ServerBan);
 
 	char aBuf[256];
@@ -1476,6 +1590,7 @@ int CServer::Run()
 	{
 		m_GameStartTime = time_get();
 
+		UpdateRegisterServerInfo();
 		while(m_RunServer)
 		{
 			// load new map
@@ -1553,10 +1668,16 @@ int CServer::Run()
 
 				UpdateClientRconCommands();
 				UpdateClientMapListEntries();
-			}
 
-			// master server stuff
-			m_Register.RegisterUpdate(m_NetServer.NetType());
+				// master server stuff
+				m_Register.RegisterUpdate(m_NetServer.NetType());
+			
+				if(m_ServerInfoNeedsUpdate)
+				{
+					m_ServerInfoNeedsUpdate = false;
+					UpdateRegisterServerInfo();
+				}
+			}
 
 			PumpNetwork();
 
@@ -1978,6 +2099,10 @@ int main(int argc, const char **argv)
 		return -1;
 	}
 
+	CCurlInit Curl;
+	if(Curl.IsFailed())
+		return -1;
+
 	signal(SIGINT, HandleSigIntTerm);
 	signal(SIGTERM, HandleSigIntTerm);
 
@@ -1990,12 +2115,15 @@ int main(int argc, const char **argv)
 	IEngineMap *pEngineMap = CreateEngineMap();
 	IMapChecker *pMapChecker = CreateMapChecker();
 	IGameServer *pGameServer = CreateGameServer();
+<<<<<<< HEAD
 	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER|CFGFLAG_ECON);
 	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
+=======
+	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER | CFGFLAG_ECON);
+	// IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
+>>>>>>> cba03057e (Http mastersrv)
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv);
 	IConfigManager *pConfigManager = CreateConfigManager();
-
-	pServer->InitRegister(&pServer->m_NetServer, pEngineMasterServer, pConfigManager->Values(), pConsole);
 
 	{
 		bool RegisterFail = false;
@@ -2009,8 +2137,13 @@ int main(int argc, const char **argv)
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConsole);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
+<<<<<<< HEAD
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer*>(pEngineMasterServer)); // register as both
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer*>(pEngineMasterServer));
+=======
+		// RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer *>(pEngineMasterServer)); // register as both
+		// RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer *>(pEngineMasterServer));
+>>>>>>> cba03057e (Http mastersrv)
 
 		if(RegisterFail)
 			return -1;
@@ -2019,8 +2152,8 @@ int main(int argc, const char **argv)
 	pEngine->Init();
 	pConfigManager->Init(FlagMask);
 	pConsole->Init();
-	pEngineMasterServer->Init();
-	pEngineMasterServer->Load();
+	// pEngineMasterServer->Init();
+	// pEngineMasterServer->Load();
 
 	pServer->InitInterfaces(pKernel);
 	if(!UseDefaultConfig)
@@ -2048,14 +2181,14 @@ int main(int argc, const char **argv)
 	int Ret = pServer->Run();
 
 	// free
+	delete pEngine;
 	delete pServer;
 	delete pKernel;
-	delete pEngine;
 	delete pEngineMap;
 	delete pMapChecker;
 	delete pGameServer;
 	delete pConsole;
-	delete pEngineMasterServer;
+	// delete pEngineMasterServer;
 	delete pStorage;
 	delete pConfigManager;
 

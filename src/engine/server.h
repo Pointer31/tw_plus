@@ -68,8 +68,13 @@ public:
 
 	virtual void DemoRecorder_HandleAutoStart() = 0;
 	virtual bool DemoRecorder_IsRecording() = 0;
+<<<<<<< HEAD
 	virtual int GetClientInfclassVersion(int ClientId) = 0;
 	virtual int GetClientDDNetVersion(int ClientId) = 0;
+=======
+
+	virtual void ExpireServerInfo() = 0;
+>>>>>>> cba03057e (Http mastersrv)
 };
 
 class IGameServer : public IInterface
@@ -110,6 +115,8 @@ public:
 
 	virtual const char *GetBotName(int ClientID) = 0;
 	virtual const char *GetBotClan(int ClientID) = 0;
+	
+	virtual void OnUpdatePlayerServerInfo(class CJsonWriter *pJsonWriter, int ClientID) = 0;
 };
 
 extern IGameServer *CreateGameServer();

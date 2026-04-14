@@ -3,6 +3,7 @@
 #include <base/math.h>
 
 #include <engine/shared/config.h>
+#include <engine/shared/jsonwriter.h>
 #include <engine/shared/memheap.h>
 #include <engine/storage.h>
 #include <engine/map.h>
@@ -774,6 +775,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	}
 
 	BotsMinimumPlayersCheck();
+	Server()->ExpireServerInfo();
 }
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
@@ -810,6 +812,8 @@ void CGameContext::OnClientTeamChange(int ClientID)
 	}
 	
 	BotsMinimumPlayersCheck();
+
+	Server()->ExpireServerInfo();
 }
 
 void CGameContext::OnClientDrop(int ClientID, const char *pReason)
@@ -861,6 +865,8 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	BotsMinimumPlayersCheck(ClientID);
 
 	m_VoteUpdate = true;
+
+	Server()->ExpireServerInfo();
 }
 
 void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
@@ -1990,6 +1996,47 @@ const char *CGameContext::Version() const { return GAME_VERSION; }
 const char *CGameContext::NetVersion() const { return GAME_NETVERSION; }
 const char *CGameContext::NetVersionHashUsed() const { return GAME_NETVERSION_HASH_FORCED; }
 const char *CGameContext::NetVersionHashReal() const { return GAME_NETVERSION_HASH; }
+bool CGameContext::TimeScore() const { return false; }
+
+void CGameContext::OnUpdatePlayerServerInfo(CJsonWriter *pJsonWriter, int ClientID)
+{
+	if(!m_apPlayers[ClientID])
+		return;
+
+	CTeeInfos &TeeInfo = m_apPlayers[ClientID]->m_TeeInfos;
+
+	pJsonWriter->WriteAttribute("skin");
+	pJsonWriter->BeginObject();
+
+	const char *apPartNames[NUM_SKINPARTS] = {"body", "marking", "decoration", "hands", "feet", "eyes"};
+
+	for(int i = 0; i < NUM_SKINPARTS; ++i)
+	{
+		pJsonWriter->WriteAttribute(apPartNames[i]);
+		pJsonWriter->BeginObject();
+
+		pJsonWriter->WriteAttribute("name");
+		pJsonWriter->WriteStrValue(TeeInfo.m_aaSkinPartNames[i]);
+
+		if(TeeInfo.m_aUseCustomColors[i])
+		{
+			pJsonWriter->WriteAttribute("color");
+			pJsonWriter->WriteIntValue(TeeInfo.m_aSkinPartColors[i]);
+		}
+
+		pJsonWriter->EndObject();
+	}
+
+	pJsonWriter->EndObject();
+
+	pJsonWriter->WriteAttribute("afk");
+	pJsonWriter->WriteBoolValue(false);
+
+	pJsonWriter->WriteAttribute("team");
+	pJsonWriter->WriteIntValue(m_apPlayers[ClientID]->GetTeam());
+}
+
+int CGameContext::GetMaxPlayerSlots() { return Config()->m_SvMaxClients; }
 
 IGameServer *CreateGameServer() { return new CGameContext; }
 

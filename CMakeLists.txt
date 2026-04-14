@@ -1283,6 +1283,7 @@ set_src(BASE GLOB_RECURSE src/base
   tl/allocator.h
   tl/array.h
   tl/range.h
+  tl/stream.h
   tl/sorted_array.h
   tl/string.h
   tl/threading.h
@@ -1331,6 +1332,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   global_uuid_manager.cpp
   huffman.cpp
   huffman.h
+  http_request.cpp
+  http_request.h
   jobs.cpp
   jobs.h
   jsonparser.cpp

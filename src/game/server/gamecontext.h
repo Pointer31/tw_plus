@@ -209,6 +209,8 @@ public:
 	virtual const char *NetVersionHashReal() const override;
 
 	void PreInputClients(int ClientId, bool *pClients) override;
+	virtual bool TimeScore() const;
+	virtual void OnUpdatePlayerServerInfo(CJsonWriter *pJsonWriter, int ClientID);
 
 	virtual const char *GetBotName(int ClientID) override;
 	virtual const char *GetBotClan(int ClientID) override;

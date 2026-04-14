@@ -240,6 +240,7 @@ public:
 	TOKEN GenerateToken(const NETADDR *pAddr) const;
 	static TOKEN GenerateToken(const NETADDR *pAddr, int64 Seed);
 
+	TOKEN GetGlobalToken() const { return m_GlobalToken; }
 private:
 	CNetBase *m_pNetBase;
 
@@ -488,6 +489,9 @@ public:
 	//
 	void SetMaxClients(int MaxClients);
 	void SetMaxClientsPerIP(int MaxClientsPerIP);
+
+	int GetMaxClients() const { return m_MaxClients; }
+	TOKEN GetGlobalToken() const { return m_TokenManager.GetGlobalToken(); }
 };
 
 class CNetConsole
