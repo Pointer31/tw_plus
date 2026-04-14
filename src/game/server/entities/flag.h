@@ -43,6 +43,8 @@ public:
 	/* Functions */
 	void Grab(class CCharacter *pChar);
 	void Drop();
+	
+	bool m_InTele;
 };
 
 #endif

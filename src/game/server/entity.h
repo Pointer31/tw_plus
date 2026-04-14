@@ -72,6 +72,7 @@ public:
 
 	/* Setters */
 	void MarkForDestroy()				{ m_MarkedForDestroy = true; }
+	void SetPos(vec2 Pos) 				{ m_Pos = Pos; }
 
 	/* Other functions */
 

@@ -219,6 +219,31 @@ void CGameControllerCTF::Tick()
 		}
 		else
 		{
+			// teleports
+			int TeleId = -1;
+			vec2 FPos = F->GetPos();
+			if (GameServer()->Collision()->GetCollisionAtId(FPos.x, FPos.y) >= TILE_TELE_START && GameServer()->Collision()->GetCollisionAtId(FPos.x, FPos.y) < TILE_TELE_START+NUM_TILE_TELE)
+				TeleId = GameServer()->Collision()->GetCollisionAtId(FPos.x, FPos.y) - TILE_TELE_START;
+				
+			if (TeleId >= 0)
+			{
+				if (!F->m_InTele) {
+					F->m_InTele = true;
+					int TeleIdEnd = TeleId % 2 == 0 ? TeleId+1  : TeleId-1;
+					int x = GameServer()->Collision()->getTeleX(TeleId);
+					int y = GameServer()->Collision()->getTeleY(TeleId);
+					int tx = GameServer()->Collision()->getTeleX(TeleIdEnd);
+					int ty = GameServer()->Collision()->getTeleY(TeleIdEnd);
+					vec2 start = {(float)x, (float)y};
+					vec2 end = {(float)tx, (float)ty};
+					F->SetPos(FPos - start * 32 + end * 32);
+				}
+			}
+			else
+			{
+				F->m_InTele = false;
+			}
+
 			CCharacter *apCloseCCharacters[MAX_CLIENTS];
 			int Num = GameServer()->m_World.FindEntities(F->GetPos(), CFlag::ms_PhysSize, (CEntity**)apCloseCCharacters, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 			for(int i = 0; i < Num; i++)

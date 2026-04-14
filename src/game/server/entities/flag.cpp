@@ -12,6 +12,7 @@ CFlag::CFlag(CGameWorld *pGameWorld, int Team, vec2 StandPos)
 	m_Team = Team;
 	m_StandPositions[0] = StandPos;
 	m_no_stands = 1;
+	m_InTele = false;
 
 	GameWorld()->InsertEntity(this);
 
