@@ -184,6 +184,8 @@ public:
 	void Quantize();
 
 	int m_Colliding = 0;
+
+	bool m_TouchingPlayer; // whether or not to explode next tick
 };
 
 #endif

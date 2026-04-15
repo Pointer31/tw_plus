@@ -85,6 +85,7 @@ void CCharacterCore::Reset()
 	m_Jumped = 0;
 	m_TriggeredEvents = 0;
 	m_Death = false;
+	m_TouchingPlayer = false;
 }
 
 void CCharacterCore::Tick(bool UseInput)
@@ -327,6 +328,9 @@ void CCharacterCore::Tick(bool UseInput)
 
 				m_Vel += Dir*a*(Velocity*0.75f);
 				m_Vel *= 0.85f;
+				
+				m_TouchingPlayer = true;
+				pCharCore->m_TouchingPlayer = true;
 			}
 
 			// handle hook influence

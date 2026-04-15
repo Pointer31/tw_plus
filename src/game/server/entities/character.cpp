@@ -621,6 +621,12 @@ void CCharacter::Tick()
 		m_inTele = false;
 	}
 
+	if (m_Core.m_TouchingPlayer && Config()->m_SvTouchExplode) {
+		Die(m_pPlayer->GetCID(), WEAPON_NINJA);
+		GameServer()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, true);
+		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
+	}
+
 	// handle Weapons
 	HandleWeapons();
 }
@@ -793,7 +799,7 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
-
+	
 	GameWorld()->RemoveEntity(this);
 	GameWorld()->m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
 	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID());

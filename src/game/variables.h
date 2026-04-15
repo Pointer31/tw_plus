@@ -172,6 +172,7 @@ MACRO_CONFIG_INT(SvRaceFriendlyFire, sv_race_friendly_fire, 0, 0, 1, CFGFLAG_SAV
 MACRO_CONFIG_INT(SvPistolAuto, sv_pistol_auto, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Whether or not the pistol should autofire")
 MACRO_CONFIG_INT(SvHTFTimeDisplay, sv_htf_time_display, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Whether or not to use time to display score in htf")
 
+MACRO_CONFIG_INT(SvTouchExplode, sv_touch_explode, 0, 0, 1, CFGFLAG_SERVER, "Whether players explode on contact with each other")
 MACRO_CONFIG_INT(SvLaserDeath, sv_laser_death, 0, 0, 1, CFGFLAG_SERVER, "spawn sv_laser_death_amount lasers on death")
 MACRO_CONFIG_INT(SvLaserDeathAmount, sv_laser_death_amount, 16, 0, 64, CFGFLAG_SERVER, "amount of lasers to spawn on death (if sv_laser_death is 1)")
 
