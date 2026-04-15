@@ -9,6 +9,7 @@
 #include <game/server/entities/projectile.h>
 #include <game/server/entities/laser.h>
 #include <game/server/entities/laser_better.h>
+#include <game/server/entities/lasertrap.h>
 #include <game/server/player.h>
 
 #include <stdio.h>
@@ -70,6 +71,11 @@ void CWeapons::Init()
     WeaponInfos[WEAPON_CHARGE_HAMMER].m_PredictsLike = WEAPON_HAMMER;
     WeaponInfos[WEAPON_CHARGE_HAMMER].m_FireDelay = 200;
     str_copy(WeaponInfos[WEAPON_CHARGE_HAMMER].m_Name, "Charge Hammer", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
+
+    WeaponInfos[WEAPON_DELAYED_POWER].m_LooksLike = WEAPON_LASER;
+    WeaponInfos[WEAPON_DELAYED_POWER].m_PredictsLike = WEAPON_LASER;
+    WeaponInfos[WEAPON_DELAYED_POWER].m_FireDelay = 300;
+    str_copy(WeaponInfos[WEAPON_DELAYED_POWER].m_Name, "Delayed Power", sizeof(WeaponInfos[WEAPON_GUN].m_Name));
 }
 
 void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
@@ -163,6 +169,12 @@ void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
 			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_GRENADE_EXPLODE);
 			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_HAMMER_FIRE);
 		} break;
+
+        case WEAPON_DELAYED_POWER:
+        {
+            CLaserTrap* laser = new CLaserTrap(pChar->GameWorld(), pChar->GetPos(), Direction, pChar->GameServer()->Tuning()->m_LaserReach, pChar->GetPlayer()->GetCID());
+			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_LASER_FIRE);
+        } break;
     
         default:
             break;
