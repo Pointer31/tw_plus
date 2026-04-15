@@ -621,6 +621,48 @@ void CCharacter::Tick()
 		m_inTele = false;
 	}
 
+	switch (GameServer()->Collision()->GetCollisionAtId(m_Pos.x, m_Pos.y))
+	{
+	case TILE_SLOWDEATH:
+		if (Server()->Tick() % 10 == 0) {
+			GameServer()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
+			m_EmoteType = EMOTE_PAIN;
+			m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+			GameServer()->CreateDamage(m_Pos, m_pPlayer->GetCID(), {0,0}, m_Armor==0? 1 : 0, m_Armor>0? 1 : 0, false);
+
+			if (m_Armor > 0)
+				m_Armor = m_Armor - 1;
+			else
+				m_Health = m_Health - 1;
+			if (m_Health <= 0)
+				Die(m_pPlayer->GetCID(), WEAPON_NINJA);
+		}
+		break;
+	case TILE_HEALTHZONE:
+		if (Server()->Tick() % 10 == 0) {
+			if (m_Health < 10) {
+				m_Health = m_Health + 1;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+			}
+			m_EmoteType = EMOTE_HAPPY;
+			m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+		}
+		break;
+	case TILE_ARMORZONE:
+		if (Server()->Tick() % 10 == 0) {
+			if (m_Armor < 10 && !GameServer()->m_pController->IsInstagib()) {
+				m_Armor = m_Armor + 1;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
+			}
+			m_EmoteType = EMOTE_HAPPY;
+			m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
+		}
+		break;
+	
+	default:
+		break;
+	}
+
 	if (m_Core.m_TouchingPlayer && Config()->m_SvTouchExplode) {
 		Die(m_pPlayer->GetCID(), WEAPON_NINJA);
 		GameServer()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, true);
