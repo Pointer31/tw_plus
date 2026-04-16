@@ -47,6 +47,13 @@ void CFlag::Drop()
 
 void CFlag::TickDefered()
 {
+	// if the flag hits no-flag zone, reset it
+	if((GameServer()->Collision()->GetCollisionAtId(m_Pos.x, m_Pos.y) == TILE_NOFLAG))
+	{
+		Reset();
+		GameServer()->m_pController->OnFlagReturn(this);
+	}
+
 	if(m_pCarrier)
 	{
 		// update flag position
