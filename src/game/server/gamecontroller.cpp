@@ -13,6 +13,8 @@
 
 #include "localization.h"
 
+extern const char *GIT_SHORTREV_HASH;
+
 IGameController::IGameController(CGameContext *pGameServer)
 {
 	m_pGameServer = pGameServer;
@@ -1430,7 +1432,13 @@ void IGameController::Com_ServerInfo(IConsole::IResult *pResult, void *pContext)
 
 	int ClientID = pComContext->m_ClientID;
 
+	char aBuf[128];
 	pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, "TWplus server mod");
+	if (GIT_SHORTREV_HASH)
+	{
+		str_format(aBuf, sizeof(aBuf), "Git revision hash: %s", GIT_SHORTREV_HASH);
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, aBuf);
+	}
 	if (str_comp(pSelf->Config()->m_SvInfoSources, "") != 0)
 		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoSources);
 	if (str_comp(pSelf->Config()->m_SvInfoLine1, "") != 0)
