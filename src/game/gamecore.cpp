@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "gamecore.h"
+#include "mapitems.h"
 
 const char *CTuningParams::s_apNames[] =
 {
@@ -121,6 +122,9 @@ void CCharacterCore::Tick(bool UseInput)
 					m_TriggeredEvents |= COREEVENTFLAG_GROUND_JUMP;
 					m_Vel.y = -m_pWorld->m_Tuning.m_GroundJumpImpulse;
 					m_Jumped |= 1;
+					if (m_pCollision->GetCollisionAtId(m_Pos.x - PHYS_SIZE / 3.f, m_Pos.y + 2*32) == TILE_SPEEDUPFAST ||
+						m_pCollision->GetCollisionAtId(m_Pos.x + PHYS_SIZE / 3.f, m_Pos.y + 2*32) == TILE_SPEEDUPFAST)
+						m_Vel = {m_Vel.x, m_Vel.y * 2};
 				}
 				else if(!(m_Jumped&2))
 				{
