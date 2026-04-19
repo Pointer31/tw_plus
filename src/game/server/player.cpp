@@ -7,6 +7,7 @@
 #include "gamecontroller.h"
 #include "player.h"
 #include "bots/base_ai.h"
+#include <algorithm>
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 

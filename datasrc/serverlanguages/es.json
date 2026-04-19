@@ -1,0 +1,95 @@
+{
+"authors": {
+	"modified by": [
+		"",
+	],
+	"originally created by": "+KZ",
+	"license": "CC BY-SA 4.0"
+},
+"translated strings": [
+	{
+		"or": "TWplus server mod",
+		"tr": "TWPlus, modificación del servidor"
+	},
+	{
+		"or": "Git revision hash: %s",
+		"tr": "Revisión de Git: %s"
+	},
+	{
+		"or": "Welcome to TWplus!",
+		"tr": "Bienvenido a TWplus!"
+	},
+	{
+		"or": "Gametype: Death Match. Kill others to get points!",
+		"tr": "Modo de juego: Death Match. Mata a otros para obtener puntos!"
+	},
+	{
+		"or": "Gametype: Team Death Match. Kill the other team for points!",
+		"tr": "Modo de juego: Team Death Match. Mata a los del equipo opuesto para obtener puntos!"
+	},
+	{
+		"or": "Gametype: Capture The Flag. Bring the other team's flag to your own to get points!",
+		"tr": "Modo de juego: Capture The Flag. Trae la bandera del otro equipo a la tuya para obtener puntos!"
+	},
+	{
+		"or": "Gametype: Last Man Standing. Kill others but avoid dying yourself!",
+		"tr": "Modo de juego: Last Man Standing. Mata a otros pero evita morir!"
+	},
+	{
+		"or": "Gametype: Last Team Standing. Kill the other team but avoid dying yourself!",
+		"tr": "Modo de juego: Last Team Standing. Mata a los del equipo contrario pero evita morir!"
+	},
+	{
+		"or": "Gametype: Hold The Flag. Hold the flag to continually get points!",
+		"tr": "Modo de juego: Hold The Flag. Sostén la bandera para ganar puntos de forma continua!"
+	},
+	{
+		"or": "Gametype: Hide & Seek, Seekers will try to kill the Hiders, Hiders need to run!",
+		"tr": "Modo de juego: Hide & Seek. Los buscadores intentarán matar a los que se esconden, ellos deberán correr!"
+	},
+	{
+		"or": "Instagib is enabled. Your rifle instakills others.",
+		"tr": "Instagib está activado. Tu rifle mata instantáneamente a los demás"
+	},
+	{
+		"or": "Instagib is enabled. Your grenade launcher instakills others.",
+		"tr": "Instagib está activado. Tu lanzagranadas mata instantáneamente a los demás"
+	},
+	{
+		"or": "No-items is enabled. The weapon you use changes every %i seconds.",
+		"tr": "No-items está activado. El arma que usas cambiará cada &i segundos."
+	},
+	{
+		"or": "Red team has won the match!",
+		"tr": "El equipo rojo ha ganado la partida!"
+	},
+	{
+		"or": "Blue team has won the match!",
+		"tr": "El equipo azul ha ganado la partida!"
+	},
+	{
+		"or": "Match is a draw!",
+		"tr": "La partida es un empate!"
+	},
+	{
+		"or": "'%s' has won the match!",
+		"tr": "'%s' ha ganado la partida!"
+	},
+	{
+		"or": "You are a Seeker now! Kill the Hiders!",
+		"tr": "Ahora eres un buscador! Mata a los que se esconden!"
+	},
+	{
+		"or": "You are a Hider now! Run away from the Seekers!",
+		"tr": "Escóndete de los buscadores para que no te maten!"
+	},
+	{
+		"or": "Hiders won this round!",
+		"tr": "Los que se esconden ganaron la partida!"
+	},
+	{
+		"or": "Seekers won this round!",
+		"tr": "Los buscadores ganaron la partida!"
+	}
+]
+}

@@ -5,7 +5,7 @@
 #include <game/server/gamecontroller.h>
 #include <game/server/gamecontext.h>
 
-#include <bits/stdc++.h>
+#include <algorithm>
 
 #include "character.h"
 #include "laser_better.h"

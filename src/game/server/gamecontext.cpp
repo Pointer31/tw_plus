@@ -236,7 +236,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = Mode;
 	Msg.m_ClientID = ChatterClientID;
-	Msg.m_pMessage = pText;
+	Msg.m_pMessage = ChatterClientID == -1 ? Localize(pText) : pText;
 	Msg.m_TargetID = -1;
 
 	if(Mode == CHAT_ALL)
