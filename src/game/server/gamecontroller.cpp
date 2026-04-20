@@ -1436,7 +1436,7 @@ void IGameController::Com_ServerInfo(IConsole::IResult *pResult, void *pContext)
 	pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, "TWplus server mod");
 	if (GIT_SHORTREV_HASH)
 	{
-		str_format(aBuf, sizeof(aBuf), "Git revision hash: %s", GIT_SHORTREV_HASH);
+		str_format(aBuf, sizeof(aBuf), Localize("Git revision hash: %s"), GIT_SHORTREV_HASH);
 		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, aBuf);
 	}
 	if (str_comp(pSelf->Config()->m_SvInfoSources, "") != 0)

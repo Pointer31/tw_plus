@@ -139,11 +139,11 @@ void CGameControllerHidNSek::Tick()
 
 				if(m_HidNSekPlayers[pPlayer->GetCID()].m_IsSeeker)
 				{
-					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, Localize("You are a Seeker now! Kill the Hiders!"));
+					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, "You are a Seeker now! Kill the Hiders!");
 				}
 				else
 				{
-					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, Localize("You are a Hider now! Run away from the Seekers!"));
+					SendChatMsg(pPlayer->GetCID(), pPlayer->GetCID(), CHAT_WHISPER, "You are a Hider now! Run away from the Seekers!");
 				}
 			}
 			m_ToldSeekers = true;
@@ -486,7 +486,7 @@ void CGameControllerHidNSek::DoWincheckRound()
 		m_GameStartTick = Server()->Tick(); // hack to not end match
 		EndRound();
 		m_DoResetSeekers = true;
-		GameServer()->SendChat(-1, CHAT_ALL, -1, Localize("Hiders won this round!"));
+		GameServer()->SendChat(-1, CHAT_ALL, -1, "Hiders won this round!");
 	}
 	else
 	{
@@ -515,7 +515,7 @@ void CGameControllerHidNSek::DoWincheckRound()
 			}
 			EndRound();
 			m_DoResetSeekers = true;
-			GameServer()->SendChat(-1, CHAT_ALL, -1, Localize("Seekers won this round!"));
+			GameServer()->SendChat(-1, CHAT_ALL, -1, "Seekers won this round!");
 		}
 	}
 }
@@ -613,10 +613,12 @@ void CGameControllerHidNSek::HandleCharacterSnap(CCharacter &Char, CNetObj_Chara
 
 void CGameControllerHidNSek::SendChatMsg(int From, int To, int Mode, const char *pText)
 {
+	//not intended for actual players chatting, but for server messages
+
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = Mode;
 	Msg.m_ClientID = From;
-	Msg.m_pMessage = pText;
+	Msg.m_pMessage = Localize(pText);
 	Msg.m_TargetID = To;
 
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
