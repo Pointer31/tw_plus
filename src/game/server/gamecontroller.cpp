@@ -6,6 +6,7 @@
 
 #include "entities/character.h"
 #include "entities/pickup.h"
+#include "entities/pickupcustom.h"
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
@@ -326,6 +327,12 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	case ENTITY_WEAPON_LASER:
 		Type = PICKUP_LASER;
 		break;
+	case ENTITY_ARMOR_5:{
+		new CCustomPickup(&GameServer()->m_World, 0, Pos);
+		return true;} break;
+	case ENTITY_HEALTH_5:
+		{new CCustomPickup(&GameServer()->m_World, 1, Pos);
+		return true;} break;
 	case ENTITY_POWERUP_NINJA:
 		if(Config()->m_SvPowerups)
 			Type = PICKUP_NINJA;

@@ -1616,6 +1616,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/lasertrap.h
   entities/pickup.cpp
   entities/pickup.h
+  entities/pickupcustom.cpp
+  entities/pickupcustom.h
   entities/projectile.cpp
   entities/projectile.h
   entity.cpp
