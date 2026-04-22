@@ -25,7 +25,7 @@ if(NOT POLICY CMP0048)
   set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 endif()
 
-project(twplus)
+project(teeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 set(ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 set(ORIGINAL_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
@@ -87,8 +87,8 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
   src/game/version.h
 )
 
-set(SERVER_EXECUTABLE twplus_srv CACHE STRING "Name of the built server executable")
-set(CLIENT_EXECUTABLE twplus_client CACHE STRING "Name of the build client executable")
+set(SERVER_EXECUTABLE teeworlds_srv CACHE STRING "Name of the built server executable")
+set(CLIENT_EXECUTABLE teeworlds CACHE STRING "Name of the build client executable")
 
 ########################################################################
 # Download dependencies
