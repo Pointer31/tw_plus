@@ -16,6 +16,9 @@
 
 #include "entities/character.h"
 #include "entities/projectile.h"
+#include "entities/laser.h"
+#include "entities/laser_better.h"
+#include "entities/lasertrap.h"
 #include "gamemodes/ctf.h"
 #include "gamemodes/htf.h"
 #include "gamemodes/dm.h"
@@ -840,6 +843,15 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	{
 		if(p->GetOwner() == ClientID)
 			p->LoseOwner();
+	}
+
+	{
+		CLaserTrap *p = (CLaserTrap *)m_World.FindFirst(CGameWorld::ENTTYPE_LASERTRAP);
+		for(; p; p = (CLaserTrap *)p->TypeNext())
+		{
+			if(p->GetOwner() == ClientID)
+				p->LoseOwner();
+		}
 	}
 
 	delete m_apPlayers[ClientID];

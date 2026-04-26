@@ -2,14 +2,17 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <game/server/gamecontext.h>
 #include <engine/shared/config.h>
+#include <game/server/player.h>
+
 #include "lasertrap.h"
 #include "laser.h"
 
 CLaserTrap::CLaserTrap(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASERTRAP, Pos)
 {
 	m_Pos = Pos;
 	m_Owner = Owner;
+	m_OwnerTeam = Owner >= 0 ? GameServer()->m_apPlayers[Owner]->GetTeam() : -1; //PLAYER_TEAM_RED
 	m_Energy = StartEnergy;
 	m_Dir = Direction;
 	m_Bounces = 0;
@@ -48,6 +51,14 @@ void CLaserTrap::DoBounce()
 void CLaserTrap::Reset()
 {
 	GameServer()->m_World.DestroyEntity(this);
+}
+
+void CLaserTrap::LoseOwner()
+{
+	if(m_OwnerTeam == TEAM_BLUE)
+		m_Owner = -2; // PLAYER_TEAM_BLUE
+	else
+		m_Owner = -1; // PLAYER_TEAM_RED
 }
 
 void CLaserTrap::Tick()
