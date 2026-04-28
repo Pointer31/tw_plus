@@ -78,7 +78,7 @@ void CPickup::Tick()
 			case PICKUP_GRENADE:
 				if(pChr->GiveWeapon(WEAPON_GRENADE, g_pData->m_Weapons.m_aId[WEAPON_GRENADE].m_Maxammo))
 				{
-					Picked = true;
+					Picked = 1-Config()->m_SvWeaponsStay;
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
 					if(pChr->GetPlayer())
 						GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_GRENADE);
@@ -87,7 +87,7 @@ void CPickup::Tick()
 			case PICKUP_SHOTGUN:
 				if(pChr->GiveWeapon(WEAPON_SHOTGUN, g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Maxammo))
 				{
-					Picked = true;
+					Picked = 1-Config()->m_SvWeaponsStay;
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
 					if(pChr->GetPlayer())
 						GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_SHOTGUN);
@@ -96,7 +96,7 @@ void CPickup::Tick()
 			case PICKUP_LASER:
 				if(pChr->GiveWeapon(WEAPON_LASER, g_pData->m_Weapons.m_aId[WEAPON_LASER].m_Maxammo))
 				{
-					Picked = true;
+					Picked = 1-Config()->m_SvWeaponsStay;
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
 					if(pChr->GetPlayer())
 						GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_LASER);
