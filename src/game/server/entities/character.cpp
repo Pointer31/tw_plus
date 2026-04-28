@@ -805,7 +805,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, (Killer < 0) ? 0 : GameServer()->m_apPlayers[Killer], Weapon);
 
 	char aBuf[256];
-	if(Killer < 0)
+	if(Killer < 0 || !GameServer()->m_apPlayers[Killer])
 	{
 		str_format(aBuf, sizeof(aBuf), "kill killer='%d:%d:' victim='%d:%d:%s' weapon=%d special=%d",
 			Killer, - 1 - Killer,
