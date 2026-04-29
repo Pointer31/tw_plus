@@ -51,6 +51,8 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Armor = 0;
 	m_TriggeredEvents = 0;
 	m_inTele = false;
+	m_Powerups.m_ShieldedTicks = 0;
+	m_Powerups.m_StrengthTicks = 0;
 }
 
 void CCharacter::Reset()
@@ -585,6 +587,46 @@ void CCharacter::ResetInput()
 	m_LatestPrevInput = m_LatestInput = m_Input;
 }
 
+void CCharacter::HandlePowerups()
+{
+	m_Powerups.m_ShieldedTicks--;
+	m_Powerups.m_StrengthTicks--;
+	if (m_Powerups.m_ShieldedTicks > 0)
+	{
+		if (m_Armor < 4 && Server()->Tick() % 10 == 0)
+		{
+			m_Armor++;
+		}
+		if (Server()->Tick() % 4 == 0) {
+			float r = ((float)Server()->Tick() / 10.0f);
+			new CProjectile(GameWorld(), WEAPON_HAMMER,
+				-1,
+				{m_Pos.x + sin(r)*64.0f, m_Pos.y + cos(r)*64.0f},
+				{0,1},
+				10,
+				0, 0, 0, -1, WEAPON_HAMMER);
+			new CProjectile(GameWorld(), WEAPON_HAMMER,
+				-1,
+				{m_Pos.x + sin(r + pi)*64.0f, m_Pos.y + cos(r + pi)*64.0f},
+				{0,1},
+				10,
+				0, 0, 0, -1, WEAPON_HAMMER);
+		}
+	}
+	if (m_Powerups.m_StrengthTicks > 0)
+	{
+		if (Server()->Tick() % 4 == 0) {
+			new CProjectile(GameWorld(), WEAPON_HAMMER,
+				-1,
+				{m_Pos.x - 32 + rand() % 64, m_Pos.y - 32 + rand() % 64},
+				{0,1},
+				10,
+				0, 0, 0, -1, WEAPON_HAMMER);
+		}
+	}
+
+}
+
 void CCharacter::Tick()
 {
 	m_Core.m_Input = m_Input;
@@ -678,6 +720,8 @@ void CCharacter::Tick()
 
 	// handle Weapons
 	HandleWeapons();
+
+	HandlePowerups();
 }
 
 void CCharacter::TickDefered()
@@ -878,6 +922,9 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		if(GameServer()->m_pController->IsFriendlyTeamFire(m_pPlayer->GetTeam(), Team))
 			return false;
 	}
+
+	if(GameServer()->GetPlayerChar(From) && GameServer()->GetPlayerChar(From)->HasPowerupStrength())
+		Dmg = Dmg * 2;
 
 	// m_pPlayer only inflicts half damage on self
 	if(From == m_pPlayer->GetCID())

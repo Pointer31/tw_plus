@@ -80,6 +80,11 @@ public:
 
 	} m_aWeapons[WEAPON_CUSTOM_END];
 
+	void GivePowerupShields() { m_Powerups.m_ShieldedTicks = 50*15; } /*Server()->TickSpeed()*/
+	void GivePowerupStrength() { m_Powerups.m_StrengthTicks = 50*15; }
+	bool HasPowerupStrength() { return m_Powerups.m_StrengthTicks > 0; }
+	void HandlePowerups();
+
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;
@@ -136,6 +141,12 @@ private:
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
 
 	bool m_inTele;
+
+	struct
+	{
+		int m_ShieldedTicks;
+		int m_StrengthTicks;
+	} m_Powerups;
 };
 
 #endif

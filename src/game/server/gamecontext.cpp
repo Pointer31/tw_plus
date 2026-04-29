@@ -1716,6 +1716,29 @@ void CGameContext::ConGiveWeapon(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "no player found");
 }
 
+void CGameContext::ConGivePowerup(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	int ClientID = pResult->GetInteger(0);
+
+	if(pSelf->m_apPlayers[ClientID] && pSelf->m_apPlayers[ClientID]->GetCharacter())
+	{
+		int Powerup = pResult->GetInteger(1);
+
+		if (Powerup == 0)
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->GiveNinja();
+		else if (Powerup == 1)
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->GivePowerupShields();
+		else if (Powerup == 2)
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->GivePowerupStrength();
+
+		return;
+	}
+	if (!pSelf->m_apPlayers[ClientID])
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "no player found");
+}
+
 void CGameContext::ConBotsCheckCount(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
@@ -1753,6 +1776,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("add_bot", "i[AI] ?i[Difficulty]", CFGFLAG_SERVER, ConAddBot, this, "Add a bot");
 	Console()->Register("remove_bot", "", CFGFLAG_SERVER, ConRemoveBot, this, "Remove a bot");
 	Console()->Register("give", "i[id] i[weapon]", CFGFLAG_SERVER, ConGiveWeapon, this, "Give a player a weapon");
+	Console()->Register("powerup", "i[id] i[power]", CFGFLAG_SERVER, ConGivePowerup, this, "Give a player a powerup");
 	Console()->Register("bots_check_count", "", CFGFLAG_SERVER, ConBotsCheckCount, this, "Check playercount and add or remove bots. Useful in combination with sv_bots_minimum_players");
 }
 
