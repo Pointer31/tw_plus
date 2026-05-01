@@ -22,6 +22,9 @@ public:
 	virtual void Tick();
 	virtual void OnPlayerConnect(class CPlayer *pPlayer);
 	virtual bool IsFriendlyFire(int ClientID1, int ClientID2) const;
+
+	virtual bool IsUnfreezeHammers() const { return true; }
+	virtual bool IsUnfreezeLasers() const { return true; }
 };
 
 #endif

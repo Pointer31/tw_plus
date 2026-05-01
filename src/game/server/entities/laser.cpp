@@ -32,6 +32,8 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	m_From = From;
 	m_Pos = At;
 	m_Energy = -1;
+	if (GameServer()->m_pController->IsUnfreezeLasers())
+		pHit->Freeze(0);
 	pHit->TakeDamage(vec2(0.f, 0.f), normalize(To-From), g_pData->m_Weapons.m_aId[WEAPON_LASER].m_Damage, m_Owner, WEAPON_LASER);
 	return true;
 }

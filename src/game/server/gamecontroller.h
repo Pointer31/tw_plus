@@ -225,6 +225,9 @@ public:
 	bool IsInstagibGrenade() const { return m_Instagib == 2; }
 	bool IsNoItems() const { return m_Instagib == 3; }
 
+	virtual bool IsUnfreezeHammers() const { return false; }
+	virtual bool IsUnfreezeLasers() const { return false; }
+
 	const char *GetGameType() const { return m_pGameType; }
 
 	// map
