@@ -176,5 +176,6 @@ MACRO_CONFIG_INT(SvTouchExplode, sv_touch_explode, 0, 0, 1, CFGFLAG_SERVER, "Whe
 MACRO_CONFIG_INT(SvLaserDeath, sv_laser_death, 0, 0, 1, CFGFLAG_SERVER, "spawn sv_laser_death_amount lasers on death")
 MACRO_CONFIG_INT(SvLaserDeathAmount, sv_laser_death_amount, 16, 0, 64, CFGFLAG_SERVER, "amount of lasers to spawn on death (if sv_laser_death is 1)")
 MACRO_CONFIG_INT(SvWeaponsStay, sv_weapons_stay, 0, 0, 1, CFGFLAG_SERVER, "Whether weapons stay after being pickupped or not")
+MACRO_CONFIG_INT(SvCustomPowerups, sv_custom_powerups, 0, 0, 1, CFGFLAG_SERVER, "Whether to use custom powerups along with the default ninja")
 
 MACRO_CONFIG_STR(SvDefaultLanguageFile, sv_default_language_file, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "Which language file to load, if any")

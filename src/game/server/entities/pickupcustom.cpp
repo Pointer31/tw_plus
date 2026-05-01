@@ -9,10 +9,11 @@
 #include "pickupcustom.h"
 #include "projectile.h"
 
-CCustomPickup::CCustomPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
+CCustomPickup::CCustomPickup(CGameWorld *pGameWorld, int Type, vec2 Pos, int SubType)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP, Pos, PickupCustomPhysSize)
 {
 	m_Type = Type;
+	m_SubType = SubType;
 	m_ID2 = Server()->SnapNewID();
 
 	Reset();
@@ -22,7 +23,10 @@ CCustomPickup::CCustomPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 
 void CCustomPickup::Reset()
 {
-	m_SpawnTick = -1;
+	if (m_Type == 2)
+		m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * g_pData->m_aPickups[PICKUP_NINJA].m_Spawndelay;
+	else
+		m_SpawnTick = -1;
 }
 
 void CCustomPickup::Tick()
@@ -55,6 +59,7 @@ void CCustomPickup::Tick()
 	{
 		// player picked us up, is someone was hooking us, let them go
 		bool Picked = false;
+		int RespawnTime = g_pData->m_aPickups[PICKUP_HEALTH].m_Respawntime * 2;
 		switch (m_Type)
 		{
 			case 0:
@@ -73,6 +78,39 @@ void CCustomPickup::Tick()
 				}
 				break;
 
+			case 2:
+				{
+					Picked = true;
+					RespawnTime = g_pData->m_aPickups[PICKUP_NINJA].m_Respawntime;
+
+					// give one of the subtypes
+					if (m_SubType == 0)
+						pChr->GiveNinja();
+					else if (m_SubType == 1)
+					{
+						pChr->GivePowerupShields();
+						GameServer()->SendBroadcast("You gained shields for 15s!", pChr->GetPlayer()->GetCID());
+					}
+					else if (m_SubType == 2)
+					{
+						pChr->GivePowerupStrength();
+						GameServer()->SendBroadcast("You gained strength for 15s!", pChr->GetPlayer()->GetCID());
+					}
+
+					m_SubType = rand() % 3;
+
+					// loop through all players, setting their emotes
+					CCharacter *pC = static_cast<CCharacter *>(GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER));
+					for(; pC; pC = (CCharacter *)pC->TypeNext())
+					{
+						if (pC != pChr)
+							pC->SetEmote(EMOTE_SURPRISE, Server()->Tick() + Server()->TickSpeed());
+					}
+
+					pChr->SetEmote(EMOTE_ANGRY, Server()->Tick() + 1200 * Server()->TickSpeed() / 1000);
+				}
+				break;
+
 			default:
 				break;
 		};
@@ -80,10 +118,9 @@ void CCustomPickup::Tick()
 		if(Picked)
 		{
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "(c)pickup player='%d:%s' item=%d",
-				pChr->GetPlayer()->GetCID(), Server()->ClientName(pChr->GetPlayer()->GetCID()), m_Type);
+			str_format(aBuf, sizeof(aBuf), "(c)pickup player='%d:%s' item=%d:%d",
+				pChr->GetPlayer()->GetCID(), Server()->ClientName(pChr->GetPlayer()->GetCID()), m_Type, m_SubType);
 			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-			int RespawnTime = g_pData->m_aPickups[PICKUP_HEALTH].m_Respawntime * 2;
 			if(RespawnTime >= 0)
 				m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * RespawnTime;
 		}
@@ -104,19 +141,62 @@ void CCustomPickup::Snap(int SnappingClient)
 	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	if(!pP)
 		return;
-
-	CNetObj_Pickup *pP2 = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID2, sizeof(CNetObj_Pickup)));
-	if(!pP2)
-		return;
 	
 	float t = Server()->Tick();
 	if (GameServer()->m_World.m_Paused)
 		t = 0.0f;
 
-	pP->m_X = (int)m_Pos.x + 16*sin(t / 25.0);
-	pP->m_Y = (int)m_Pos.y + 16*sin(t / 25.0);
-	pP->m_Type = m_Type==0 ? PICKUP_ARMOR : PICKUP_HEALTH;
-	pP2->m_X = (int)m_Pos.x + 16*cos(t / 25.0);
-	pP2->m_Y = (int)m_Pos.y + -16*cos(t / 25.0);
-	pP2->m_Type = m_Type==0 ? PICKUP_ARMOR : PICKUP_HEALTH;
+	switch (m_Type)
+	{
+		case 0:
+		case 1:
+		{
+			CNetObj_Pickup *pP2 = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID2, sizeof(CNetObj_Pickup)));
+			if(!pP2)
+				return;
+
+			pP->m_X = (int)m_Pos.x + 16*sin(t / 25.0);
+			pP->m_Y = (int)m_Pos.y + 16*sin(t / 25.0);
+			pP->m_Type = m_Type==0 ? PICKUP_ARMOR : PICKUP_HEALTH;
+			pP2->m_X = (int)m_Pos.x + 16*cos(t / 25.0);
+			pP2->m_Y = (int)m_Pos.y + -16*cos(t / 25.0);
+			pP2->m_Type = m_Type==0 ? PICKUP_ARMOR : PICKUP_HEALTH;
+		}
+		break;
+		case 2:
+		{
+			t = t*1.5f;
+			pP->m_X = m_Pos.x;
+			pP->m_Y = m_Pos.y;
+			pP->m_Type = PICKUP_NINJA;
+			if (m_SubType == 1)
+			{
+				CNetObj_Pickup *pP2 = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_ID2, sizeof(CNetObj_Pickup)));
+				if(!pP2)
+					return;
+
+				pP2->m_X = (int)m_Pos.x + 32*sin(t / 25.0);
+				pP2->m_Y = (int)m_Pos.y + -32*cos(t / 25.0);
+				pP2->m_Type = PICKUP_ARMOR;
+			} 
+			else if (m_SubType == 2)
+			{
+
+				CNetObj_Projectile *pProj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));
+				if(!pProj)
+					return;
+
+				pProj->m_X = (int)m_Pos.x + 32*sin(t / 25.0);
+				pProj->m_Y = (int)m_Pos.y + -32*cos(t / 25.0);
+				pProj->m_VelX = 0;
+				pProj->m_VelY = 0;
+				pProj->m_StartTick = Server()->Tick();
+				pProj->m_Type = 4 /*WEAPON_LASER*/;
+			}
+		}
+		break;
+	
+	default:
+		break;
+	}
 }

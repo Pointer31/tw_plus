@@ -335,7 +335,15 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 		return true;} break;
 	case ENTITY_POWERUP_NINJA:
 		if(Config()->m_SvPowerups)
-			Type = PICKUP_NINJA;
+		{
+			if (Config()->m_SvCustomPowerups)
+			{
+				new CCustomPickup(&GameServer()->m_World, 2, Pos, rand() % 3);
+				return true;
+			}
+			else
+				Type = PICKUP_NINJA;
+		}
 	}
 
 	if(Type != -1)

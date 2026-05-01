@@ -10,7 +10,7 @@ const int PickupCustomPhysSize = 14;
 class CCustomPickup : public CEntity
 {
 public:
-	CCustomPickup(CGameWorld *pGameWorld, int Type, vec2 Pos);
+	CCustomPickup(CGameWorld *pGameWorld, int Type, vec2 Pos, int SubType=0);
 
 	virtual void Reset();
 	virtual void Tick();
@@ -22,6 +22,7 @@ public:
 
 private:
 	int m_Type;
+	int m_SubType;
 	int m_SpawnTick;
 	int m_ID2;
 };
