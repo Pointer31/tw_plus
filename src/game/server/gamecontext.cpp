@@ -1746,6 +1746,23 @@ void CGameContext::ConBotsCheckCount(IConsole::IResult *pResult, void *pUserData
 	pSelf->BotsMinimumPlayersCheck();
 }
 
+void CGameContext::ConFreeze(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	int ClientID = pResult->GetInteger(0);
+	int Duration = pResult->GetInteger(1);
+
+	if (pSelf->m_apPlayers[ClientID])
+	{
+		if (pSelf->m_apPlayers[ClientID]->GetCharacter())
+			pSelf->m_apPlayers[ClientID]->GetCharacter()->Freeze(Duration);
+	}
+	else
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "no player found");
+
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1778,6 +1795,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("give", "i[id] i[weapon]", CFGFLAG_SERVER, ConGiveWeapon, this, "Give a player a weapon");
 	Console()->Register("powerup", "i[id] i[power]", CFGFLAG_SERVER, ConGivePowerup, this, "Give a player a powerup");
 	Console()->Register("bots_check_count", "", CFGFLAG_SERVER, ConBotsCheckCount, this, "Check playercount and add or remove bots. Useful in combination with sv_bots_minimum_players");
+	Console()->Register("freeze", "i[id] i[seconds]", CFGFLAG_SERVER, ConFreeze, this, "Freeze player i for i seconds");
 }
 
 void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)

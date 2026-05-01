@@ -53,6 +53,8 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_inTele = false;
 	m_Powerups.m_ShieldedTicks = 0;
 	m_Powerups.m_StrengthTicks = 0;
+	m_FreezeTick = 0;
+	m_FreezeDuration = 0;
 }
 
 void CCharacter::Reset()
@@ -272,6 +274,9 @@ void CCharacter::HandleWeaponSwitch()
 void CCharacter::FireWeapon()
 {
 	if(!GameServer()->m_pController->CanFireWeapon(*this))
+		return;
+
+	if (m_FreezeTick + m_FreezeDuration > Server()->Tick()) 
 		return;
 
 	if(m_ReloadTimer != 0)
@@ -553,6 +558,14 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 		m_Input.m_TargetY = -1;
 
 	GameServer()->m_pController->HandleCharacterInput(*this, &m_Input, true);
+
+	if (m_FreezeTick + m_FreezeDuration > Server()->Tick()) 
+	{
+		m_Input.m_Direction = 0;
+		m_Input.m_Hook = 0;
+		m_Input.m_Jump = 0;
+		m_Input.m_Fire = 0;
+	}
 }
 
 void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
@@ -718,6 +731,13 @@ void CCharacter::Tick()
 		m_Core.m_Vel += {0, -5};
 	}
 
+	// freeze stars
+	if (m_FreezeTick > 0 && (m_FreezeTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0) 
+	{
+		int amount = (m_FreezeTick + m_FreezeDuration - Server()->Tick() + 1) / Server()->TickSpeed();
+		GameServer()->CreateDamage(m_Pos, m_pPlayer->GetCID(), m_Pos, amount, 0, true);
+	}
+
 	// handle Weapons
 	HandleWeapons();
 
@@ -817,6 +837,7 @@ void CCharacter::TickPaused()
 	++m_AttackTick;
 	++m_Ninja.m_ActivationTick;
 	++m_ReckoningTick;
+	++m_FreezeTick;
 	if(m_LastAction != -1)
 		++m_LastAction;
 	if(m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart > -1)
@@ -1012,6 +1033,14 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	return true;
 }
 
+void CCharacter::Freeze(int Seconds)
+{
+	// only change freezetick once a second to avoid many freeze stars, and to match ddrace behaviour
+	if (abs(m_FreezeTick - Server()->Tick()) >= Server()->TickSpeed()) 
+		m_FreezeTick = Server()->Tick();
+	m_FreezeDuration = Server()->TickSpeed()*Seconds;
+}
+
 void CCharacter::Snap(int SnappingClient)
 {
 	if(NetworkClipped(SnappingClient))
@@ -1053,6 +1082,8 @@ void CCharacter::Snap(int SnappingClient)
 
 	pCharacter->m_Weapon = CWeapons::LooksLike(m_ActiveWeapon);
 	pCharacter->m_AttackTick = m_AttackTick;
+	if (m_FreezeTick + m_FreezeDuration > Server()->Tick()) 
+		pCharacter->m_Weapon = WEAPON_NINJA;
 
 	pCharacter->m_Direction = m_Input.m_Direction;
 

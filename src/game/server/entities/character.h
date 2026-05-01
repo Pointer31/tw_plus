@@ -80,6 +80,8 @@ public:
 
 	} m_aWeapons[WEAPON_CUSTOM_END];
 
+	void Freeze(int Seconds);
+
 	void GivePowerupShields() { m_Powerups.m_ShieldedTicks = 50*15; } /*Server()->TickSpeed()*/
 	void GivePowerupStrength() { m_Powerups.m_StrengthTicks = 50*15; }
 	bool HasPowerupStrength() { return m_Powerups.m_StrengthTicks > 0; }
@@ -141,6 +143,9 @@ private:
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
 
 	bool m_inTele;
+
+	int m_FreezeTick;
+	int m_FreezeDuration;
 
 	struct
 	{

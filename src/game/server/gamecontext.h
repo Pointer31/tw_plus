@@ -71,6 +71,7 @@ class CGameContext : public IGameServer
 	static void ConGiveWeapon(IConsole::IResult *pResult, void *pUserData);
 	static void ConGivePowerup(IConsole::IResult *pResult, void *pUserData);
 	static void ConBotsCheckCount(IConsole::IResult *pResult, void *pUserData);
+	static void ConFreeze(IConsole::IResult *pResult, void *pUserData);
 
 	static void NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);
 	static void RemoveCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);
