@@ -35,6 +35,8 @@ void CGameControllerRACE::Tick()
 
 	const int TILE_START = 33;
 	const int TILE_FINISH = 34;
+	const int TILE_FREEZE = 9;
+	const int TILE_UNFREEZE = 11;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -65,6 +67,15 @@ void CGameControllerRACE::Tick()
 				Msg.m_RecordServer = 0;
 				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
 			}
+			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_FREEZE)
+			{
+				pChar->Freeze(3);
+			}
+			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_UNFREEZE)
+			{
+				pChar->Freeze(0);
+			}
+
 		}
 		else
 		{
