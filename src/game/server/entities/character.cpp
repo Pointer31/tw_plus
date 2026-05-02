@@ -735,7 +735,7 @@ void CCharacter::Tick()
 	}
 
 	// freeze stars
-	if (m_FreezeTick > 0 && (m_FreezeTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0) 
+	if ((m_FreezeTick + m_FreezeDuration > Server()->Tick()) && (m_FreezeTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0) 
 	{
 		int amount = (m_FreezeTick + m_FreezeDuration - Server()->Tick() + 1) / Server()->TickSpeed();
 		GameServer()->CreateDamage(m_Pos, m_pPlayer->GetCID(), m_Pos, amount, 0, true);
