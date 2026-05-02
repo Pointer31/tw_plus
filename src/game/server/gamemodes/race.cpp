@@ -66,6 +66,13 @@ void CGameControllerRACE::Tick()
 				Msg.m_RecordPersonal = 0;
 				Msg.m_RecordServer = 0;
 				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+
+				if (Config()->m_SvRaceFinishInChat)
+				{
+					char aBuf[128];
+					str_format(aBuf, sizeof(aBuf), "★ '%s' finished in: %.2fs", Server()->ClientName(i), (float)Time/1000);
+					GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+				}
 			}
 			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_FREEZE)
 			{
@@ -104,12 +111,20 @@ void CGameControllerRACE::Snap(int SnappingClient)
 {
 	IGameController::Snap(SnappingClient);
 
-	if (m_aRacers[SnappingClient].start == 0)
-		return;
-		
-	CNetObj_PlayerInfoRace *pPlayerInfoRace = static_cast<CNetObj_PlayerInfoRace *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFORACE, 0, sizeof(CNetObj_PlayerInfoRace)));
-	if(!pPlayerInfoRace)
+	if (m_aRacers[SnappingClient].start != 0)
+	{
+		CNetObj_PlayerInfoRace *pPlayerInfoRace = static_cast<CNetObj_PlayerInfoRace *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFORACE, SnappingClient, sizeof(CNetObj_PlayerInfoRace)));
+		if(!pPlayerInfoRace)
+			return;
+
+		pPlayerInfoRace->m_RaceStartTick = m_aRacers[SnappingClient].start;
+	}
+
+	CNetObj_GameDataRace *pGameDataRace = static_cast<CNetObj_GameDataRace *>(Server()->SnapNewItem(NETOBJTYPE_GAMEDATARACE, 0, sizeof(CNetObj_GameDataRace)));
+	if(!pGameDataRace)
 		return;
 
-	pPlayerInfoRace->m_RaceStartTick = m_aRacers[SnappingClient].start;
+	pGameDataRace->m_BestTime = -1;
+	pGameDataRace->m_Precision = 2;
+	pGameDataRace->m_RaceFlags = 0;
 }
