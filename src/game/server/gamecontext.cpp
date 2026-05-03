@@ -21,6 +21,7 @@
 #include "entities/lasertrap.h"
 #include "gamemodes/ctf.h"
 #include "gamemodes/htf.h"
+#include "gamemodes/thtf.h"
 #include "gamemodes/dm.h"
 #include "gamemodes/lms.h"
 #include "gamemodes/lts.h"
@@ -1837,6 +1838,8 @@ void CGameContext::OnInit()
 		m_pController = new CGameControllerMOD(this);
 	else if(str_comp_nocase(Config()->m_SvGametype, "htf") == 0)
 		m_pController = new CGameControllerHTF(this);
+	else if(str_comp_nocase(Config()->m_SvGametype, "thtf") == 0)
+		m_pController = new CGameControllerTHTF(this);
 	else if(str_comp_nocase(Config()->m_SvGametype, "ctf") == 0)
 		m_pController = new CGameControllerCTF(this);
 	else if(str_comp_nocase(Config()->m_SvGametype, "lms") == 0)

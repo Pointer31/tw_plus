@@ -1634,6 +1634,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   gamemodes/dm.h
   gamemodes/htf.cpp
   gamemodes/htf.h
+  gamemodes/thtf.cpp
+  gamemodes/thtf.h
   gamemodes/kz/hidnsek.cpp
   gamemodes/kz/hidnsek.h
   gamemodes/lms.cpp
