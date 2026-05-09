@@ -355,7 +355,7 @@ void CCharacter::FireWeapon()
 				else
 					Dir = vec2(0.f, -1.f);
 
-				if (GameServer()->m_pController->IsUnfreezeHammers())
+				if (GameServer()->m_pController->IsUnfreezeHammers() && !pTarget->IsDeepFrozen())
 					pTarget->Freeze(0);
 
 				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, Dir*-1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
@@ -735,7 +735,7 @@ void CCharacter::Tick()
 	}
 
 	// freeze stars
-	if (IsFrozen() && (m_FreezeTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0) 
+	if (IsFrozen() && !IsDeepFrozen() && (m_FreezeTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0) 
 	{
 		int amount = (m_FreezeTick + m_FreezeDuration - Server()->Tick() + 1) / Server()->TickSpeed();
 		GameServer()->CreateDamage(m_Pos, m_pPlayer->GetCID(), m_Pos, amount, 0, true);
@@ -1041,12 +1041,17 @@ void CCharacter::Freeze(int Seconds)
 	// only change freezetick once a second to avoid many freeze stars, and to match ddrace behaviour
 	if (abs(m_FreezeTick - Server()->Tick()) >= Server()->TickSpeed()) 
 		m_FreezeTick = Server()->Tick();
-	m_FreezeDuration = Server()->TickSpeed()*Seconds;
+	m_FreezeDuration = Seconds == -1 ? -1 : Server()->TickSpeed()*Seconds;
 }
 
 bool CCharacter::IsFrozen()
 {
-	return m_FreezeTick + m_FreezeDuration > Server()->Tick();
+	return m_FreezeTick + m_FreezeDuration > Server()->Tick() || m_FreezeDuration == -1;
+}
+
+bool CCharacter::IsDeepFrozen()
+{
+	return m_FreezeDuration == -1;
 }
 
 void CCharacter::Snap(int SnappingClient)

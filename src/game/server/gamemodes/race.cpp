@@ -37,6 +37,8 @@ void CGameControllerRACE::Tick()
 	const int TILE_FINISH = 34;
 	const int TILE_FREEZE = 9;
 	const int TILE_UNFREEZE = 11;
+	const int TILE_DEEPFREEZE = 12;
+	const int TILE_DEEPUNFREEZE = 13;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -74,11 +76,19 @@ void CGameControllerRACE::Tick()
 					GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 				}
 			}
-			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_FREEZE)
+			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_FREEZE && !pChar->IsDeepFrozen())
 			{
 				pChar->Freeze(3);
 			}
-			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_UNFREEZE)
+			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_UNFREEZE && !pChar->IsDeepFrozen())
+			{
+				pChar->Freeze(0);
+			}
+			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_DEEPFREEZE)
+			{
+				pChar->Freeze(-1);
+			}
+			else if (GameServer()->Collision()->GetCollisionAtId(Pos.x, Pos.y) == TILE_DEEPUNFREEZE)
 			{
 				pChar->Freeze(0);
 			}

@@ -82,6 +82,7 @@ public:
 
 	void Freeze(int Seconds);
 	bool IsFrozen();
+	bool IsDeepFrozen();
 
 	void GivePowerupShields() { m_Powerups.m_ShieldedTicks = 50*15; } /*Server()->TickSpeed()*/
 	void GivePowerupStrength() { m_Powerups.m_StrengthTicks = 50*15; }
