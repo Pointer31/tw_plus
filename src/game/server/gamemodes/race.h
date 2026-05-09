@@ -25,6 +25,7 @@ public:
 
 	virtual bool IsUnfreezeHammers() const { return true; }
 	virtual bool IsUnfreezeLasers() const { return true; }
+	virtual bool IsRace() const { return true; }
 };
 
 #endif

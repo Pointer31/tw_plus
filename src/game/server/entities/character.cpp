@@ -276,7 +276,7 @@ void CCharacter::FireWeapon()
 	if(!GameServer()->m_pController->CanFireWeapon(*this))
 		return;
 
-	if (m_FreezeTick + m_FreezeDuration > Server()->Tick()) 
+	if (IsFrozen()) 
 		return;
 
 	if(m_ReloadTimer != 0)
@@ -562,7 +562,7 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 
 	GameServer()->m_pController->HandleCharacterInput(*this, &m_Input, true);
 
-	if (m_FreezeTick + m_FreezeDuration > Server()->Tick()) 
+	if (IsFrozen()) 
 	{
 		m_Input.m_Direction = 0;
 		m_Input.m_Hook = 0;
@@ -735,7 +735,7 @@ void CCharacter::Tick()
 	}
 
 	// freeze stars
-	if ((m_FreezeTick + m_FreezeDuration > Server()->Tick()) && (m_FreezeTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0) 
+	if (IsFrozen() && (m_FreezeTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0) 
 	{
 		int amount = (m_FreezeTick + m_FreezeDuration - Server()->Tick() + 1) / Server()->TickSpeed();
 		GameServer()->CreateDamage(m_Pos, m_pPlayer->GetCID(), m_Pos, amount, 0, true);
@@ -1044,6 +1044,11 @@ void CCharacter::Freeze(int Seconds)
 	m_FreezeDuration = Server()->TickSpeed()*Seconds;
 }
 
+bool CCharacter::IsFrozen()
+{
+	return m_FreezeTick + m_FreezeDuration > Server()->Tick();
+}
+
 void CCharacter::Snap(int SnappingClient)
 {
 	if(NetworkClipped(SnappingClient))
@@ -1085,7 +1090,7 @@ void CCharacter::Snap(int SnappingClient)
 
 	pCharacter->m_Weapon = CWeapons::LooksLike(m_ActiveWeapon);
 	pCharacter->m_AttackTick = m_AttackTick;
-	if (m_FreezeTick + m_FreezeDuration > Server()->Tick()) 
+	if (IsFrozen()) 
 		pCharacter->m_Weapon = WEAPON_NINJA;
 
 	pCharacter->m_Direction = m_Input.m_Direction;
@@ -1106,6 +1111,45 @@ void CCharacter::Snap(int SnappingClient)
 		if(5 * Server()->TickSpeed() - ((Server()->Tick() - m_LastAction) % (5 * Server()->TickSpeed())) < 5)
 			pCharacter->m_Emote = EMOTE_BLINK;
 	}
+
+	
+	// DDnet client support
+	CNetObj_DDNetCharacter *pDDNetCharacter = static_cast<CNetObj_DDNetCharacter *>(Server()->SnapNewItem(NETOBJTYPE_DDNETCHARACTER, m_pPlayer->GetCID(), sizeof(CNetObj_DDNetCharacter)));
+	if(!pDDNetCharacter)
+		return;
+
+	pDDNetCharacter->m_Flags = 0;
+	if (m_pPlayer->GetCID() == SnappingClient || m_pPlayer->GetTeam() == TEAM_SPECTATORS || m_pPlayer->m_RespawnDisabled)
+	{
+		if (m_aWeapons[0].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_HAMMER;
+		if (m_aWeapons[1].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_GUN;
+		if (m_aWeapons[2].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_SHOTGUN;
+		if (m_aWeapons[3].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_GRENADE;
+		if (m_aWeapons[4].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_LASER;
+		if (m_aWeapons[5].m_Got)
+			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_NINJA;
+	}
+	if (IsFrozen() > 0 && Config()->m_SvDDFreezeSnowflakes)
+		pDDNetCharacter->m_Flags |= CHARACTERFLAG_IN_FREEZE | CHARACTERFLAG_MOVEMENTS_DISABLED;
+	// 	pDDNetCharacter->m_Flags |= CHARACTERFLAG_INVINCIBLE;
+	pDDNetCharacter->m_FreezeEnd = 0;
+	pDDNetCharacter->m_Jumps = 2;
+	pDDNetCharacter->m_TeleCheckpoint = -1;
+	pDDNetCharacter->m_StrongWeakId = 0;
+	
+	pDDNetCharacter->m_JumpedTotal = m_Core.m_Jumped;
+	pDDNetCharacter->m_NinjaActivationTick = -1;
+	if (m_ActiveWeapon == WEAPON_NINJA)
+		pDDNetCharacter->m_NinjaActivationTick = m_Ninja.m_ActivationTick;
+	pDDNetCharacter->m_FreezeStart = -1;
+	pDDNetCharacter->m_TargetX = m_LatestInput.m_TargetX;
+	pDDNetCharacter->m_TargetY = m_LatestInput.m_TargetY;
+
 	GameServer()->m_pController->HandleCharacterSnap(*this, pCharacter, SnappingClient);
 }
 

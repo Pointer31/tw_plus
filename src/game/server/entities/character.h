@@ -81,6 +81,7 @@ public:
 	} m_aWeapons[WEAPON_CUSTOM_END];
 
 	void Freeze(int Seconds);
+	bool IsFrozen();
 
 	void GivePowerupShields() { m_Powerups.m_ShieldedTicks = 50*15; } /*Server()->TickSpeed()*/
 	void GivePowerupStrength() { m_Powerups.m_StrengthTicks = 50*15; }

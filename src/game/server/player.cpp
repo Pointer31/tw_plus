@@ -1,6 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
+#include <engine/shared/config.h>
 #include "entities/character.h"
 #include "entities/flag.h"
 #include "gamecontext.h"
@@ -204,6 +204,20 @@ void CPlayer::Snap(int SnappingClient)
 			pRespawnTimer->m_TicksLeft = m_RespawnDisabled ? -1 : std::max(0, TicksLeft);
 		}
 	}
+
+	// ddnet client support
+	CNetObj_DDNetPlayer *pDDNetPlayer = static_cast<CNetObj_DDNetPlayer *>(Server()->SnapNewItem(NETOBJTYPE_DDNETPLAYER, m_ClientID, sizeof(CNetObj_DDNetPlayer)));
+	if(!pDDNetPlayer)
+		return;
+	
+	pDDNetPlayer->m_Flags = 0;
+	if (Server()->Tick() > m_LastActionTick + Server()->TickSpeed()*(std::max(GameServer()->Config()->m_SvInactiveKickTime*60, 60)))
+		pDDNetPlayer->m_Flags |= EXPLAYERFLAG_AFK;
+
+	if (GameServer()->Config()->m_SvDDExposeAuthed && Server()->IsAuthed(GetCID()))
+		pDDNetPlayer->m_AuthLevel = AUTHED_MOD;
+	else
+		pDDNetPlayer->m_AuthLevel = AUTHED_NO;
 
 	// demo recording
 	if(SnappingClient == -1)

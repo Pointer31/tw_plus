@@ -22,6 +22,31 @@ GameMsgIDs = Enum("GAMEMSG", ["TEAM_SWAP", "SPEC_INVALID_ID", "TEAM_SHUFFLE", "T
 
 GameInfoFlagsTWPlus = Flags("GAMETWPLUSFLAG", ["PREDICT_PTWPLUS_TILES", "LASERJUMPS", "GUN_FULLAUTO"])
 
+# ddnet
+CharacterFlags = Flags("CHARACTERFLAG", ["SOLO", "JETPACK", "COLLISION_DISABLED", "ENDLESS_HOOK", "ENDLESS_JUMP", "SUPER",
+                  "HAMMER_HIT_DISABLED", "SHOTGUN_HIT_DISABLED", "GRENADE_HIT_DISABLED", "LASER_HIT_DISABLED", "HOOK_HIT_DISABLED",
+                  "TELEGUN_GUN", "TELEGUN_GRENADE", "TELEGUN_LASER",
+                  "WEAPON_HAMMER", "WEAPON_GUN", "WEAPON_SHOTGUN", "WEAPON_GRENADE", "WEAPON_LASER", "WEAPON_NINJA",
+				  "MOVEMENTS_DISABLED", "IN_FREEZE", "PRACTICE_MODE", "LOCK_MODE", "TEAM0_MODE", "INVINCIBLE"])
+GameInfoFlags = Flags("GAMEINFOFLAG", [
+	"TIMESCORE", "GAMETYPE_RACE", "GAMETYPE_FASTCAP", "GAMETYPE_FNG",
+	"GAMETYPE_DDRACE", "GAMETYPE_DDNET", "GAMETYPE_BLOCK_WORLDS",
+	"GAMETYPE_VANILLA", "GAMETYPE_PLUS", "FLAG_STARTS_RACE", "RACE",
+	"UNLIMITED_AMMO", "DDRACE_RECORD_MESSAGE", "RACE_RECORD_MESSAGE",
+	"ALLOW_EYE_WHEEL", "ALLOW_HOOK_COLL", "ALLOW_ZOOM", "BUG_DDRACE_GHOST",
+	"BUG_DDRACE_INPUT", "BUG_FNG_LASER_RANGE", "BUG_VANILLA_BOUNCE",
+	"PREDICT_FNG", "PREDICT_DDRACE", "PREDICT_DDRACE_TILES", "PREDICT_VANILLA",
+	"ENTITIES_DDNET", "ENTITIES_DDRACE", "ENTITIES_RACE", "ENTITIES_FNG",
+	"ENTITIES_VANILLA", "DONT_MASK_ENTITIES", "ENTITIES_BW"
+	# Full, use GameInfoFlags2 for more flags
+])
+GameInfoFlags2 = Flags("GAMEINFOFLAG2", [
+	"ALLOW_X_SKINS", "GAMETYPE_CITY", "GAMETYPE_FDDRACE", "ENTITIES_FDDRACE", "HUD_HEALTH_ARMOR", "HUD_AMMO",
+	"HUD_DDRACE", "NO_WEAK_HOOK", "NO_SKIN_CHANGE_FOR_FROZEN"
+])
+ExPlayerFlags = Flags("EXPLAYERFLAG", ["AFK", "PAUSED", "SPEC"])
+Authed = Enum("AUTHED", ["NO", "HELPER", "MOD", "ADMIN"])
+
 
 RawHeader = '''
 
@@ -76,6 +101,7 @@ Enums = [
 	Votes,
 	ChatModes,
 	GameMsgIDs,
+	Authed,
 ]
 
 Flags = [
@@ -85,6 +111,10 @@ Flags = [
 	CoreEventFlags,
 	RaceFlags,
 	GameInfoFlagsTWPlus,
+	CharacterFlags,
+	GameInfoFlags,
+	GameInfoFlags2,
+	ExPlayerFlags,
 ]
 
 Objects = [
@@ -288,6 +318,37 @@ Objects = [
 	NetObjectEx("RespawnTimer", "respawn-timer@ddnet-community.github.io", [
 		NetIntAny("m_TicksLeft"), # 0->can respawn, -1->cannot respawn
 	]),
+
+	NetObjectEx("DDNetCharacter", "character@netobj.ddnet.tw", [
+		NetIntAny("m_Flags", default=0),
+		NetTick("m_FreezeEnd"),
+		NetIntRange("m_Jumps", -1, 255, default=2),
+		NetIntAny("m_TeleCheckpoint", default=-1),
+		NetIntRange("m_StrongWeakId", 0, 'MAX_CLIENTS-1', default=0),
+
+		# New data fields for jump display, freeze bar and ninja bar
+		# Default values indicate that these values should not be used
+		NetIntRange("m_JumpedTotal", -1, 255, default=-1),
+		NetTick("m_NinjaActivationTick"),
+		NetTick("m_FreezeStart"),
+		# New data fields for improved target accuracy
+		NetIntAny("m_TargetX", default=0),
+		NetIntAny("m_TargetY", default=0),
+		# NetIntRange("m_TuneZoneOverride", 'TuneZone::OVERRIDE_NONE', 'TuneZone::NUM-1', default='TuneZone::OVERRIDE_NONE'),
+	]), #, validate_size=False
+
+	NetObjectEx("DDNetPlayer", "player@netobj.ddnet.tw", [
+		NetIntAny("m_Flags"),
+		NetIntRange("m_AuthLevel", "AUTHED_NO", "AUTHED_ADMIN"),
+		# NetIntRange("m_FinishTimeSeconds", 'FinishTime::UNSET', 'max_int', default='FinishTime::UNSET'),
+		# NetIntRange("m_FinishTimeMillis", 0, 999, default=0),
+	]),
+
+	NetObjectEx("GameInfoEx", "gameinfo@netobj.ddnet.tw", [
+		NetIntAny("m_Flags", default=0),
+		NetIntAny("m_Version", default=0),
+		NetIntAny("m_Flags2", default=0),
+	]), # , validate_size=False
 ]
 
 Messages = [

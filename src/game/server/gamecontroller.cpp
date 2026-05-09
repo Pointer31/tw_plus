@@ -821,6 +821,27 @@ void IGameController::Snap(int SnappingClient)
 	if (Config()->m_SvPistolAuto)
 		pGameInfoTWPlus->m_Flags |= GAMETWPLUSFLAG_GUN_FULLAUTO;
 
+	// DDnet client support
+	CNetObj_GameInfoEx *pGameInfoEx = static_cast<CNetObj_GameInfoEx *>(Server()->SnapNewItem(NETOBJTYPE_GAMEINFOEX, 0, sizeof(CNetObj_GameInfoEx)));
+	if(!pGameInfoEx)
+		return;
+
+	pGameInfoEx->m_Flags = GAMEINFOFLAG_GAMETYPE_PLUS
+		| GAMEINFOFLAG_PREDICT_VANILLA
+		| GAMEINFOFLAG_ALLOW_EYE_WHEEL
+		| GAMEINFOFLAG_ENTITIES_DDNET;
+	if (Config()->m_SvDDAllowHookColl)
+		pGameInfoEx->m_Flags |= GAMEINFOFLAG_ALLOW_HOOK_COLL;
+	if (IsRace())
+		pGameInfoEx->m_Flags |= GAMEINFOFLAG_BUG_DDRACE_INPUT;
+	if (IsRace() || Config()->m_SvDDAllowZoom)
+		pGameInfoEx->m_Flags |= GAMEINFOFLAG_ALLOW_ZOOM;
+	pGameInfoEx->m_Flags2 = GAMEINFOFLAG2_HUD_HEALTH_ARMOR 
+		| GAMEINFOFLAG2_HUD_AMMO;
+	if (Config()->m_SvDDShowHud)
+		pGameInfoEx->m_Flags2 |= GAMEINFOFLAG2_HUD_DDRACE;
+	pGameInfoEx->m_Version = 8;
+
 	// demo recording
 	if(SnappingClient == -1)
 	{

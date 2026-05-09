@@ -224,6 +224,7 @@ public:
 	bool IsInstagibLaser() const { return m_Instagib == 1; }
 	bool IsInstagibGrenade() const { return m_Instagib == 2; }
 	bool IsNoItems() const { return m_Instagib == 3; }
+	virtual bool IsRace() const { return false; }
 
 	virtual bool IsUnfreezeHammers() const { return false; }
 	virtual bool IsUnfreezeLasers() const { return false; }

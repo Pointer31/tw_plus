@@ -181,4 +181,11 @@ MACRO_CONFIG_INT(SvLaserDeathAmount, sv_laser_death_amount, 16, 0, 64, CFGFLAG_S
 MACRO_CONFIG_INT(SvWeaponsStay, sv_weapons_stay, 0, 0, 1, CFGFLAG_SERVER, "Whether weapons stay after being pickupped or not")
 MACRO_CONFIG_INT(SvCustomPowerups, sv_custom_powerups, 0, 0, 1, CFGFLAG_SERVER, "Whether to use custom powerups along with the default ninja")
 
+// ddnet client support
+MACRO_CONFIG_INT(SvDDAllowZoom, sv_dd_allow_zoom, 0, 0, 1, CFGFLAG_SERVER, "Whether to always allow zoom")
+MACRO_CONFIG_INT(SvDDShowHud, sv_dd_show_hud, 0, 0, 1, CFGFLAG_SERVER, "Whether to make ddnet clients use ddnet hud")
+MACRO_CONFIG_INT(SvDDFreezeSnowflakes, sv_freeze_snowflakes, 1, 0, 1, CFGFLAG_SERVER, "Whether to make clients show snowflakes at frozen tees (changes prediction too)")
+MACRO_CONFIG_INT(SvDDAllowHookColl, sv_dd_allow_hook_col, 1, 0, 1, CFGFLAG_SERVER, "Whether to allow ddnet clients to use hook col")
+MACRO_CONFIG_INT(SvDDExposeAuthed, sv_dd_expose_authed, 0, 0, 1, CFGFLAG_SERVER, "Whether or not to color client's names if they are authenticated in rcon for ddnet clients")
+
 MACRO_CONFIG_STR(SvDefaultLanguageFile, sv_default_language_file, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "Which language file to load, if any")
