@@ -1124,7 +1124,7 @@ void CCharacter::Snap(int SnappingClient)
 		return;
 
 	pDDNetCharacter->m_Flags = 0;
-	if (m_pPlayer->GetCID() == SnappingClient || m_pPlayer->GetTeam() == TEAM_SPECTATORS || m_pPlayer->m_RespawnDisabled)
+	if (m_pPlayer->GetCID() == SnappingClient || (GameServer()->m_apPlayers[SnappingClient] && (GameServer()->m_apPlayers[SnappingClient]->GetTeam() == TEAM_SPECTATORS || GameServer()->m_apPlayers[SnappingClient]->m_RespawnDisabled)))
 	{
 		if (m_aWeapons[0].m_Got)
 			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_HAMMER;
