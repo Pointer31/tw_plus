@@ -91,13 +91,29 @@ void CPickupCustom::Snap(int SnappingClient)
 	if(m_SpawnTick != -1 || NetworkClipped(SnappingClient))
 		return;
 
-	CNetObj_PickupCustom *pP = static_cast<CNetObj_PickupCustom *>(Server()->SnapNewItem(NETOBJTYPE_PICKUPCUSTOM, GetID(), sizeof(CNetObj_PickupCustom)));
-	if(!pP)
-		return;
+	int ResourceId = GetID() % 3;
 
-	pP->m_X = round_to_int(m_Pos.x);
-	pP->m_Y = round_to_int(m_Pos.y);
-	pP->m_ResourceId = GetID() % 3;
+	if (GameServer()->m_aClientsReceivedResources[SnappingClient][ResourceId])
+	{
+		CNetObj_PickupCustom *pP = static_cast<CNetObj_PickupCustom *>(Server()->SnapNewItem(NETOBJTYPE_PICKUPCUSTOM, GetID(), sizeof(CNetObj_PickupCustom)));
+		if(!pP)
+			return;
+
+		pP->m_X = round_to_int(m_Pos.x);
+		pP->m_Y = round_to_int(m_Pos.y);
+		pP->m_ResourceId = ResourceId;
+	}
+	else
+	{
+		CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
+		if(!pP)
+			return;
+
+		pP->m_X = round_to_int(m_Pos.x);
+		pP->m_Y = round_to_int(m_Pos.y);
+		pP->m_Type = PICKUP_HEALTH;
+	}
+
 	// CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	// if(!pP)
 	// 	return;

@@ -42,6 +42,10 @@ void CGameContext::Construct(int Resetting)
 	for(int i = 0; i < MAX_CLIENTS; i++)
 		m_apPlayers[i] = 0;
 
+	for(int i = 0; i < MAX_CLIENTS; i++)
+		for(int j = 0; j < 64; j++)
+			m_aClientsReceivedResources[i][j] = 0;
+
 	m_pController = 0;
 	m_VoteCloseTime = 0;
 	m_VoteCancelTime = 0;
@@ -895,6 +899,8 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 
 	delete m_apPlayers[ClientID];
 	m_apPlayers[ClientID] = 0;
+	for(int j = 0; j < 64; j++)
+		m_aClientsReceivedResources[ClientID][j] = 0;
 
 	BotsMinimumPlayersCheck(ClientID);
 
@@ -915,6 +921,13 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 		}
 		return;
+	}
+
+	if(MsgID == NETMSGTYPE_CL_IHAVERESOURCE) {
+		CNetMsg_Cl_IHaveResource *pMsg = (CNetMsg_Cl_IHaveResource*)pRawMsg;
+
+		if (pMsg->m_Id >= 0 && pMsg->m_Id < 64)
+			m_aClientsReceivedResources[ClientID][pMsg->m_Id] = 1;
 	}
 
 	if(Server()->ClientIngame(ClientID))

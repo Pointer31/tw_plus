@@ -508,6 +508,10 @@ Messages = [
 		NetString("m_pHash"),
 	]),
 
+	NetMessageEx("Cl_IHaveResource", "i-have-resource@pointerstwplus", [
+		NetIntAny("m_Id"),
+	]),
+
 	NetMessageEx("Sv_CustomWeaponInfo", "custom-weapon-info@pointerstwplus", [
 		NetIntAny("m_WeaponId"),
 		NetIntAny("m_LooksLike"), # may be used to distinguish hammer-like and gun-like weapons, etc

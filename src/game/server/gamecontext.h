@@ -94,6 +94,8 @@ public:
 	CEventHandler m_Events;
 	class CPlayer *m_apPlayers[MAX_CLIENTS];
 
+	bool m_aClientsReceivedResources[MAX_CLIENTS][64];
+
 	class IGameController *m_pController;
 	CGameWorld m_World;
 	CCommandManager m_CommandManager;
