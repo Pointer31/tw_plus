@@ -185,6 +185,13 @@ void CResources::OnResourceMessage(CNetMsg_Sv_ImageResource* msg)
 	str_format(aBuf, sizeof(aBuf), "got resource id %i, name='%s'", Id, pName);
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "resources", aBuf);
 
+	if (Find(pName) >= 0) 
+	{
+		CNetMsg_Cl_IHaveResource MsgIHaveResource;
+		MsgIHaveResource.m_Id = Id;
+		Client()->SendPackMsg(&MsgIHaveResource, MSGFLAG_VITAL);
+	}
+
 	str_copy(ResourceMapping[Id], pName, sizeof(ResourceMapping[Id]));
 	return;
 }
