@@ -55,6 +55,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	m_Powerups.m_StrengthTicks = 0;
 	m_FreezeTick = 0;
 	m_FreezeDuration = 0;
+	m_Spree = 0;
 }
 
 void CCharacter::Reset()
@@ -886,6 +887,9 @@ void CCharacter::Die(int Killer, int Weapon)
 			Killer, GameServer()->m_apPlayers[Killer]->GetTeam(), Server()->ClientName(Killer),
 			m_pPlayer->GetCID(), m_pPlayer->GetTeam(), Server()->ClientName(m_pPlayer->GetCID()), Weapon, ModeSpecial
 		);
+
+		if (Killer != m_pPlayer->GetCID() && GameServer()->m_apPlayers[Killer]->GetCharacter())
+			GameServer()->m_apPlayers[Killer]->GetCharacter()->IncreaseKillSpree();
 	}
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
@@ -916,6 +920,22 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// this is for auto respawn after 3 secs
 	m_pPlayer->m_DieTick = Server()->Tick();
+
+	// killspree ended message
+	if (Config()->m_SvKillingspreeKills > 0 && m_Spree >= Config()->m_SvKillingspreeKills && !(Killer < 0 || !GameServer()->m_apPlayers[Killer]))
+	{
+		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
+		CNetEvent_Explosion *pEvent = (CNetEvent_Explosion *)GameServer()->m_Events.Create(NETEVENTTYPE_EXPLOSION, sizeof(CNetEvent_Explosion));
+		if(pEvent)
+		{
+			pEvent->m_X = (int)m_Pos.x;
+			pEvent->m_Y = (int)m_Pos.y;
+		}
+
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "'%s' %d-kills killing spree was ended by '%s'", Server()->ClientName(m_pPlayer->GetCID()), m_Spree, Server()->ClientName(Killer));
+		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+	}
 	
 	GameWorld()->RemoveEntity(this);
 	GameWorld()->m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
@@ -1052,6 +1072,25 @@ bool CCharacter::IsFrozen()
 bool CCharacter::IsDeepFrozen()
 {
 	return m_FreezeDuration == -1;
+}
+
+void CCharacter::IncreaseKillSpree()
+{
+	if (Config()->m_SvKillingspreeKills == 0)
+		return;
+
+	m_Spree++;
+	const int NumMsg = 5;
+	char aBuf[128];
+
+	if (m_Spree % Config()->m_SvKillingspreeKills == 0)
+	{
+		static const char aaSpreeMsg[NumMsg][32] = {"is on a killing spree", "is on a rampage", "is dominating", "is unstoppable", "is godlike"};
+		int No = m_Spree / Config()->m_SvKillingspreeKills - 1;
+
+		str_format(aBuf, sizeof(aBuf), "'%s' %s with %d kills!", Server()->ClientName(m_pPlayer->GetCID()), aaSpreeMsg[(No > NumMsg - 1) ? NumMsg - 1 : No], m_Spree);
+		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+	}
 }
 
 void CCharacter::Snap(int SnappingClient)

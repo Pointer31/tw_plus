@@ -182,6 +182,8 @@ MACRO_CONFIG_INT(SvLaserDeathAmount, sv_laser_death_amount, 16, 0, 64, CFGFLAG_S
 MACRO_CONFIG_INT(SvWeaponsStay, sv_weapons_stay, 0, 0, 1, CFGFLAG_SERVER, "Whether weapons stay after being pickupped or not")
 MACRO_CONFIG_INT(SvCustomPowerups, sv_custom_powerups, 0, 0, 1, CFGFLAG_SERVER, "Whether to use custom powerups along with the default ninja")
 
+MACRO_CONFIG_INT(SvKillingspreeKills, sv_killspree_kills, 5, 0, 20, CFGFLAG_SERVER, "How many kills are needed to be on a killing-spree")
+
 // ddnet client support
 MACRO_CONFIG_INT(SvDDAllowZoom, sv_dd_allow_zoom, 0, 0, 1, CFGFLAG_SERVER, "Whether to always allow zoom")
 MACRO_CONFIG_INT(SvDDShowHud, sv_dd_show_hud, 0, 0, 1, CFGFLAG_SERVER, "Whether to make ddnet clients use ddnet hud")

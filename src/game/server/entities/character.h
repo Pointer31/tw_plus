@@ -88,6 +88,7 @@ public:
 	void GivePowerupStrength() { m_Powerups.m_StrengthTicks = 50*15; }
 	bool HasPowerupStrength() { return m_Powerups.m_StrengthTicks > 0; }
 	void HandlePowerups();
+	void IncreaseKillSpree();
 
 private:
 	// player controlling this character
@@ -154,6 +155,8 @@ private:
 		int m_ShieldedTicks;
 		int m_StrengthTicks;
 	} m_Powerups;
+
+	int m_Spree; // killing spree
 };
 
 #endif
