@@ -49,6 +49,8 @@ public:
 	int getTeleY(int index);
 
 	int FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const;
+
+	void ClearTelePositions();
 };
 
 #endif

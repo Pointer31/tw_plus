@@ -20,6 +20,11 @@ CCollision::CCollision()
 	m_Height = 0;
 	m_pLayers = 0;
 
+	ClearTelePositions();
+}
+
+void CCollision::ClearTelePositions()
+{
 	for (int i = 0; i < 4; i++)
 	{
 		m_telePositions[i].x = 0;

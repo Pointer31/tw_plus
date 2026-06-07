@@ -174,6 +174,7 @@ MACRO_CONFIG_INT(SvPistolAuto, sv_pistol_auto, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SER
 MACRO_CONFIG_INT(SvHTFTimeDisplay, sv_htf_time_display, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Whether or not to use time to display score in htf")
 MACRO_CONFIG_INT(SvHammerIgnoreTiles, sv_hammer_ignore_tiles, 0, 0, 1, CFGFLAG_SERVER, "Whether to, like ddrace, allow hammers to hit through blocks")
 MACRO_CONFIG_INT(SvRaceFinishInChat, sv_race_finish_in_chat, 1, 0, 1, CFGFLAG_SERVER, "Whether to show race finish messages in the chat")
+MACRO_CONFIG_INT(SvRaceDisableTeleports, sv_race_disable_teleports, 0, 0, 1, CFGFLAG_SERVER, "Whether to disable TWplus teleports for better ddrace compatability, in race gametype")
 
 MACRO_CONFIG_INT(SvTouchExplode, sv_touch_explode, 0, 0, 1, CFGFLAG_SERVER, "Whether players explode on contact with each other")
 MACRO_CONFIG_INT(SvLaserDeath, sv_laser_death, 0, 0, 1, CFGFLAG_SERVER, "spawn sv_laser_death_amount lasers on death")

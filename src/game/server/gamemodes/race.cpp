@@ -17,6 +17,8 @@ CGameControllerRACE::CGameControllerRACE(CGameContext *pGameServer)
 		m_aRacers[i].start = 0;
 		m_aRacers[i].finish = 0;
 	}
+	if(true)
+		GameServer()->Collision()->ClearTelePositions();
 }
 
 const char* CGameControllerRACE::GetGameHelpText()
