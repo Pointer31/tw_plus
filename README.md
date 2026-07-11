@@ -1,14 +1,17 @@
-TWplus
+[TWplus](https://pointer31.github.io/twplus.html)
 =========
 
 A fun mod for a fun game
 ---------------------------
 
-This mods adds two new gametypes: hold the flag (HTF) and hide and seek (HNS). Additionally, for all gametypes except HNS you can choose if you want a laser/grenade instagib mod added!
+This mods adds two new gametypes: hold the flag (HTF / THTF for teams) and hide and seek (HNS). Additionally, for all gametypes except HNS you can choose if you want a laser/grenade instagib mod added! There are also some custom weapons available through the no-items mod, applicabale to most gametypes similar to instagib.
 
 Some server-side bots have also been added of which there are two types and of the second type multiple difficulties. They are most suited for playing DM, and can play CTF too.
 
-Some map features have been added. Right now: map teleports!
+Some map features have been added, like map teleports, no-flag zones, slow death zones and boost pads!
+
+There are even more features! Particles while pickups are repsawning, laser deaths and touch explosions, match-end messages, laser jumps, +5 heart/shield pickups, a bit of ddnet client support and killing sprees!
+
 
 Below is the upstream teeworlds readme:
 
