@@ -10,7 +10,7 @@ Some server-side bots have also been added of which there are two types and of t
 
 Some map features have been added, like map teleports, no-flag zones, slow death zones and boost pads!
 
-There are even more features! Particles while pickups are repsawning, laser deaths and touch explosions, match-end messages, laser jumps, +5 heart/shield pickups, a bit of ddnet client support and killing sprees!
+There are even more features! Particles while pickups are respawning, laser deaths and touch explosions, match-end messages, laser jumps, +5 heart/shield pickups, a bit of ddnet client support and killing sprees!
 
 
 Below is the upstream teeworlds readme:
