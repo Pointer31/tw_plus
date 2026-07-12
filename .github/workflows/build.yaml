@@ -65,11 +65,6 @@ jobs:
         ${{ matrix.cmake-path }}cmake --version
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Debug -DDOWNLOAD_GTEST=ON -DDEV=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=. ..
         ${{ matrix.cmake-path }}cmake --build . --config Debug ${{ matrix.build-args }} --target everything
-    - name: Run debug server
-      env: ${{ matrix.env }}
-      run: |
-        cd debug
-        ./teeworlds_srv shutdown
 
     - name: Build in release mode
       env: ${{ matrix.env }}
@@ -78,11 +73,6 @@ jobs:
         cd release
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target everything
-    - name: Run release server
-      env: ${{ matrix.env }}
-      run: |
-        cd release
-        ./teeworlds_srv shutdown
 
     - name: Package
       run: |

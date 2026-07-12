@@ -971,6 +971,20 @@ set(EXPECTED_DATA
   maps/dm7.map
   maps/dm8.map
   maps/dm9.map
+  maps/ctf_bots.map
+  maps/ctf_jungleflowers.map
+  maps/ctf_quadflags7.map
+  maps/ctf_sixflags7.map
+  maps/ctf_tele7.map
+  maps/dm_jungle_large_tele.map
+  maps/dm_tele7.map
+  maps/dm_towerravine_tele7.map
+  maps/hns_alien_planet.map
+  maps/hns_kill_zone.map
+  maps/htf1.map
+  maps/htf2.map
+  maps/ddr_test.map
+  maps/race_test.map
   maps/license.txt
   maps/lms1.map
   maps/readme.txt
