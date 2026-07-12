@@ -618,13 +618,13 @@ void CCharacter::HandlePowerups()
 			float r = ((float)Server()->Tick() / 10.0f);
 			new CProjectile(GameWorld(), WEAPON_HAMMER,
 				-1,
-				{m_Pos.x + sin(r)*64.0f, m_Pos.y + cos(r)*64.0f},
+				{m_Pos.x + (float)sin(r)*64.0f, m_Pos.y + (float)cos(r)*64.0f},
 				{0,1},
 				10,
 				0, 0, 0, -1, WEAPON_HAMMER);
 			new CProjectile(GameWorld(), WEAPON_HAMMER,
 				-1,
-				{m_Pos.x + sin(r + pi)*64.0f, m_Pos.y + cos(r + pi)*64.0f},
+				{m_Pos.x + (float)sin(r + pi)*64.0f, m_Pos.y + (float)cos(r + pi)*64.0f},
 				{0,1},
 				10,
 				0, 0, 0, -1, WEAPON_HAMMER);
@@ -1178,7 +1178,7 @@ void CCharacter::Snap(int SnappingClient)
 		if (m_aWeapons[5].m_Got)
 			pDDNetCharacter->m_Flags |= CHARACTERFLAG_WEAPON_NINJA;
 	}
-	if (IsFrozen() > 0 && Config()->m_SvDDFreezeSnowflakes)
+	if (IsFrozen() && Config()->m_SvDDFreezeSnowflakes)
 		pDDNetCharacter->m_Flags |= CHARACTERFLAG_IN_FREEZE | CHARACTERFLAG_MOVEMENTS_DISABLED;
 	// 	pDDNetCharacter->m_Flags |= CHARACTERFLAG_INVINCIBLE;
 	pDDNetCharacter->m_FreezeEnd = 0;
