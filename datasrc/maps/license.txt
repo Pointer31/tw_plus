@@ -4,9 +4,16 @@ All content is released under CC-BY-SA 3.0 (http://creativecommons.org/licenses/
 maps added by the TWplus modification:
 
 ctf_bots by Pointer
+ctf_jungleflowers by Pointer
+ctf_quadflags7 by Pointer
+ctf_sixflags7 by Pointer
+ctf_tele7 by Pointer
 dm_jungle_large_tele by Pointer
 dm_tele7 by Pointer
+dm_towerravine_tele7 by Pointer
 hns_alien_planet by +KZ
 hns_kill_zone by +KZ
 htf1 by Pointer
 htf2 by Pointer, inspired by yuiluy's version
+ddr_test by Pointer
+race_test by Pointer
