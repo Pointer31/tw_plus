@@ -118,7 +118,7 @@ void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
         {
             for (int i = -1; i < 2; i += 2)
             {
-                const float ExtraAngle = 0.1;
+                const float ExtraAngle = 0.1f;
                 vec2 Direction2 = direction(angle(Direction) - i*2*ExtraAngle);
                 CLaserBetter* laser = new CLaserBetter(pChar->GameWorld(), pChar->GetPos(), Direction2, 600, pChar->GetPlayer()->GetCID());
                 laser->m_MaxLength = 100;
@@ -172,7 +172,7 @@ void CWeapons::FireWeapon(int WeaponId, CCharacter *pChar)
 
         case WEAPON_DELAYED_POWER:
         {
-            CLaserTrap* laser = new CLaserTrap(pChar->GameWorld(), pChar->GetPos(), Direction, pChar->GameServer()->Tuning()->m_LaserReach, pChar->GetPlayer()->GetCID());
+            new CLaserTrap(pChar->GameWorld(), pChar->GetPos(), Direction, pChar->GameServer()->Tuning()->m_LaserReach, pChar->GetPlayer()->GetCID());
 			pChar->GameServer()->CreateSound(pChar->GetPos(), SOUND_LASER_FIRE);
         } break;
     
