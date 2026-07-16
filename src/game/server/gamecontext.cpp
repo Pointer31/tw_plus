@@ -977,10 +977,17 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 			else
 			{
-				if((Config()->m_SvSpamprotection && ((pPlayer->m_LastVoteTryTick && pPlayer->m_LastVoteTryTick+Server()->TickSpeed()*3 > Now) ||
-					(pPlayer->m_LastVoteCallTick && pPlayer->m_LastVoteCallTick+Server()->TickSpeed()*VOTE_COOLDOWN > Now))) ||
-					pPlayer->GetTeam() == TEAM_SPECTATORS || m_VoteCloseTime)
+				if (pPlayer->GetTeam() == TEAM_SPECTATORS)
+				{
+					SendChat(-1, CHAT_ALL, ClientID, "Spectators aren't allowed to start a vote.");
 					return;
+				}
+				if((Config()->m_SvSpamprotection && ((pPlayer->m_LastVoteTryTick && pPlayer->m_LastVoteTryTick+Server()->TickSpeed()*3 > Now) ||
+					(pPlayer->m_LastVoteCallTick && pPlayer->m_LastVoteCallTick+Server()->TickSpeed()*VOTE_COOLDOWN > Now))) || m_VoteCloseTime)
+				{
+					SendChat(-1, CHAT_ALL, ClientID, "You cannot vote right now");
+					return;
+				}
 
 				pPlayer->m_LastVoteTryTick = Now;
 			}
