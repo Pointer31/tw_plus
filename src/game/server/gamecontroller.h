@@ -51,8 +51,6 @@ class IGameController
 	// map
 	char m_aMapWish[128];
 
-	void CycleMap();
-
 	// spawn
 	struct CSpawnEval
 	{
@@ -233,6 +231,7 @@ public:
 
 	// map
 	void ChangeMap(const char *pToMap);
+	void CycleMap();
 
 	//spawn
 	bool CanSpawn(int Team, vec2 *pPos) const;

@@ -1771,6 +1771,12 @@ void CGameContext::ConFreeze(IConsole::IResult *pResult, void *pUserData)
 
 }
 
+void CGameContext::ConSkipMap(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->m_pController->CycleMap();
+}
+
 void CGameContext::OnConsoleInit()
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -1804,6 +1810,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Register("powerup", "i[id] i[power]", CFGFLAG_SERVER, ConGivePowerup, this, "Give a player a powerup");
 	Console()->Register("bots_check_count", "", CFGFLAG_SERVER, ConBotsCheckCount, this, "Check playercount and add or remove bots. Useful in combination with sv_bots_minimum_players");
 	Console()->Register("freeze", "i[id] i[seconds]", CFGFLAG_SERVER, ConFreeze, this, "Freeze player i for i seconds");
+	Console()->Register("skip_map", "", CFGFLAG_SERVER, ConSkipMap, this, "Skips the current map if sv_maprotation is used");
 }
 
 void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
