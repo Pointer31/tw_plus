@@ -458,8 +458,7 @@ bool CGameControllerHidNSek::DoWincheckMatch()
 	}
 
 	// check score win condition
-	if ((m_GameInfo.m_ScoreLimit > 0 && Topscore >= m_GameInfo.m_ScoreLimit) ||
-		(m_GameInfo.m_TimeLimit > 0 && (Server()->Tick() - m_GameStartTick) >= m_GameInfo.m_TimeLimit * Server()->TickSpeed() * 60))
+	if (m_GameInfo.m_ScoreLimit > 0 && Topscore >= m_GameInfo.m_ScoreLimit)
 	{
 		EndMatch();
 		return true;
@@ -486,7 +485,6 @@ void CGameControllerHidNSek::DoWincheckRound()
 				(GameServer()->m_apPlayers[i]->GetCharacter() && GameServer()->m_apPlayers[i]->GetCharacter()->IsAlive())))
 				GameServer()->m_apPlayers[i]->m_Score++;
 		}
-		m_GameStartTick = Server()->Tick(); // hack to not end match
 		EndRound();
 		m_DoResetSeekers = true;
 		GameServer()->SendChat(-1, CHAT_ALL, -1, "Hiders won this round!");
