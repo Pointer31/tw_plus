@@ -149,6 +149,15 @@ void CGameControllerHidNSek::Tick()
 			m_ToldSeekers = true;
 		}
 	}
+	else if(!IsGamePaused() && !HasEnoughPlayers())
+	{
+		// not enough players, so always allow respawn
+		for(int i = 0; i < MAX_CLIENTS; ++i)
+		{
+			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
+				GameServer()->m_apPlayers[i]->m_RespawnDisabled = false;
+		}
+	}
 
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{
