@@ -45,6 +45,7 @@ public:
     int OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon) override;
     virtual void HandleCharacterInput(class CCharacter &Char, CNetObj_PlayerInput *pInput, bool Predicted) override;
     virtual void HandleCharacterSnap(class CCharacter &Char, CNetObj_Character *pCharObj, int SnappingClient) override;
+    virtual void HandleDDNetCharacterSnap(class CCharacter &Char, CNetObj_DDNetCharacter *pCharObj, int SnappingClient) override;
     virtual void SendChatMsg(int From, int To, int Mode, const char* pText);
 
     class CHidNSekPlayer
@@ -69,5 +70,6 @@ public:
     void SetPlayerSeeker(int ClientID, bool set, bool infected = false);
     void SendSkinChangeHNS(int ClientID, int TargetID, int ColorBody);
     void UpdatePlayerSkin(int ClientID);
+    bool IsPlayerFrozen(int ClientID);
 };
 #endif

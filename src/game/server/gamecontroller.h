@@ -135,6 +135,7 @@ public:
 	virtual bool CanFireWeapon(class CCharacter &Char) { return true; }
 	virtual void HandleCharacterInput(class CCharacter &Char, CNetObj_PlayerInput *pInput, bool Predicted) {}
 	virtual void HandleCharacterSnap(class CCharacter &Char, CNetObj_Character *pCharObj, int SnappingClient) {}
+	virtual void HandleDDNetCharacterSnap(class CCharacter &Char, CNetObj_DDNetCharacter *pCharObj, int SnappingClient) {}
 	virtual int GetPlayerScore(class CPlayer *pPlayer, int SnappingClient);		
 	// event
 	/*

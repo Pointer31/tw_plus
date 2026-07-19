@@ -89,6 +89,7 @@ public:
 	bool HasPowerupStrength() { return m_Powerups.m_StrengthTicks > 0; }
 	void HandlePowerups();
 	void IncreaseKillSpree();
+	void UpdateNinjaActivationTick();
 
 private:
 	// player controlling this character
