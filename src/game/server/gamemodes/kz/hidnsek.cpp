@@ -203,7 +203,7 @@ void CGameControllerHidNSek::Tick()
 
 
 			if(
-				(((int)m_HidNSekPlayers[i].m_IsSeeker) + 1 & ninjas) &&
+				((m_HidNSekPlayers[i].m_IsSeeker ? (1 << 1) : 1) & ninjas) &&
 				GameServer()->m_apPlayers[i]->GetCharacter() &&
 				GameServer()->m_apPlayers[i]->GetCharacter()->GetActiveWeapon() == WEAPON_NINJA
 			)
