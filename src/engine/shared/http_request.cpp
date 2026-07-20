@@ -1,3 +1,4 @@
+#include <base/math.h>
 #include <base/system.h>
 #include <engine/engine.h>
 #include <game/version.h>
@@ -93,8 +94,12 @@ int CHttpRequest::Run(void *pUser)
 		return -1;
 	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_URL, pRequest->m_aUrl);
 	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_CUSTOMREQUEST, pRequest->m_aRequest);
-	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_PROTOCOLS, "https");
 
+#if LIBCURL_VERSION_NUM >= 0x075500
+	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_PROTOCOLS_STR, "https");
+#else
+	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
+#endif
 	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_MAXREDIRS, 5L);
 
@@ -102,11 +107,8 @@ int CHttpRequest::Run(void *pUser)
 	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_CONNECTTIMEOUT, 5L);
 	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_TIMEOUT, pRequest->m_TimeoutSeconds);
 
-	if(pRequest->m_PostData.size() > 0)
-	{
-		curl_easy_setopt(pRequest->m_pHandle, CURLOPT_POSTFIELDS, (const char *) pRequest->m_PostData.base_ptr());
-		curl_easy_setopt(pRequest->m_pHandle, CURLOPT_POSTFIELDSIZE, pRequest->m_PostData.size());
-	}
+	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_POSTFIELDS, (const char *) pRequest->m_PostData.base_ptr());
+	curl_easy_setopt(pRequest->m_pHandle, CURLOPT_POSTFIELDSIZE, maximum(0, pRequest->m_PostData.size()));
 
 	switch(pRequest->m_IPResolve)
 	{

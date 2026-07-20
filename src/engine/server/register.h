@@ -16,7 +16,7 @@ class CRegister
 		STATUS_NEEDCHALLENGE,
 		STATUS_NEEDINFO,
 		STATUS_ERROR,
-	
+
 		PROTOCOL_IPV4 = 0,
 		PROTOCOL_IPV6,
 		NUM_PROTOCOLS,
@@ -49,8 +49,8 @@ class CRegister
 		int m_LastResponseIndex;
 
 		void *m_Lock;
-	
-		array<CJob*> m_lpJobs;
+
+		array<CJob *> m_lpJobs;
 	} m_aProtocols[NUM_PROTOCOLS];
 	CUuid m_Secret;
 	CUuid m_ChallengeSecret;
@@ -63,6 +63,7 @@ class CRegister
 	class IEngine *m_pEngine;
 	class CConfig *m_pConfig;
 	class IConsole *m_pConsole;
+
 private:
 	class IEngine *Engine() const { return m_pEngine; }
 	class CConfig *Config() const { return m_pConfig; }
@@ -74,6 +75,7 @@ private:
 	void CheckChallengeStatus(int Protocol);
 	void UpdateRegister(int Protocol);
 	void OnToken(int Protocol, const char *pToken);
+
 public:
 	CRegister();
 	~CRegister();
