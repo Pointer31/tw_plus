@@ -3,7 +3,7 @@
 #ifndef ENGINE_SERVER_REGISTER_H
 #define ENGINE_SERVER_REGISTER_H
 
-#include <base/uuid.h>
+#include <engine/shared/uuid_manager.h>
 #include <engine/shared/network.h>
 #include <mastersrv/mastersrv.h>
 
@@ -52,8 +52,8 @@ class CRegister
 	
 		array<CJob*> m_lpJobs;
 	} m_aProtocols[NUM_PROTOCOLS];
-	Uuid m_Secret;
-	Uuid m_ChallengeSecret;
+	CUuid m_Secret;
+	CUuid m_ChallengeSecret;
 
 	void *m_Lock;
 	int m_InfoSerial;

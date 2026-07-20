@@ -216,6 +216,7 @@ public:
 	virtual const char *GetBotClan(int ClientID) override;
 
 	void BotsMinimumPlayersCheck(int DontUseID = -1);
+	int GetMaxPlayerSlots();
 };
 
 inline int64 CmaskAll() { return -1; }

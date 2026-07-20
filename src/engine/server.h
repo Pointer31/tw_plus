@@ -68,13 +68,10 @@ public:
 
 	virtual void DemoRecorder_HandleAutoStart() = 0;
 	virtual bool DemoRecorder_IsRecording() = 0;
-<<<<<<< HEAD
 	virtual int GetClientInfclassVersion(int ClientId) = 0;
 	virtual int GetClientDDNetVersion(int ClientId) = 0;
-=======
 
 	virtual void ExpireServerInfo() = 0;
->>>>>>> cba03057e (Http mastersrv)
 };
 
 class IGameServer : public IInterface

@@ -70,10 +70,10 @@ int CRegister::SendRegister(void *pUser)
 	str_format(aAddress, sizeof(aAddress), "%sconnecting-address.invalid:%d", ProtocolToScheme(Protocol), pContext->m_pParent->m_ServerPort);
 
 	char aSecret[UUID_MAXSTRSIZE];
-	format_uuid(pContext->m_pParent->m_Secret, aSecret, sizeof(aSecret));
+	FormatUuid(pContext->m_pParent->m_Secret, aSecret, sizeof(aSecret));
 
 	char aChallengeUuid[UUID_MAXSTRSIZE];
-	format_uuid(pContext->m_pParent->m_ChallengeSecret, aChallengeUuid, sizeof(aChallengeUuid));
+	FormatUuid(pContext->m_pParent->m_ChallengeSecret, aChallengeUuid, sizeof(aChallengeUuid));
 
 	char aChallengeSecret[64];
 	str_format(aChallengeSecret, sizeof(aChallengeSecret), "%s:%s", aChallengeUuid, ProtocolToString(Protocol));
@@ -244,7 +244,7 @@ void CRegister::SendDeleteIfRegistered(void *pUser)
 	str_format(aAddress, sizeof(aAddress), "%sconnecting-address.invalid:%d", ProtocolToScheme(Protocol), pContext->m_pParent->m_ServerPort);
 
 	char aSecret[UUID_MAXSTRSIZE];
-	format_uuid(pContext->m_pParent->m_Secret, aSecret, sizeof(aSecret));
+	FormatUuid(pContext->m_pParent->m_Secret, aSecret, sizeof(aSecret));
 
 	CHttpRequest Request("POST", pContext->m_pParent->Config()->m_SvRegisterUrl, 15, Protocol == PROTOCOL_IPV4 ? HTTP_IPRESOLVE_IPV4ONLY : HTTP_IPRESOLVE_IPV6ONLY);
 	Request.AddHeader("Action: delete");
@@ -273,8 +273,8 @@ CRegister::CRegister()
 
 	m_GotServerInfo = false;
 
-	m_Secret = random_uuid();
-	m_ChallengeSecret = random_uuid();
+	m_Secret = RandomUuid();
+	m_ChallengeSecret = RandomUuid();
 
 	for(int i = 0; i < NUM_PROTOCOLS; i++)
 	{
@@ -295,7 +295,7 @@ CRegister::CRegister()
 
 	static const int HEADER_LEN = sizeof(SERVERBROWSE_CHALLENGE);
 	mem_copy(m_aVerifyPacketPrefix, SERVERBROWSE_CHALLENGE, HEADER_LEN);
-	format_uuid(m_ChallengeSecret, m_aVerifyPacketPrefix + HEADER_LEN, sizeof(m_aVerifyPacketPrefix) - HEADER_LEN);
+	FormatUuid(m_ChallengeSecret, m_aVerifyPacketPrefix + HEADER_LEN, sizeof(m_aVerifyPacketPrefix) - HEADER_LEN);
 	m_aVerifyPacketPrefix[HEADER_LEN + UUID_MAXSTRSIZE - 1] = ':';
 }
 

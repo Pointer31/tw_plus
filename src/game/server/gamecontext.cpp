@@ -2003,7 +2003,7 @@ void CGameContext::OnUpdatePlayerServerInfo(CJsonWriter *pJsonWriter, int Client
 	if(!m_apPlayers[ClientID])
 		return;
 
-	CTeeInfos &TeeInfo = m_apPlayers[ClientID]->m_TeeInfos;
+	STeeInfos &TeeInfo = m_apPlayers[ClientID]->m_TeeInfos;
 
 	pJsonWriter->WriteAttribute("skin");
 	pJsonWriter->BeginObject();

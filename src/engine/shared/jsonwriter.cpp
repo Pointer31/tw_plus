@@ -7,28 +7,27 @@ static char EscapeJsonChar(char c)
 {
 	switch(c)
 	{
-	case '\"': return '\"';
-	case '\\': return '\\';
-	case '\b': return 'b';
-	case '\n': return 'n';
-	case '\r': return 'r';
-	case '\t': return 't';
-	// Don't escape '\f', who uses that. :)
-	default: return 0;
+		case '\"': return '\"';
+		case '\\': return '\\';
+		case '\b': return 'b';
+		case '\n': return 'n';
+		case '\r': return 'r';
+		case '\t': return 't';
+		// Don't escape '\f', who uses that. :)
+		default: return 0;
 	}
 }
 
-CJsonWriter::CJsonWriter(IOHANDLE IO)
+CJsonWriter::CJsonWriter(stream *pStream)
 {
-	m_IO = IO;
+	m_pStream = pStream;
 	m_NumStates = 0; // no root created yet
 	m_Indentation = 0;
 }
 
 CJsonWriter::~CJsonWriter()
 {
-	io_write_newline(m_IO);
-	io_close(m_IO);
+	m_pStream->write_newline();
 }
 
 void CJsonWriter::BeginObject()
@@ -46,7 +45,6 @@ void CJsonWriter::EndObject()
 	CompleteDataType();
 	WriteIndent(true);
 	WriteInternal("}");
-	
 }
 
 void CJsonWriter::BeginArray()
@@ -93,6 +91,16 @@ void CJsonWriter::WriteIntValue(int Value)
 	CompleteDataType();
 }
 
+void CJsonWriter::WriteInt64Value(int64 Value)
+{
+	dbg_assert(CanWriteDatatype(), "Cannot write value at this position");
+	WriteIndent(false);
+	char aBuf[32];
+	str_format(aBuf, sizeof(aBuf), "%lld", Value);
+	WriteInternal(aBuf);
+	CompleteDataType();
+}
+
 void CJsonWriter::WriteBoolValue(bool Value)
 {
 	dbg_assert(CanWriteDatatype(), "Cannot write value at this position");
@@ -111,14 +119,12 @@ void CJsonWriter::WriteNullValue()
 
 bool CJsonWriter::CanWriteDatatype()
 {
-	return m_NumStates == 0
-		|| TopState()->m_Kind == STATE_ARRAY
-		|| TopState()->m_Kind == STATE_ATTRIBUTE;
+	return m_NumStates == 0 || TopState()->m_Kind == STATE_ARRAY || TopState()->m_Kind == STATE_ATTRIBUTE;
 }
 
 inline void CJsonWriter::WriteInternal(const char *pStr)
 {
-	io_write(m_IO, pStr, str_length(pStr));
+	m_pStream->write((const unsigned char *) pStr, str_length(pStr));
 }
 
 void CJsonWriter::WriteInternalEscaped(const char *pStr)
@@ -131,12 +137,12 @@ void CJsonWriter::WriteInternalEscaped(const char *pStr)
 		char SimpleEscape = EscapeJsonChar(pStr[i]);
 		// Assuming ASCII/UTF-8, exactly everything below 0x20 is a
 		// control character.
-		bool NeedsEscape = SimpleEscape || (unsigned char)pStr[i] < 0x20;
+		bool NeedsEscape = SimpleEscape || (unsigned char) pStr[i] < 0x20;
 		if(NeedsEscape)
 		{
 			if(i - UnwrittenFrom > 0)
 			{
-				io_write(m_IO, pStr + UnwrittenFrom, i - UnwrittenFrom);
+				m_pStream->write((const unsigned char *) pStr + UnwrittenFrom, i - UnwrittenFrom);
 			}
 
 			if(SimpleEscape)
@@ -144,7 +150,7 @@ void CJsonWriter::WriteInternalEscaped(const char *pStr)
 				char aStr[2];
 				aStr[0] = '\\';
 				aStr[1] = SimpleEscape;
-				io_write(m_IO, aStr, sizeof(aStr));
+				m_pStream->write((const unsigned char *) aStr, sizeof(aStr));
 			}
 			else
 			{
@@ -157,21 +163,20 @@ void CJsonWriter::WriteInternalEscaped(const char *pStr)
 	}
 	if(Length - UnwrittenFrom > 0)
 	{
-		io_write(m_IO, pStr + UnwrittenFrom, Length - UnwrittenFrom);
+		m_pStream->write((const unsigned char *) pStr + UnwrittenFrom, Length - UnwrittenFrom);
 	}
 	WriteInternal("\"");
 }
 
 void CJsonWriter::WriteIndent(bool EndElement)
 {
-	const bool NotRootOrAttribute = m_NumStates != 0
-		&& TopState()->m_Kind != STATE_ATTRIBUTE;
+	const bool NotRootOrAttribute = m_NumStates != 0 && TopState()->m_Kind != STATE_ATTRIBUTE;
 
 	if(NotRootOrAttribute && !TopState()->m_Empty && !EndElement)
 		WriteInternal(",");
 
 	if(NotRootOrAttribute || EndElement)
-		io_write_newline(m_IO);
+		m_pStream->write_newline();
 
 	if(NotRootOrAttribute)
 		for(int i = 0; i < m_Indentation; i++)

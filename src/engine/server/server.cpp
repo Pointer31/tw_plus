@@ -1208,7 +1208,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 	}
 }
 
-void CServer::GenerateServerInfo(CPacker *pPacker, bool IncludeClientInfo)
+void CServer::GenerateServerInfo(CPacker *pPacker, int ServerInfoVersion, bool IncludeClientInfo)
 {
 	// count the players
 	int PlayerCount = 0, ClientCount = 0;
@@ -1264,7 +1264,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, bool IncludeClientInfo)
 void CServer::SendServerInfo(int ClientID)
 {
 	CMsgPacker Msg(NETMSG_SERVERINFO, true);
-	GenerateServerInfo(&Msg, false);
+	GenerateServerInfo(&Msg, 0, false);
 	if(ClientID == -1)
 	{
 		for(int i = 0; i < MAX_CLIENTS; i++)
@@ -1347,7 +1347,7 @@ void CServer::UpdateRegisterServerInfo()
 	JsonWriter.WriteStrValue("points");
 
 	JsonWriter.WriteAttribute("requires_login");
-	JsonWriter.WriteBoolValue(true);
+	JsonWriter.WriteBoolValue(false);
 
 	JsonWriter.WriteAttribute("clients");
 	JsonWriter.BeginArray();
@@ -1414,7 +1414,7 @@ void CServer::PumpNetwork()
 				Packer.Reset();
 				Packer.AddRaw(SERVERBROWSE_INFO, sizeof(SERVERBROWSE_INFO));
 				Packer.AddInt(SrvBrwsToken);
-				GenerateServerInfo(&Packer, true);
+				GenerateServerInfo(&Packer, 0, true);
 
 				CNetChunk Response;
 				Response.m_ClientID = -1;
@@ -2115,13 +2115,8 @@ int main(int argc, const char **argv)
 	IEngineMap *pEngineMap = CreateEngineMap();
 	IMapChecker *pMapChecker = CreateMapChecker();
 	IGameServer *pGameServer = CreateGameServer();
-<<<<<<< HEAD
 	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER|CFGFLAG_ECON);
-	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
-=======
-	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER | CFGFLAG_ECON);
 	// IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
->>>>>>> cba03057e (Http mastersrv)
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv);
 	IConfigManager *pConfigManager = CreateConfigManager();
 
@@ -2137,13 +2132,8 @@ int main(int argc, const char **argv)
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConsole);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
-<<<<<<< HEAD
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer*>(pEngineMasterServer)); // register as both
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer*>(pEngineMasterServer));
-=======
-		// RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer *>(pEngineMasterServer)); // register as both
-		// RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer *>(pEngineMasterServer));
->>>>>>> cba03057e (Http mastersrv)
+		// RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer*>(pEngineMasterServer)); // register as both
+		// RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer*>(pEngineMasterServer));
 
 		if(RegisterFail)
 			return -1;
