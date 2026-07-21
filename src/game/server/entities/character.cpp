@@ -1093,6 +1093,11 @@ void CCharacter::IncreaseKillSpree()
 	}
 }
 
+void CCharacter::UpdateNinjaActivationTick()
+{
+	m_Ninja.m_ActivationTick = Server()->Tick();
+}
+
 void CCharacter::Snap(int SnappingClient)
 {
 	if(NetworkClipped(SnappingClient))
@@ -1195,6 +1200,7 @@ void CCharacter::Snap(int SnappingClient)
 	pDDNetCharacter->m_TargetY = m_LatestInput.m_TargetY;
 
 	GameServer()->m_pController->HandleCharacterSnap(*this, pCharacter, SnappingClient);
+	GameServer()->m_pController->HandleDDNetCharacterSnap(*this, pDDNetCharacter, SnappingClient);
 }
 
 void CCharacter::PostSnap()

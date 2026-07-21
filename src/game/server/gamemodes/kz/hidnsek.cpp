@@ -148,6 +148,26 @@ void CGameControllerHidNSek::Tick()
 			}
 			m_ToldSeekers = true;
 		}
+
+		//hint sound each 15 seconds
+		if(
+			Config()->m_SvHidNSekHintSound &&
+			(m_GameStartTick - Server()->Tick()) % (Server()->TickSpeed() * 15) == 0
+		)
+		{
+			for(int i = 0; i < MAX_CLIENTS; ++i)
+			{
+				if(
+					GameServer()->m_apPlayers[i] &&
+					GameServer()->m_apPlayers[i]->GetCharacter() &&
+					GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS &&
+					!m_HidNSekPlayers[i].m_IsSeeker
+				)
+				{
+					GameServer()->CreateSound(GameServer()->m_apPlayers[i]->GetCharacter()->GetPos(), SOUND_PLAYER_PAIN_LONG);
+				}
+			}
+		}
 	}
 	else if(!IsGamePaused() && !HasEnoughPlayers())
 	{
@@ -161,8 +181,36 @@ void CGameControllerHidNSek::Tick()
 
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{
+		//keep ninja active
+		int ninjas = 0;
+
+		if(Config()->m_SvHidNSekHiderWeapon == WEAPON_NINJA)
+		{
+			ninjas |= 1;
+		}
+
+		if(Config()->m_SvHidNSekSeekerWeapon == WEAPON_NINJA)
+		{
+			ninjas |= 1 << 1;
+		}
+
 		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
 			UpdatePlayerSkin(i);
+
+			if(!GameServer()->m_apPlayers[i])
+				continue;
+
+
+			if(
+				((m_HidNSekPlayers[i].m_IsSeeker ? (1 << 1) : 1) & ninjas) &&
+				GameServer()->m_apPlayers[i]->GetCharacter() &&
+				GameServer()->m_apPlayers[i]->GetCharacter()->GetActiveWeapon() == WEAPON_NINJA
+			)
+			{
+				GameServer()->m_apPlayers[i]->GetCharacter()->UpdateNinjaActivationTick();
+			}
+		}
 	}
 }
 
@@ -220,6 +268,14 @@ void CGameControllerHidNSek::UpdatePlayerSkin(int ClientID)
 		SendSkinChangeHNS(pPlayer->GetCID(), -1, 0);
 }
 
+bool CGameControllerHidNSek::IsPlayerFrozen(int ClientID)
+{
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS)
+		return false;
+    return m_HidNSekPlayers[ClientID].m_FrozenSpecial || (m_HidNSekPlayers[ClientID].m_FrozenTick != -1 &&
+		m_HidNSekPlayers[ClientID].m_FrozenTick > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit);
+}
+
 void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 {
 	IGameController::OnCharacterSpawn(pChr);
@@ -240,8 +296,32 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 	if(m_HidNSekPlayers[pChr->GetPlayer()->GetCID()].m_IsSeeker)
 	{
 		pChr->RemoveWeapon(WEAPON_HAMMER);
-		pChr->GiveWeapon(Config()->m_SvHidNSekSeekerWeapon, -1);
-		pChr->SetWeapon(Config()->m_SvHidNSekSeekerWeapon);
+		if(Config()->m_SvHidNSekSeekerWeapon == WEAPON_NINJA)
+		{
+			pChr->GiveNinja();
+		}
+		else
+		{
+			pChr->GiveWeapon(Config()->m_SvHidNSekSeekerWeapon, -1);
+			pChr->SetWeapon(Config()->m_SvHidNSekSeekerWeapon);
+		}
+	}
+	else
+	{
+		pChr->RemoveWeapon(WEAPON_HAMMER);
+		//-1 is no weapon
+		if(Config()->m_SvHidNSekHiderWeapon >= 0)
+		{
+			if(Config()->m_SvHidNSekHiderWeapon == WEAPON_NINJA)
+			{
+				pChr->GiveNinja();
+			}
+			else
+			{
+				pChr->GiveWeapon(Config()->m_SvHidNSekHiderWeapon, -1);
+				pChr->SetWeapon(Config()->m_SvHidNSekHiderWeapon);
+			}
+		}
 	}
 
 	if(!m_HidNSekPlayers[pChr->GetPlayer()->GetCID()].m_SentSpecialModeBroadcast)
@@ -268,7 +348,12 @@ void CGameControllerHidNSek::OnCharacterSpawn(CCharacter *pChr)
 
 bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClient)
 {
-	if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker) //always snap seekers
+	//always snap seekers
+	//but in classic do it like in Kaizo-Insta
+	if(
+		m_SpecialMode != SPECIAL_MODE_KAIZOINSTA &&
+		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker
+	)
 	{
 		if((m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick <= Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit && 
 		m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHitProtection > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit))
@@ -294,45 +379,68 @@ bool CGameControllerHidNSek::OnCharacterSnap(CCharacter *pChar, int SnappingClie
 		return false;
 
 	//always snap frozen hiders
-	if(!(m_SpecialMode == SPECIAL_MODE_FREEZE && !m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker && m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenSpecial))
+	if(!(m_SpecialMode == SPECIAL_MODE_FREEZE && m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_FrozenSpecial))
 	{
 		CPlayer * pPlayer = GameServer()->m_apPlayers[SnappingClient];
 		if(!pPlayer)
 			return false;
 
-		if(Config()->m_SvHidNSekShowHidersSpec && pPlayer->GetTeam() == TEAM_SPECTATORS)
+		if(
+			(
+				Config()->m_SvHidNSekShowHidersSpec ||
+				m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker //always snap seekers to spectators, even in kaizo-insta mode
+			) &&
+			pPlayer->GetTeam() == TEAM_SPECTATORS
+		)
 			return false;
 
 		CCharacter *pOther = GameServer()->GetPlayerChar(SnappingClient);
 		if(!pOther)
 		{
-			if(m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
-				return false;
-			else
-				return true;
+			return true;
 		}
 
-		if(m_HidNSekPlayers[SnappingClient].m_IsSeeker && GameServer()->Collision()->FastIntersectLine(pChar->GetPos(), pOther->GetPos(), nullptr, nullptr))
+		if(GameServer()->Collision()->FastIntersectLine(pChar->GetPos(), pOther->GetPos(), nullptr, nullptr))
+		{
 			return true;
+		}
+		else if(
+			m_SpecialMode == SPECIAL_MODE_KAIZOINSTA &&
+			m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker
+		)
+		{
+			if(IsPlayerFrozen(pChar->GetPlayer()->GetCID()))
+			{
+				CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Pickup)));
+
+				if(pPickup)
+				{
+					vec2 postemp;
+					postemp.x = pChar->GetPos().x + 32*sin((float)Server()->Tick() / 25.0);
+					postemp.y = pChar->GetPos().y + 32*cos((float)Server()->Tick() / 25.0);
+
+					pPickup->m_Type = PICKUP_ARMOR;
+					pPickup->m_X = round_to_int(postemp.x);
+					pPickup->m_Y = round_to_int(postemp.y);
+				}
+			}
+		}
 	}
 
-	if(!m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_IsSeeker)
+	//snap ball
+	CNetObj_Projectile *pProj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Projectile)));
+	if(pProj)
 	{
-		//snap ball
-		CNetObj_Projectile *pProj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_HidNSekPlayers[pChar->GetPlayer()->GetCID()].m_Ball, sizeof(CNetObj_Projectile)));
-		if(pProj)
-		{
-			vec2 postemp;
-			postemp.x = pChar->GetPos().x + 32*sin((float)Server()->Tick() / 25.0);
-			postemp.y = pChar->GetPos().y + 32*cos((float)Server()->Tick() / 25.0);
+		vec2 postemp;
+		postemp.x = pChar->GetPos().x + 32*sin((float)Server()->Tick() / 25.0);
+		postemp.y = pChar->GetPos().y + 32*cos((float)Server()->Tick() / 25.0);
 
-			pProj->m_Type = WEAPON_HAMMER;
-			pProj->m_StartTick = Server()->Tick();
-			pProj->m_VelX = 0;
-			pProj->m_VelY = 0;
-			pProj->m_X = round_to_int(postemp.x);
-			pProj->m_Y = round_to_int(postemp.y);
-		}
+		pProj->m_Type = WEAPON_HAMMER;
+		pProj->m_StartTick = Server()->Tick();
+		pProj->m_VelX = 0;
+		pProj->m_VelY = 0;
+		pProj->m_X = round_to_int(postemp.x);
+		pProj->m_Y = round_to_int(postemp.y);
 	}
 
     return false;
@@ -370,7 +478,8 @@ bool CGameControllerHidNSek::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &F
 
 	if(m_SpecialMode == SPECIAL_MODE_KAIZOINSTA && m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
 	{
-		return false; //do damage
+		if(!IsPlayerFrozen(Character.GetPlayer()->GetCID()))
+			return false; //do damage
 	}
 
 	if(m_HidNSekPlayers[Character.GetPlayer()->GetCID()].m_IsSeeker)
@@ -607,8 +716,7 @@ void CGameControllerHidNSek::HandleCharacterSnap(CCharacter &Char, CNetObj_Chara
 	if(m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_IsSeeker)
 		pCharObj->m_Emote = EMOTE_ANGRY;
 
-	if(m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenSpecial || (m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenTick != -1 &&
-		m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenTick > Server()->Tick() - Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit))
+	if(IsPlayerFrozen(Char.GetPlayer()->GetCID()))
 	{
 		pCharObj->m_Weapon = WEAPON_NINJA;
 		pCharObj->m_AmmoCount = m_HidNSekPlayers[Char.GetPlayer()->GetCID()].m_FrozenTick + Server()->TickSpeed() * Config()->m_SvHidNSekFreezeHit;
@@ -618,6 +726,14 @@ void CGameControllerHidNSek::HandleCharacterSnap(CCharacter &Char, CNetObj_Chara
 			pCharObj->m_Emote = EMOTE_PAIN;
 		pCharObj->m_Jumped = 3;
 		pCharObj->m_Direction = 0;
+	}
+}
+
+void CGameControllerHidNSek::HandleDDNetCharacterSnap(CCharacter &Char, CNetObj_DDNetCharacter *pCharObj, int SnappingClient)
+{
+	if(IsPlayerFrozen(Char.GetPlayer()->GetCID()))
+	{
+		pCharObj->m_FreezeEnd = -1;
 	}
 }
 
