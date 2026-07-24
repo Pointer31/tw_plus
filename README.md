@@ -1,4 +1,4 @@
-[TWplus](https://pointer31.github.io/twplus.html)
+[TWplus](https://pointer31.github.io/twplus.html) ![GitHub Actions](https://github.com/Pointer31/tw_plus/workflows/Build/badge.svg)
 =========
 
 A fun mod for a fun game
