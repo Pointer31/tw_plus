@@ -713,6 +713,8 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 	pThis->m_aClients[ClientID].Reset();
 	pThis->m_aClients[ClientID].m_InfclassVersion = 0;
 	pThis->m_aClients[ClientID].m_DDNetVersion = 0;
+	pThis->m_aClients[ClientID].m_ShownWelcomeMsg = false;
+	pThis->m_aClients[ClientID].m_aLanguage[0] = 0;
 
 	return 0;
 }

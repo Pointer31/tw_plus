@@ -70,6 +70,8 @@ public:
 	virtual bool DemoRecorder_IsRecording() = 0;
 	virtual int GetClientInfclassVersion(int ClientId) = 0;
 	virtual int GetClientDDNetVersion(int ClientId) = 0;
+	virtual bool GetClientShownWelcomeMsg(int ClientId) = 0;
+	virtual void SetClientShownWelcomeMsg(int ClientId) = 0;
 };
 
 class IGameServer : public IInterface

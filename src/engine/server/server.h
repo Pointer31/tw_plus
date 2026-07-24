@@ -144,11 +144,16 @@ public:
 		int m_InfclassVersion = 0;
 		int m_DDNetVersion = 0;
 
+		bool m_ShownWelcomeMsg = false;
+		char m_aLanguage[8] = "";
+
 		void Reset();
 	};
 
 	virtual int GetClientInfclassVersion(int ClientId) override { return m_aClients[ClientId].m_InfclassVersion; }
 	virtual int GetClientDDNetVersion(int ClientId) override { return m_aClients[ClientId].m_DDNetVersion; }
+	virtual bool GetClientShownWelcomeMsg(int ClientId) override { return m_aClients[ClientId].m_ShownWelcomeMsg; }
+	virtual void SetClientShownWelcomeMsg(int ClientId) override { m_aClients[ClientId].m_ShownWelcomeMsg = true; }
 
 	CClient m_aClients[MAX_CLIENTS];
 

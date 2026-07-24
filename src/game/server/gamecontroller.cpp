@@ -16,8 +16,6 @@
 
 #include <game/version.h>
 
-extern const char *GIT_SHORTREV_HASH;
-
 IGameController::IGameController(CGameContext *pGameServer)
 {
 	m_pGameServer = pGameServer;
@@ -1470,22 +1468,7 @@ void IGameController::Com_ServerInfo(IConsole::IResult *pResult, void *pContext)
 
 	int ClientID = pComContext->m_ClientID;
 
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), Localize("TWplus server mod v%s"), TWPLUS_VERSION);
-	pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, aBuf);
-	if (GIT_SHORTREV_HASH)
-	{
-		str_format(aBuf, sizeof(aBuf), Localize("Git revision hash: %s"), GIT_SHORTREV_HASH);
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, aBuf);
-	}
-	if (str_comp(pSelf->Config()->m_SvInfoSources, "") != 0)
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoSources);
-	if (str_comp(pSelf->Config()->m_SvInfoLine1, "") != 0)
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoLine1);
-	if (str_comp(pSelf->Config()->m_SvInfoLine2, "") != 0)
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoLine2);
-	if (str_comp(pSelf->Config()->m_SvInfoLine3, "") != 0)
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, ClientID, pSelf->Config()->m_SvInfoLine3);
+	pSelf->GameServer()->SendInfo(ClientID);
 }
 
 void IGameController::Com_Whisper(IConsole::IResult *pResult, void *pContext)

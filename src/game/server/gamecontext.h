@@ -152,6 +152,8 @@ public:
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
 	void SendMotd(int ClientID);
+	void SendInfo(int ClientID);
+	void SendWelcome(int ClientID);
 	void SendSettings(int ClientID);
 	void SendSkinChange(int ClientID, int TargetID);
 	void SendTuningParams(int ClientID);

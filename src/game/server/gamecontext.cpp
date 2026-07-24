@@ -36,6 +36,8 @@
 
 #include "localization.h"
 
+extern const char *GIT_SHORTREV_HASH;
+
 enum
 {
 	RESET,
@@ -307,6 +309,43 @@ void CGameContext::SendSettings(int ClientID)
 	Msg.m_TeamBalance = Config()->m_SvTeambalanceTime != 0;
 	Msg.m_PlayerSlots = Config()->m_SvPlayerSlots;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+void CGameContext::SendInfo(int ClientID)
+{
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), Localize("TWplus server mod v%s"), TWPLUS_VERSION);
+	SendChat(-1, CHAT_ALL, ClientID, aBuf);
+	if (GIT_SHORTREV_HASH)
+	{
+		str_format(aBuf, sizeof(aBuf), Localize("Git revision hash: %s"), GIT_SHORTREV_HASH);
+		SendChat(-1, CHAT_ALL, ClientID, aBuf);
+	}
+	if (str_comp(Config()->m_SvInfoSources, "") != 0)
+		SendChat(-1, CHAT_ALL, ClientID, Config()->m_SvInfoSources);
+	if (str_comp(Config()->m_SvInfoLine1, "") != 0)
+		SendChat(-1, CHAT_ALL, ClientID, Config()->m_SvInfoLine1);
+	if (str_comp(Config()->m_SvInfoLine2, "") != 0)
+		SendChat(-1, CHAT_ALL, ClientID, Config()->m_SvInfoLine2);
+	if (str_comp(Config()->m_SvInfoLine3, "") != 0)
+		SendChat(-1, CHAT_ALL, ClientID, Config()->m_SvInfoLine3);
+}
+
+void CGameContext::SendWelcome(int ClientID)
+{
+	if(!Server()->GetClientShownWelcomeMsg(ClientID))
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), Localize("TWplus server mod v%s"), TWPLUS_VERSION);
+		SendChat(-1, CHAT_ALL, ClientID, aBuf);
+		if (str_comp(Config()->m_SvWelcomeLine1, "") != 0)
+			SendChat(-1, CHAT_ALL, ClientID, Config()->m_SvWelcomeLine1);
+		if (str_comp(Config()->m_SvWelcomeLine2, "") != 0)
+			SendChat(-1, CHAT_ALL, ClientID, Config()->m_SvWelcomeLine2);
+		if (str_comp(Config()->m_SvWelcomeLine3, "") != 0)
+			SendChat(-1, CHAT_ALL, ClientID, Config()->m_SvWelcomeLine3);
+		Server()->SetClientShownWelcomeMsg(ClientID);
+	}
 }
 
 void CGameContext::SendSkinChange(int ClientID, int TargetID)
@@ -794,6 +833,9 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
 
 	// send settings
 	SendSettings(ClientID);
+
+	// send welcome message
+	SendWelcome(ClientID);
 }
 
 void CGameContext::OnClientTeamChange(int ClientID)
