@@ -7,6 +7,7 @@
 #include "entities/character.h"
 #include "entities/pickup.h"
 #include "entities/pickupcustom.h"
+#include "entities/structure.h"
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
@@ -292,6 +293,19 @@ void IGameController::OnFlagReturn(CFlag *pFlag)
 
 bool IGameController::OnEntity(int Index, vec2 Pos)
 {
+	// structures
+	switch (Index)
+	{
+	case ENTITY_STRUCTURE_GRENADE:{
+		new CStructure(&GameServer()->m_World, 0, Pos);
+		return true;} break;
+	case ENTITY_STRUCTURE_LASERTRAP:{
+		new CStructure(&GameServer()->m_World, 1, Pos);
+		return true;} break;
+	default:
+		break;
+	}
+
 	// don't add pickups in survival
 	if(m_GameFlags&GAMEFLAG_SURVIVAL || m_Instagib != 0)
 	{

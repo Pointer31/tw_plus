@@ -186,6 +186,7 @@ MACRO_CONFIG_INT(SvWeaponsStay, sv_weapons_stay, 0, 0, 1, CFGFLAG_SERVER, "Wheth
 MACRO_CONFIG_INT(SvCustomPowerups, sv_custom_powerups, 0, 0, 1, CFGFLAG_SERVER, "Whether to use custom powerups along with the default ninja")
 
 MACRO_CONFIG_INT(SvKillingspreeKills, sv_killspree_kills, 5, 0, 20, CFGFLAG_SERVER, "How many kills are needed to be on a killing-spree")
+MACRO_CONFIG_INT(SvStructureFireDelay, sv_structure_fire_delay, 100, 0, 1000, CFGFLAG_SERVER, "How often structures should fire, in ticks")
 
 // ddnet client support
 MACRO_CONFIG_INT(SvDDAllowZoom, sv_dd_allow_zoom, 0, 0, 1, CFGFLAG_SERVER, "Whether to always allow zoom")

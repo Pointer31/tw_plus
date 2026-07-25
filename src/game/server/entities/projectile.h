@@ -7,6 +7,7 @@
 
 enum
 {
+	PLAYER_TEAM_WORLD = -3,
 	PLAYER_TEAM_BLUE = -2,
 	PLAYER_TEAM_RED = -1
 };

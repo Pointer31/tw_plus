@@ -1634,6 +1634,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/pickupcustom.h
   entities/projectile.cpp
   entities/projectile.h
+  entities/structure.cpp
+  entities/structure.h
   entity.cpp
   entity.h
   eventhandler.cpp

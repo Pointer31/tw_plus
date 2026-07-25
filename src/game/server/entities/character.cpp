@@ -868,6 +868,9 @@ bool CCharacter::IncreaseArmor(int Amount)
 
 void CCharacter::Die(int Killer, int Weapon)
 {
+	if(Killer == PLAYER_TEAM_WORLD)
+		Killer = GetPlayer()->GetCID();
+		
 	// we got to wait 0.5 secs before respawning
 	m_Alive = false;
 	m_pPlayer->m_RespawnTick = Server()->Tick()+Server()->TickSpeed()/2;
@@ -958,7 +961,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From))
 			return false;
 	}
-	else
+	else if(From != PLAYER_TEAM_WORLD)
 	{
 		int Team = TEAM_RED;
 		if(From == PLAYER_TEAM_BLUE)
