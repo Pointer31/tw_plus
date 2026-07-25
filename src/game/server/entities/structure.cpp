@@ -24,15 +24,15 @@ vec2 CStructure::FigureOutAngle(vec2 Pos)
 {
 	int x = 0;
 	int y = 0;
-	if (GameServer()->Collision()->CheckPoint(Pos.x - 32, Pos.y))
+	if (GameServer()->Collision()->CheckPoint(Pos.x - 32.0f, Pos.y))
 		x++;
-	if (GameServer()->Collision()->CheckPoint(Pos.x + 32, Pos.y))
+	if (GameServer()->Collision()->CheckPoint(Pos.x + 32.0f, Pos.y))
 		x--;
-	if (GameServer()->Collision()->CheckPoint(Pos.x, Pos.y - 32))
+	if (GameServer()->Collision()->CheckPoint(Pos.x, Pos.y - 32.0f))
 		y++;
-	if (GameServer()->Collision()->CheckPoint(Pos.x, Pos.y + 32))
+	if (GameServer()->Collision()->CheckPoint(Pos.x, Pos.y + 32.0f))
 		y--;
-	return {x, y};
+	return {(float)x, (float)y};
 }
 
 void CStructure::Reset()
